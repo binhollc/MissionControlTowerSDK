@@ -34,3 +34,7 @@
 # Built Python backend
 
 build/
+
+# Python
+
+__pycache__/
