@@ -31,6 +31,12 @@
 *.out
 *.app
 
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
 # Built Python backend
 
 build/
@@ -38,3 +44,6 @@ build/
 # Python
 
 __pycache__/
+
+# macOS specific files
+.DS_Store
