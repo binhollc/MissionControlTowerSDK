@@ -17,5 +17,7 @@ set_target_properties(mct_api PROPERTIES
     SOVERSION 1
 )
 
+target_compile_features(mct_api PUBLIC cxx_std_17)
+
 install(TARGETS mct_api DESTINATION lib)
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION include)

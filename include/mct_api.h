@@ -10,6 +10,9 @@ public:
     std::string command;
     std::map<std::string, std::string> params;
 
+    CommandRequest()
+        : transaction_id("0"), command(""), params() {}
+
     CommandRequest(const std::string& id, const std::string& cmd, const std::map<std::string, std::string>& prms)
         : transaction_id(id), command(cmd), params(prms) {}
 };
@@ -31,4 +34,7 @@ class CommandManager {
 public:
     void invoke_command(const CommandRequest& request);
     void on_command_response(std::function<void(CommandResponse)> fn);
+private:
+    CommandRequest lastRequest;
+    std::function<void(CommandResponse)> callback_fn;
 };
