@@ -39,3 +39,35 @@ To run the executable, navigate to the `build/exe.[platform identifier].[python 
 **Note:** If you encounter any issues during the build process or when running the executable, ensure that you have the necessary dependencies and that your environment is correctly set up.
 
 Feel free to adjust the instructions as needed based on your project's specific requirements or directory structure.
+
+### Building the Library
+
+1. Open a terminal or command prompt.
+
+2. Navigate to the root directory of the project.
+
+3. Run the following commands to build the library:
+
+   ```shell
+   cmake .
+   ```
+
+After the build process completes, the library file libmct_api.so (or libmct_api.dylib on macOS) will be located in the lib directory.
+
+### Building the Sample App
+
+To build the sample app that demonstrates how to use the mct_api library, follow these steps:
+
+1. Open a terminal or command prompt.
+
+2. Navigate to the sample_app directory.
+
+3. Run the following commands to build the sample app:
+
+   ```shell
+   cmake .
+   ```
+
+After the build process completes, the executable file sample_app will be located in the build directory.
+
+Note: Make sure you have already built the mct_api library as described in the 'Building the Library' section before building the sample app. The sample app depends on the library.
