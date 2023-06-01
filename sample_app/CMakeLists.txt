@@ -20,3 +20,5 @@ add_executable(sample_app ${SOURCES})
 
 # Link against the mct_api library
 target_link_libraries(sample_app PRIVATE mct_api)
+
+target_link_libraries(sample_app PRIVATE nlohmann_json::nlohmann_json)

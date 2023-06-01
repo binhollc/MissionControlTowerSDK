@@ -12,6 +12,13 @@ target_include_directories(mct_api PUBLIC
     ${PROJECT_SOURCE_DIR}/include
 )
 
+include(FetchContent)
+
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
+FetchContent_MakeAvailable(json)
+
+target_link_libraries(mct_api PRIVATE nlohmann_json::nlohmann_json)
+
 set_target_properties(mct_api PROPERTIES
     VERSION 0.1.0
     SOVERSION 1

@@ -2,6 +2,11 @@
 #include <string>
 #include <map>
 #include <functional>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <thread>
+#include <nlohmann/json.hpp>
 
 // CommandRequest class definition
 class CommandRequest {
@@ -32,9 +37,22 @@ public:
 // CommandManager class definition
 class CommandManager {
 public:
+    CommandManager();  // Constructor
+    void start();
+    void stop();
     void invoke_command(const CommandRequest& request);
     void on_command_response(std::function<void(CommandResponse)> fn);
 private:
-    CommandRequest lastRequest;
+    std::queue<CommandRequest> requestQueue;
+    std::queue<CommandResponse> responseQueue;
+    std::mutex requestMutex;
+    std::mutex responseMutex;
+    std::condition_variable requestCV;
+    std::condition_variable responseCV;
+    std::thread requestThread;
+    std::thread responseThread;
+    void handleRequestThread();
+    void handleResponseThread();
     std::function<void(CommandResponse)> callback_fn;
+    bool isRunning;
 };
