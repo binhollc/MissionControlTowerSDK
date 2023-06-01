@@ -40,7 +40,7 @@ install_manifest.txt
 
 # Built Python backend
 
-build/
+build_bridge/
 
 # Python
 
