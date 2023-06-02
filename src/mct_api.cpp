@@ -98,7 +98,16 @@ void CommandManager::handleReadBridgeThread() {
 
             // Parse the JSON string and enqueue a CommandResponse
             nlohmann::json j = nlohmann::json::parse(jsonString);
-            CommandResponse response(j["transaction_id"], j["status"], j["is_promise"], j["data"]);
+
+            std::string transactionIdStr = j["transaction_id"].dump();
+            std::string statusStr = j["status"].dump();
+            std::string dataStr = j["data"].is_null() ? "" : j["data"].dump();
+            std::string isPromiseStr = j["is_promise"].is_null() ? "" : j["is_promise"].dump();
+
+            CommandResponse response(transactionIdStr,
+                                     statusStr,
+                                     isPromiseStr,
+                                     dataStr);
 
             std::lock_guard<std::mutex> lock(responseMutex);
             responseQueue.push(response);
