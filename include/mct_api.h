@@ -7,6 +7,7 @@
 #include <condition_variable>
 #include <thread>
 #include <nlohmann/json.hpp>
+#include "bridge_reader.h"
 
 // CommandRequest class definition
 class CommandRequest {
@@ -43,16 +44,20 @@ public:
     void invoke_command(const CommandRequest& request);
     void on_command_response(std::function<void(CommandResponse)> fn);
 private:
+    FILE* bridgeProcess;
     std::queue<CommandRequest> requestQueue;
     std::queue<CommandResponse> responseQueue;
     std::mutex requestMutex;
     std::mutex responseMutex;
     std::condition_variable requestCV;
     std::condition_variable responseCV;
-    std::thread requestThread;
-    std::thread responseThread;
-    void handleRequestThread();
-    void handleResponseThread();
+    std::thread writeBridgeThread;
+    std::thread readBridgeThread;
+    std::thread callbackOnResponseThread;
+    void handleWriteBridgeThread();
+    void handleReadBridgeThread();
+    void handleCallbackOnResponseThread();
     std::function<void(CommandResponse)> callback_fn;
     bool isRunning;
+    std::unique_ptr<BridgeReader> bridgeReader;
 };

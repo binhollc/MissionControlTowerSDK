@@ -8,7 +8,7 @@ int main() {
 
     cm.start();
 
-    CommandRequest cr("1", "test_command", {{"param1", "value1"}, {"param2", "value2"}});
+    CommandRequest cr("1", "open", {{"address", "123"}});
     cm.invoke_command(cr);
 
     cm.on_command_response([](CommandResponse cr){
@@ -16,13 +16,9 @@ int main() {
         std::cout << "Received response: " << cr.transaction_id << " " << cr.status << " " << cr.is_promise << " " << cr.data << "\n";
     });
 
-    cm.stop();
+    std::this_thread::sleep_for(std::chrono::seconds(30));
 
-    // // Let the program run indefinitely.
-    // // In a real application, you'd have some way to quit this loop.
-    // while(true) {
-    //     std::this_thread::sleep_for(std::chrono::seconds(1));
-    // }
+    cm.stop();
 
     return 0;
 }
