@@ -11,7 +11,6 @@ class MockCommandAdaptor(BaseCommandAdaptor):
 
     @command("open")
     def open(self, address=None):
-        print(address)
         return Error(f"Device {address} not available.")
 
     @command("info", is_async=True)
