@@ -2,8 +2,11 @@ cmake_minimum_required(VERSION 3.8)
 
 project(mission_control_tower)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 set(SOURCE_FILES
     src/mct_api.cpp
+    src/bridge_reader.cpp
 )
 
 add_library(mct_api SHARED ${SOURCE_FILES})
@@ -14,17 +17,22 @@ target_include_directories(mct_api PUBLIC
 
 include(FetchContent)
 
+# Install JSON library
+
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
 FetchContent_MakeAvailable(json)
 
-target_link_libraries(mct_api PRIVATE nlohmann_json::nlohmann_json)
+# Add link libraries
+
+target_link_libraries(
+    mct_api PRIVATE
+    nlohmann_json::nlohmann_json
+)
 
 set_target_properties(mct_api PROPERTIES
     VERSION 0.1.0
     SOVERSION 1
 )
-
-target_compile_features(mct_api PUBLIC cxx_std_17)
 
 # Set the output directory for the library
 set_target_properties(mct_api PROPERTIES
@@ -35,6 +43,8 @@ set_target_properties(mct_api PROPERTIES
 set_target_properties(mct_api PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib
 )
+
+target_compile_features(mct_api PUBLIC cxx_std_17)
 
 install(TARGETS mct_api DESTINATION lib)
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION include)
