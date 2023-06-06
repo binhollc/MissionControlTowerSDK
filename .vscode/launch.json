@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Build and debug sample_app/main",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/sample_app/main",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [{
+        "name": "PATH",
+        "value": "${workspaceFolder}/build_bridge:${env:PATH}"
+      }],
+      "externalConsole": false,
+      "MIMode": "lldb",
+      "preLaunchTask": "Build sample_app/main"
+    }
+  ]
+}
