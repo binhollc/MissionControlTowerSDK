@@ -20,48 +20,42 @@ bool BridgeReader::hasMoreData() const {
 }
 
 std::string BridgeReader::readNextData() {
-    // std::cout << "[INI] std::string BridgeReader::readNextData()" << "\n";
-
     char tmpBuffer[128];
     int fd = fileno(bridgeProcess);
     fcntl(fd, F_SETFL, O_NONBLOCK);  // Make reading non-blocking
 
-    while (true) {
-        ssize_t result = read(fd, tmpBuffer, sizeof(tmpBuffer) - 1);
+    ssize_t result = read(fd, tmpBuffer, sizeof(tmpBuffer) - 1);
 
-        if (result < 0) {
-            // If errno == EAGAIN, that means we have read all data.
-            // So go back to the main loop.
-            if (errno == EAGAIN) {
-                // std::cout << "read all data" << "\n";
-                break;
-            } else {
-                // Error occurred, report it and exit.
-                perror("read");
-                exit(EXIT_FAILURE);
-            }
-        } else if (result == 0) {
-            // End of file. The remote has closed the connection.
-            std::cout << "End of file" << "\n";
-            break;
+    if (result < 0) {
+        // If errno == EAGAIN, that means we have read all data.
+        // So go back to the main loop.
+        if (errno == EAGAIN) {
+            // std::cout << "read all data" << "\n";
+            return "";
         } else {
-            // Ensure null-terminated string
-            tmpBuffer[result] = '\0';
+            // Error occurred, report it and exit.
+            perror("read");
+            exit(EXIT_FAILURE);
+        }
+    } else if (result == 0) {
+        // End of file. The remote has closed the connection.
+        std::cout << "End of file" << "\n";
+        return "";
+    } else {
+        // Ensure null-terminated string
+        tmpBuffer[result] = '\0';
 
-            std::cout << "Data read from bridge process" << "\n";
+        std::cout << "Data read from bridge process" << "\n";
 
-            buffer += tmpBuffer;
+        buffer += tmpBuffer;
 
-            std::size_t pos = buffer.find("\n");
-            if (pos != std::string::npos) {
-                std::string data = buffer.substr(0, pos);
-                buffer = buffer.substr(pos + 1);
-                return data;
-            }
+        std::size_t pos = buffer.find("\n");
+        if (pos != std::string::npos) {
+            std::string data = buffer.substr(0, pos);
+            buffer = buffer.substr(pos + 1);
+            return data;
+        } else {
+            return "";
         }
     }
-
-    // std::cout << "[END] std::string BridgeReader::readNextData()" << "\n";
-
-    return "";
 }

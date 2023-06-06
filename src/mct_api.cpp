@@ -77,7 +77,7 @@ void CommandManager::handleWriteBridgeThread() {
         j["command"] = request.command;
         j["params"] = request.params;
 
-        std::string jsonString = j.dump();
+        std::string jsonString = j.dump() + "\n";
 
         std::cout << "Command read from queue: " << jsonString << "\n";
 
@@ -93,7 +93,7 @@ void CommandManager::handleReadBridgeThread() {
     while (isRunning) {
         // read from bridge's stdout
         std::string jsonString = bridgeReader->readNextData();
-        while (!jsonString.empty()) {
+        if (!jsonString.empty()) {
             std::cout << "Command response read from bridge: " << jsonString << "\n";
 
             // Parse the JSON string and enqueue a CommandResponse
@@ -112,9 +112,6 @@ void CommandManager::handleReadBridgeThread() {
             std::lock_guard<std::mutex> lock(responseMutex);
             responseQueue.push(response);
             responseCV.notify_one();
-
-            // Try to read the next data
-            jsonString = bridgeReader->readNextData();
         }
     }
 }
