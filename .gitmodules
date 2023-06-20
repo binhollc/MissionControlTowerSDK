@@ -1,3 +1,6 @@
 [submodule "mission-control-tower"]
 	path = mission-control-tower
 	url = git@github.com:binhollc/MissionControlTower
+[submodule "python-backend"]
+	path = python-backend
+	url = git@github.com:binhollc/MissionControlBridge.git
