@@ -22,23 +22,30 @@ pip install cx_Freeze
 3. Run the following command to build the executable:
 
    ```shell
-   python setup.py build
+   python3 setup.py build
    ```
 
    This command invokes cx_Freeze using the `setup.py` script, which contains the necessary configuration to freeze the Python backend into an executable.
 
-4. After the build process completes, the executable and its dependencies will be located in the `build/exe.[platform identifier].[python version]` directory.
-
-   - The `[platform identifier]` represents the platform-specific build, such as `macosx-10.9-x86_64` for macOS or `win32` for Windows.
-   - The `[python version]` indicates the Python version used for the build, such as `3.10`.
+4. After the build process completes, the executable and its dependencies will be located in the `build_bridge` directory.
 
 ### Running the Executable
 
-To run the executable, navigate to the `build/exe.[platform identifier].[python version]` directory and execute the appropriate executable file for your platform.
+To run the executable, navigate to the `build` directory and execute the `bridge.exe` on Windows, or `bridge` on Mac/Linux.
 
 **Note:** If you encounter any issues during the build process or when running the executable, ensure that you have the necessary dependencies and that your environment is correctly set up.
 
 Feel free to adjust the instructions as needed based on your project's specific requirements or directory structure.
+
+### Killing the Executable
+
+On Mac/Linux you can kill the bridge executable by pressing Command+C on Mac, or Control+C on Linux.
+
+On Windows, if you are using PowerShell you can open a different PowerShell window and execute the following command:
+
+```shell
+Stop-Process -Name "bridge"
+```
 
 ### Building the Library
 
