@@ -11,11 +11,20 @@ OUTPUT_FOLDER = "backend-build"
 # Define the executables to build
 executables = [Executable(script=SUBMODULE_FOLDER + "/bridge.py")]
 
+base_dir = os.path.dirname(__file__)
+
+sub_dirs = [
+    "mission-control-tower",
+    "python-backend"
+]
+
+include_path = sys.path + [os.path.abspath(os.path.join(base_dir, sub_dir)) for sub_dir in sub_dirs]
+
 # Set up the freezing options
 options = {
     "build_exe": {
         "build_exe": "build_bridge",
-        "path": sys.path + [os.path.abspath(os.path.join(os.path.dirname(__file__), "mission-control-tower")), os.path.abspath(os.path.join(os.path.dirname(__file__), "python-backend"))],
+        "path": include_path,
         "excludes": ["tkinter"]
     }
 }
