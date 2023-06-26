@@ -45,7 +45,7 @@ std::string BridgeReader::readNextData() {
         // Ensure null-terminated string
         tmpBuffer[result] = '\0';
 
-        std::cout << "Data read from bridge process" << "\n";
+        // std::cout << "Data read from bridge process" << "\n";
 
         buffer += tmpBuffer;
 

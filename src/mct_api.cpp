@@ -94,7 +94,7 @@ void CommandManager::handleReadBridgeThread() {
         // read from bridge's stdout
         std::string jsonString = bridgeReader->readNextData();
         if (!jsonString.empty()) {
-            std::cout << "Command response read from bridge: " << jsonString << "\n";
+            // std::cout << "Command response read from bridge: " << jsonString << "\n";
 
             // Parse the JSON string and enqueue a CommandResponse
             nlohmann::json j = nlohmann::json::parse(jsonString);
