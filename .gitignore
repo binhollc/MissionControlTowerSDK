@@ -42,6 +42,7 @@ build/
 
 # Built Python backend
 build_bridge/
+requirements.txt
 
 # Python
 __pycache__/
