@@ -15,9 +15,9 @@ void CommandManager::start() {
 
     // Start the bridge process
     #ifdef _WIN32
-        bridgeProcess = _popen("bridge.exe", "r+");
+        bridgeProcess = _popen("bridge.exe BinhoNova", "r+");
     #else
-        bridgeProcess = popen("bridge", "r+");
+        bridgeProcess = popen("bridge BinhoNova", "r+");
     #endif
 
     // Initialize the bridge reader class
