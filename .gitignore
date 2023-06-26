@@ -53,3 +53,6 @@ __pycache__/
 *.vcxproj
 *.vcxproj.filters
 *.sln
+
+# Compiled sample app
+sample_app/sample_app
