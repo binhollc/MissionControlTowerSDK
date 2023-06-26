@@ -9,17 +9,22 @@
 #include <nlohmann/json.hpp>
 #include "bridge_reader.h"
 
+using json = nlohmann::json;
+
 // CommandRequest class definition
 class CommandRequest {
 public:
     std::string transaction_id;
     std::string command;
-    std::map<std::string, std::string> params;
+    json params;
 
     CommandRequest()
-        : transaction_id("0"), command(""), params() {}
+        : transaction_id("0"), command(""), params(json::object()) {}
 
-    CommandRequest(const std::string& id, const std::string& cmd, const std::map<std::string, std::string>& prms)
+    CommandRequest(const std::string& id, const std::string& cmd)
+        : transaction_id(id), command(cmd), params(json::object()) {}
+
+    CommandRequest(const std::string& id, const std::string& cmd, const json& prms)
         : transaction_id(id), command(cmd), params(prms) {}
 };
 
