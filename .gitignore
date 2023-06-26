@@ -46,6 +46,7 @@ requirements.txt
 
 # Python
 __pycache__/
+venv/
 
 # macOS specific files
 .DS_Store
