@@ -21,9 +21,10 @@ int main() {
             {"addressFormat", "7"}
         }}
     }));
-    cm.invoke_command(CommandRequest("0", "exit"));
 
     std::this_thread::sleep_for(std::chrono::seconds(30));
+
+    cm.invoke_command(CommandRequest("0", "exit"));
 
     cm.stop();
 
