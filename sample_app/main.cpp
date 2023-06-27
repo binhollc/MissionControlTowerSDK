@@ -5,6 +5,11 @@
 #include <future>
 #include <map>
 
+void invokeCommandWithPromise(CommandManager& cm, std::map<std::string, std::promise<void>>& promises, const std::string& transaction_id, const std::string& cmd, const std::map<std::string, std::map<std::string, std::string>>& args) {
+    promises[transaction_id] = std::promise<void>();
+    cm.invoke_command(CommandRequest(transaction_id, cmd, args));
+}
+
 int main() {
     CommandManager cm;
 
@@ -28,18 +33,15 @@ int main() {
 
     cm.start();
 
-    // For each command request, create a promise and store it in the map
-    promises["1"] = std::promise<void>();
-    cm.invoke_command(CommandRequest("1", "open", {{"address", "SIM"}}));
-
-    promises["2"] = std::promise<void>();
-    cm.invoke_command(CommandRequest("2", "i2c_scan", {
+    // Invoke commands with promises
+    invokeCommandWithPromise(cm, promises, "1", "open", {{"address", "SIM"}});
+    invokeCommandWithPromise(cm, promises, "2", "i2c_scan", {
         {"config", {
             {"internalPullUpResistors", "false"},
             {"clockFrequency", "400000"},
             {"addressFormat", "7"}
         }}
-    }));
+    });
 
     // Wait for all futures before sending the exit command
     for (auto& promise : promises) {
