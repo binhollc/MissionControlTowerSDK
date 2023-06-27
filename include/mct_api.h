@@ -11,9 +11,8 @@
 
 using json = nlohmann::json;
 
-// CommandRequest class definition
-class CommandRequest {
-public:
+// CommandRequest struct definition
+struct CommandRequest {
     std::string transaction_id;
     std::string command;
     json params;
@@ -28,17 +27,41 @@ public:
         : transaction_id(id), command(cmd), params(prms) {}
 };
 
-// CommandResponse class definition
-class CommandResponse {
-public:
+// CommandResponse struct definition
+struct CommandResponse {
     std::string transaction_id;
     std::string status;
-    std::string is_promise;
-    std::string data;
+    bool is_promise;
+    json data;
 
-    CommandResponse(const std::string& id, const std::string& st, const std::string& pr, const std::string& dt)
+    CommandResponse()
+        : transaction_id(""), status(""), is_promise(false), data(json::object()) {}
+
+    CommandResponse(const std::string& id, const std::string& st, bool pr, const json& dt)
         : transaction_id(id), status(st), is_promise(pr), data(dt) {}
 };
+
+// Nlohmann json serialization and deserialization functions
+void to_json(json& j, const CommandRequest& p) {
+    j = json{{"transaction_id", p.transaction_id}, {"command", p.command}, {"params", p.params}};
+}
+
+void from_json(const json& j, CommandRequest& p) {
+    j.at("transaction_id").get_to(p.transaction_id);
+    j.at("command").get_to(p.command);
+    j.at("params").get_to(p.params);
+}
+
+void to_json(json& j, const CommandResponse& p) {
+    j = json{{"transaction_id", p.transaction_id}, {"status", p.status}, {"is_promise", p.is_promise}, {"data", p.data}};
+}
+
+void from_json(const json& j, CommandResponse& p) {
+    j.at("transaction_id").get_to(p.transaction_id);
+    j.at("status").get_to(p.status);
+    j.at("is_promise").get_to(p.is_promise);
+    j.at("data").get_to(p.data);
+}
 
 // CommandManager class definition
 class CommandManager {

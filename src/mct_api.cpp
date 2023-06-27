@@ -76,9 +76,7 @@ void CommandManager::handleWriteBridgeThread() {
 
         // Convert the request to JSON and write to bridge's stdin
         nlohmann::json j;
-        j["transaction_id"] = request.transaction_id;
-        j["command"] = request.command;
-        j["params"] = request.params;
+        to_json(j, request);
 
         std::string jsonString = j.dump() + "\n";
 
@@ -114,16 +112,8 @@ void CommandManager::handleReadBridgeThread() {
 
             // Parse the JSON string and enqueue a CommandResponse
             nlohmann::json j = nlohmann::json::parse(jsonString);
-
-            std::string transactionIdStr = j["transaction_id"].template get<std::string>();
-            std::string statusStr = j["status"].template get<std::string>();
-            std::string dataStr = j["data"].is_null() ? "" : j["data"].dump();
-            std::string isPromiseStr = j["is_promise"].is_null() ? "" : j["is_promise"].dump();
-
-            CommandResponse response(transactionIdStr,
-                                     statusStr,
-                                     isPromiseStr,
-                                     dataStr);
+            CommandResponse response;
+            from_json(j, response);
 
             std::lock_guard<std::mutex> lock(responseMutex);
             responseQueue.push(response);
