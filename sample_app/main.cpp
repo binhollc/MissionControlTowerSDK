@@ -9,7 +9,7 @@
 class CommandDispatcher {
 private:
     CommandManager& cm;
-    std::map<std::string, std::promise<void>> promises;
+    std::map<std::string, std::promise<CommandResponse>> promises;
     std::condition_variable cv;
     std::mutex cv_m;
     int unresolvedPromises = 0;
@@ -18,12 +18,11 @@ public:
     CommandDispatcher(CommandManager& commandManager)
         : cm(commandManager) {
         cm.on_command_response([this](CommandResponse cr){
-            std::cout << "Received response: " << cr.transaction_id << " " << cr.status << " " << cr.is_promise << " " << cr.data << "\n";
             // If the response is not a promise, set the value of the corresponding promise
             if (!cr.is_promise) {
                 auto it = promises.find(cr.transaction_id);
                 if (it != promises.end()) {
-                    it->second.set_value();
+                    it->second.set_value(cr);
                     {
                         std::lock_guard<std::mutex> lk(cv_m);
                         unresolvedPromises--;
@@ -34,8 +33,8 @@ public:
         });
     }
 
-    void invokeCommand(const std::string& transaction_id, const std::string& cmd, const json& prms, std::function<void()> callback = []() {}) {
-        promises[transaction_id] = std::promise<void>();
+    void invokeCommand(const std::string& transaction_id, const std::string& cmd, const json& prms, std::function<void(CommandResponse)> callback = [](CommandResponse cr) {}) {
+        promises[transaction_id] = std::promise<CommandResponse>();
         {
             std::lock_guard<std::mutex> lk(cv_m);
             unresolvedPromises++;
@@ -43,8 +42,8 @@ public:
         cm.invoke_command(CommandRequest(transaction_id, cmd, prms));
 
         std::thread([this, transaction_id, callback](){
-            promises[transaction_id].get_future().get();
-            callback();
+            CommandResponse cr = promises[transaction_id].get_future().get();
+            callback(cr);
         }).detach();
     }
 
@@ -60,8 +59,8 @@ int main() {
 
     cm.start();
 
-    dispatcher.invokeCommand("1", "open", {{"address", "SIM"}}, [] {
-        std::cout << "Command with transaction_id 1 has finished executing.\n";
+    dispatcher.invokeCommand("1", "open", {{"address", "SIM"}}, [](CommandResponse cr) {
+        std::cout << cr.transaction_id << cr.status << cr.is_promise << cr.data.dump() << "\n";
     });
 
     dispatcher.invokeCommand("2", "i2c_scan", {
@@ -70,6 +69,8 @@ int main() {
             {"clockFrequency", "400000"},
             {"addressFormat", "7"}
         }}
+    }, [](CommandResponse cr) {
+        std::cout << cr.transaction_id << cr.status << cr.is_promise << cr.data.dump() << "\n";
     });
 
     dispatcher.waitForAllCommands();
