@@ -22,7 +22,7 @@ int main() {
         }}
     }));
 
-    std::this_thread::sleep_for(std::chrono::seconds(30));
+    std::this_thread::sleep_for(std::chrono::seconds(5));
 
     cm.invoke_command(CommandRequest("0", "exit"));
 
