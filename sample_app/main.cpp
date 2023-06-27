@@ -1,63 +1,60 @@
 #include <iostream>
 #include "mct_api.h"
 #include <thread>
-#include <chrono>
-#include <future>
+#include <mutex>
 #include <map>
 #include <condition_variable>
 
 class CommandDispatcher {
 private:
-    CommandManager& cm;
-    std::map<std::string, std::promise<CommandResponse>> promises;
+    CommandManager commandManager;
+    std::mutex mtx;
     std::condition_variable cv;
-    std::mutex cv_m;
-    int unresolvedPromises = 0;
+    std::unordered_map<std::string, int> activeCommands;
+    std::unordered_map<std::string, std::function<void(CommandResponse)>> callbacks;
 
 public:
-    CommandDispatcher(CommandManager& commandManager)
-        : cm(commandManager) {
-        cm.on_command_response([this](CommandResponse cr){
-            // If the response is not a promise, set the value of the corresponding promise
+    void start() {
+        commandManager.start();
+        commandManager.on_command_response([this](CommandResponse cr) {
+            std::lock_guard<std::mutex> lock(mtx);
             if (!cr.is_promise) {
-                auto it = promises.find(cr.transaction_id);
-                if (it != promises.end()) {
-                    it->second.set_value(cr);
-                    {
-                        std::lock_guard<std::mutex> lk(cv_m);
-                        unresolvedPromises--;
-                    }
-                    cv.notify_all();
+                if (callbacks.count(cr.transaction_id) > 0) {
+                    callbacks[cr.transaction_id](cr);
+                    callbacks.erase(cr.transaction_id);
                 }
+                --activeCommands[cr.transaction_id];
+                if (activeCommands[cr.transaction_id] == 0) {
+                    activeCommands.erase(cr.transaction_id);
+                }
+                cv.notify_all();
             }
         });
     }
 
-    void invokeCommand(const std::string& transaction_id, const std::string& cmd, const json& prms, std::function<void(CommandResponse)> callback = [](CommandResponse cr) {}) {
-        promises[transaction_id] = std::promise<CommandResponse>();
-        {
-            std::lock_guard<std::mutex> lk(cv_m);
-            unresolvedPromises++;
-        }
-        cm.invoke_command(CommandRequest(transaction_id, cmd, prms));
+    void stop() {
+        commandManager.stop();
+    }
 
-        std::thread([this, transaction_id, callback](){
-            CommandResponse cr = promises[transaction_id].get_future().get();
-            callback(cr);
-        }).detach();
+    void invokeCommand(const std::string& id, const std::string& cmd, const json& params = json::object(), std::function<void(CommandResponse)> fn = nullptr) {
+        std::lock_guard<std::mutex> lock(mtx);
+        ++activeCommands[id];
+        if (fn != nullptr) {
+            callbacks[id] = fn;
+        }
+        commandManager.invoke_command(CommandRequest(id, cmd, params));
     }
 
     void waitForAllCommands() {
-        std::unique_lock<std::mutex> lk(cv_m);
-        cv.wait(lk, [this](){ return unresolvedPromises == 0; });
+        std::unique_lock<std::mutex> lock(mtx);
+        cv.wait(lock, [this]() { return activeCommands.empty(); });
     }
 };
 
 int main() {
-    CommandManager cm;
-    CommandDispatcher dispatcher(cm);
+    CommandDispatcher dispatcher;
 
-    cm.start();
+    dispatcher.start();
 
     dispatcher.invokeCommand("1", "open", {{"address", "SIM"}}, [](CommandResponse cr) {
         std::cout << cr.transaction_id << cr.status << cr.is_promise << cr.data.dump() << "\n";
@@ -75,9 +72,9 @@ int main() {
 
     dispatcher.waitForAllCommands();
 
-    cm.invoke_command(CommandRequest("0", "exit"));
+    dispatcher.invokeCommand("0", "exit", {});
 
-    cm.stop();
+    dispatcher.stop();
 
     return 0;
 }
