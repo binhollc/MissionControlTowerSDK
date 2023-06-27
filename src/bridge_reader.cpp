@@ -39,8 +39,8 @@ std::string BridgeReader::readNextData() {
         }
     } else if (result == 0) {
         // End of file. The remote has closed the connection.
-        std::cout << "End of file" << "\n";
-        return "";
+        // std::cout << "End of file" << "\n";
+        return "__EOF__";
     } else {
         // Ensure null-terminated string
         tmpBuffer[result] = '\0';

@@ -34,6 +34,8 @@ void CommandManager::start() {
 }
 
 void CommandManager::stop() {
+    while (!exitConfirmed);
+
     isRunning = false;
     requestCV.notify_all();
     responseCV.notify_all();
@@ -79,12 +81,17 @@ void CommandManager::handleWriteBridgeThread() {
 
         std::string jsonString = j.dump() + "\n";
 
-        std::cout << "Command read from queue: " << jsonString << "\n";
+        // std::cout << "Command read from queue: " << jsonString << "\n";
 
         // write jsonString to bridge's stdin
         if (bridgeProcess != nullptr) {
             fputs(jsonString.c_str(), bridgeProcess);
             fflush(bridgeProcess); // make sure jsonString is written immediately
+        }
+
+        // Break the loop upon receiving 'exit'
+        if (request.command == "exit") {
+            break;
         }
     }
 }
@@ -93,14 +100,21 @@ void CommandManager::handleReadBridgeThread() {
     while (isRunning) {
         // read from bridge's stdout
         std::string jsonString = bridgeReader->readNextData();
+
+        // Break the loop upon receiving EOF
+        if (jsonString == "__EOF__") {
+            exitConfirmed = true;
+            break;
+        }
+
         if (!jsonString.empty()) {
             // std::cout << "Command response read from bridge: " << jsonString << "\n";
 
             // Parse the JSON string and enqueue a CommandResponse
             nlohmann::json j = nlohmann::json::parse(jsonString);
 
-            std::string transactionIdStr = j["transaction_id"].dump();
-            std::string statusStr = j["status"].dump();
+            std::string transactionIdStr = j["transaction_id"].template get<std::string>();
+            std::string statusStr = j["status"].template get<std::string>();
             std::string dataStr = j["data"].is_null() ? "" : j["data"].dump();
             std::string isPromiseStr = j["is_promise"].is_null() ? "" : j["is_promise"].dump();
 
@@ -125,9 +139,16 @@ void CommandManager::handleCallbackOnResponseThread() {
         CommandResponse response = responseQueue.front();
         responseQueue.pop();
 
+        std::string responseStatus = response.status;
+
         callback_fn(response);
 
         lock.unlock();
+
+        // Break the loop upon receiving status == "exit"
+        if (responseStatus == "exit") {
+            break;
+        }
     }
 }
 

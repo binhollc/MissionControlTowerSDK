@@ -64,5 +64,6 @@ private:
     void handleCallbackOnResponseThread();
     std::function<void(CommandResponse)> callback_fn;
     bool isRunning;
+    bool exitConfirmed;
     std::unique_ptr<BridgeReader> bridgeReader;
 };
