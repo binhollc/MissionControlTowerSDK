@@ -63,7 +63,8 @@ private:
     void handleReadBridgeThread();
     void handleCallbackOnResponseThread();
     std::function<void(CommandResponse)> callback_fn;
-    bool isRunning;
-    bool exitConfirmed;
+    bool isRunningWriteThread;
+    bool isRunningReadThread;
+    bool isRunningCallbackThread;
     std::unique_ptr<BridgeReader> bridgeReader;
 };

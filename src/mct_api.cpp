@@ -8,11 +8,9 @@
     #include <unistd.h>
 #endif
 
-CommandManager::CommandManager() : isRunning(false) {}
+CommandManager::CommandManager() : isRunningWriteThread(false), isRunningReadThread(false), isRunningCallbackThread(false) {}
 
 void CommandManager::start() {
-    isRunning = true;
-
     // Start the bridge process
     #ifdef _WIN32
         bridgeProcess = _popen("bridge.exe BinhoNova", "r+");
@@ -24,19 +22,22 @@ void CommandManager::start() {
     bridgeReader = std::make_unique<BridgeReader>(bridgeProcess);
 
     // Start the write bridge thread
+    isRunningWriteThread = true;
     writeBridgeThread = std::thread(&CommandManager::handleWriteBridgeThread, this);
 
     // Start the read bridge thread
+    isRunningReadThread = true;
     readBridgeThread = std::thread(&CommandManager::handleReadBridgeThread, this);
 
     // Start the callback on response thread
+    isRunningCallbackThread = true;
     callbackOnResponseThread = std::thread(&CommandManager::handleCallbackOnResponseThread, this);
 }
 
 void CommandManager::stop() {
-    while (!exitConfirmed);
+    // Wait until the threads have finished running
+    while (isRunningWriteThread || isRunningReadThread || isRunningCallbackThread);
 
-    isRunning = false;
     requestCV.notify_all();
     responseCV.notify_all();
     bridgeReader.reset();
@@ -63,7 +64,7 @@ void CommandManager::stop() {
 }
 
 void CommandManager::handleWriteBridgeThread() {
-    while (isRunning) {
+    while (isRunningWriteThread) {
         std::unique_lock<std::mutex> lock(requestMutex);
         requestCV.wait(lock, [this]{ return !requestQueue.empty(); });
 
@@ -91,19 +92,20 @@ void CommandManager::handleWriteBridgeThread() {
 
         // Break the loop upon receiving 'exit'
         if (request.command == "exit") {
+            isRunningWriteThread = false;
             break;
         }
     }
 }
 
 void CommandManager::handleReadBridgeThread() {
-    while (isRunning) {
+    while (isRunningReadThread) {
         // read from bridge's stdout
         std::string jsonString = bridgeReader->readNextData();
 
         // Break the loop upon receiving EOF
         if (jsonString == "__EOF__") {
-            exitConfirmed = true;
+            isRunningReadThread = false;
             break;
         }
 
@@ -131,7 +133,7 @@ void CommandManager::handleReadBridgeThread() {
 }
 
 void CommandManager::handleCallbackOnResponseThread() {
-    while (isRunning) {
+    while (isRunningCallbackThread) {
         std::unique_lock<std::mutex> lock(responseMutex);
         responseCV.wait(lock, [this]{ return !responseQueue.empty(); });
 
@@ -147,6 +149,7 @@ void CommandManager::handleCallbackOnResponseThread() {
 
         // Break the loop upon receiving status == "exit"
         if (responseStatus == "exit") {
+            isRunningCallbackThread = false;
             break;
         }
     }
