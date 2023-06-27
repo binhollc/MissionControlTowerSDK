@@ -5,37 +5,46 @@
 #include <future>
 #include <map>
 
-void invokeCommandWithPromise(CommandManager& cm, std::map<std::string, std::promise<void>>& promises, const std::string& transaction_id, const std::string& cmd, const std::map<std::string, std::map<std::string, std::string>>& args) {
-    promises[transaction_id] = std::promise<void>();
-    cm.invoke_command(CommandRequest(transaction_id, cmd, args));
-}
+class CommandDispatcher {
+private:
+    CommandManager& cm;
+    std::map<std::string, std::promise<void>> promises;
+
+public:
+    CommandDispatcher(CommandManager& commandManager)
+        : cm(commandManager) {
+        cm.on_command_response([this](CommandResponse cr){
+            std::cout << "Received response: " << cr.transaction_id << " " << cr.status << " " << cr.is_promise << " " << cr.data << "\n";
+            // If the response is not a promise, set the value of the corresponding promise
+            if (!cr.is_promise) {
+                auto it = promises.find(cr.transaction_id);
+                if (it != promises.end()) {
+                    it->second.set_value();
+                }
+            }
+        });
+    }
+
+    void invokeCommand(const std::string& transaction_id, const std::string& cmd, const json& prms) {
+        promises[transaction_id] = std::promise<void>();
+        cm.invoke_command(CommandRequest(transaction_id, cmd, prms));
+    }
+
+    void waitForAllCommands() {
+        for (auto& promise : promises) {
+            promise.second.get_future().wait();
+        }
+    }
+};
 
 int main() {
     CommandManager cm;
-
-    // Create a map to hold the promises for each command request
-    std::map<std::string, std::promise<void>> promises;
-
-    auto responseFunction = [&promises](CommandResponse cr) {
-        // Print the response to stdout
-        std::cout << "Received response: " << cr.transaction_id << " " << cr.status << " " << cr.is_promise << " " << cr.data << "\n";
-
-        // If the response is not a promise, set the value of the corresponding promise
-        if (!cr.is_promise) {
-            auto it = promises.find(cr.transaction_id);
-            if (it != promises.end()) {
-                it->second.set_value();
-            }
-        }
-    };
-
-    cm.on_command_response(responseFunction);
+    CommandDispatcher dispatcher(cm);
 
     cm.start();
 
-    // Invoke commands with promises
-    invokeCommandWithPromise(cm, promises, "1", "open", {{"address", "SIM"}});
-    invokeCommandWithPromise(cm, promises, "2", "i2c_scan", {
+    dispatcher.invokeCommand("1", "open", {{"address", "SIM"}});
+    dispatcher.invokeCommand("2", "i2c_scan", {
         {"config", {
             {"internalPullUpResistors", "false"},
             {"clockFrequency", "400000"},
@@ -43,10 +52,7 @@ int main() {
         }}
     });
 
-    // Wait for all futures before sending the exit command
-    for (auto& promise : promises) {
-        promise.second.get_future().wait();
-    }
+    dispatcher.waitForAllCommands();
 
     cm.invoke_command(CommandRequest("0", "exit"));
 
