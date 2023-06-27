@@ -13,8 +13,8 @@ int main() {
 
     cm.start();
 
-    cm.invoke_command(CommandRequest("0", "open", {{"address", "SIM"}}));
-    cm.invoke_command(CommandRequest("0", "i2c_scan", {
+    cm.invoke_command(CommandRequest("1", "open", {{"address", "SIM"}}));
+    cm.invoke_command(CommandRequest("2", "i2c_scan", {
         {"config", {
             {"internalPullUpResistors", "false"},
             {"clockFrequency", "400000"},
