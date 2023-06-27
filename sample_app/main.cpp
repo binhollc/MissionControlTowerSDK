@@ -4,11 +4,15 @@
 #include <chrono>
 #include <future>
 #include <map>
+#include <condition_variable>
 
 class CommandDispatcher {
 private:
     CommandManager& cm;
     std::map<std::string, std::promise<void>> promises;
+    std::condition_variable cv;
+    std::mutex cv_m;
+    int unresolvedPromises = 0;
 
 public:
     CommandDispatcher(CommandManager& commandManager)
@@ -20,20 +24,33 @@ public:
                 auto it = promises.find(cr.transaction_id);
                 if (it != promises.end()) {
                     it->second.set_value();
+                    {
+                        std::lock_guard<std::mutex> lk(cv_m);
+                        unresolvedPromises--;
+                    }
+                    cv.notify_all();
                 }
             }
         });
     }
 
-    void invokeCommand(const std::string& transaction_id, const std::string& cmd, const json& prms) {
+    void invokeCommand(const std::string& transaction_id, const std::string& cmd, const json& prms, std::function<void()> callback = []() {}) {
         promises[transaction_id] = std::promise<void>();
+        {
+            std::lock_guard<std::mutex> lk(cv_m);
+            unresolvedPromises++;
+        }
         cm.invoke_command(CommandRequest(transaction_id, cmd, prms));
+
+        std::thread([this, transaction_id, callback](){
+            promises[transaction_id].get_future().get();
+            callback();
+        }).detach();
     }
 
     void waitForAllCommands() {
-        for (auto& promise : promises) {
-            promise.second.get_future().wait();
-        }
+        std::unique_lock<std::mutex> lk(cv_m);
+        cv.wait(lk, [this](){ return unresolvedPromises == 0; });
     }
 };
 
@@ -43,7 +60,10 @@ int main() {
 
     cm.start();
 
-    dispatcher.invokeCommand("1", "open", {{"address", "SIM"}});
+    dispatcher.invokeCommand("1", "open", {{"address", "SIM"}}, [] {
+        std::cout << "Command with transaction_id 1 has finished executing.\n";
+    });
+
     dispatcher.invokeCommand("2", "i2c_scan", {
         {"config", {
             {"internalPullUpResistors", "false"},
