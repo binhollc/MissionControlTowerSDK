@@ -65,6 +65,11 @@ public:
         std::unique_lock<std::mutex> lock(mtx);
         cv.wait(lock, [this]() { return activeCommands.empty(); });
     }
+
+    void invokeCommandSync(const std::string& id, const std::string& cmd, const json& params = json::object(), std::function<void(CommandResponse)> fn = nullptr) {
+        invokeCommand(id, cmd, params, fn);
+        waitFor({id});
+    }
 };
 
 int main() {
@@ -72,11 +77,9 @@ int main() {
 
     dispatcher.start();
 
-    dispatcher.invokeCommand("1", "open", {{"address", "SIM"}}, [](CommandResponse cr) {
+    dispatcher.invokeCommandSync("1", "open", {{"address", "SIM"}}, [](CommandResponse cr) {
         std::cout << cr.transaction_id << cr.status << cr.is_promise << cr.data.dump() << "\n";
     });
-
-    dispatcher.waitFor({"1"});
 
     dispatcher.invokeCommand("2", "i2c_scan", {
         {"config", {
