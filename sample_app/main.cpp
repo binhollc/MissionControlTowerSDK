@@ -28,6 +28,10 @@ public:
                     activeCommands.erase(cr.transaction_id);
                 }
                 cv.notify_all();
+            } else {
+                if (callbacks.count(cr.transaction_id) > 0) {
+                    callbacks[cr.transaction_id](cr);
+                }
             }
         });
     }
