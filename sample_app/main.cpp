@@ -49,6 +49,18 @@ public:
         commandManager.invoke_command(CommandRequest(id, cmd, params));
     }
 
+    void waitFor(const std::vector<std::string>& ids) {
+        std::unique_lock<std::mutex> lock(mtx);
+        cv.wait(lock, [this, &ids]() {
+            for (const auto& id : ids) {
+                if (activeCommands.count(id) > 0) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+
     void waitForAllCommands() {
         std::unique_lock<std::mutex> lock(mtx);
         cv.wait(lock, [this]() { return activeCommands.empty(); });
@@ -63,6 +75,8 @@ int main() {
     dispatcher.invokeCommand("1", "open", {{"address", "SIM"}}, [](CommandResponse cr) {
         std::cout << cr.transaction_id << cr.status << cr.is_promise << cr.data.dump() << "\n";
     });
+
+    dispatcher.waitFor({"1"});
 
     dispatcher.invokeCommand("2", "i2c_scan", {
         {"config", {
