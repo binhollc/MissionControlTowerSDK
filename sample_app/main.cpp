@@ -78,19 +78,9 @@ int main() {
 
     dispatcher.start();
 
-    dispatcher.invokeCommandSync("1", "open", {{"address", "/dev/cu.usbmodem14101"}}, [](CommandResponse cr) {
+    dispatcher.invokeCommandSync("1", "open", {{"address", "/dev/cu.usbmodem14201"}}, [](CommandResponse cr) {
         std::cout << cr.transaction_id << cr.status << cr.is_promise << cr.data.dump() << "\n";
     });
-
-    // dispatcher.invokeCommand("2", "i2c_scan", {
-    //     {"config", {
-    //         {"internalPullUpResistors", "false"},
-    //         {"clockFrequency", "400000"},
-    //         {"addressFormat", "7"}
-    //     }}
-    // }, [](CommandResponse cr) {
-    //     std::cout << cr.transaction_id << cr.status << cr.is_promise << cr.data.dump() << "\n";
-    // });
 
     for (int i = 1; i <= 10; ++i) {
         int dc = i * 10;  // Duty cycle goes from 10 to 100 in increments of 10
