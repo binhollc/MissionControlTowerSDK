@@ -4,6 +4,7 @@
 #include <mutex>
 #include <map>
 #include <condition_variable>
+#include <chrono>
 
 class CommandDispatcher {
 private:
@@ -77,19 +78,33 @@ int main() {
 
     dispatcher.start();
 
-    dispatcher.invokeCommandSync("1", "open", {{"address", "SIM"}}, [](CommandResponse cr) {
+    dispatcher.invokeCommandSync("1", "open", {{"address", "/dev/cu.usbmodem14101"}}, [](CommandResponse cr) {
         std::cout << cr.transaction_id << cr.status << cr.is_promise << cr.data.dump() << "\n";
     });
 
-    dispatcher.invokeCommand("2", "i2c_scan", {
-        {"config", {
-            {"internalPullUpResistors", "false"},
-            {"clockFrequency", "400000"},
-            {"addressFormat", "7"}
-        }}
-    }, [](CommandResponse cr) {
-        std::cout << cr.transaction_id << cr.status << cr.is_promise << cr.data.dump() << "\n";
-    });
+    // dispatcher.invokeCommand("2", "i2c_scan", {
+    //     {"config", {
+    //         {"internalPullUpResistors", "false"},
+    //         {"clockFrequency", "400000"},
+    //         {"addressFormat", "7"}
+    //     }}
+    // }, [](CommandResponse cr) {
+    //     std::cout << cr.transaction_id << cr.status << cr.is_promise << cr.data.dump() << "\n";
+    // });
+
+    for (int i = 1; i <= 10; ++i) {
+        int dc = i * 10;  // Duty cycle goes from 10 to 100 in increments of 10
+        dispatcher.invokeCommandSync(std::to_string(i), "gpio", {
+            {"channel", 0},
+            {"type", "pwm"},
+            {"params", {
+                {"dc", std::to_string(dc)}
+            }}
+        }, [](CommandResponse cr) {
+            std::cout << cr.transaction_id << cr.status << cr.is_promise << cr.data.dump() << "\n";
+        });
+    //    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
 
     dispatcher.waitForAllCommands();
 
