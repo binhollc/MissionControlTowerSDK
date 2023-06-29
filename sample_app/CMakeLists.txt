@@ -12,8 +12,10 @@ add_subdirectory(${MCTAPI_DIR} mct_api)
 
 include_directories(${MCTAPI_DIR}/include)
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
 # Specify the source files for the sample_app executable
-set(SOURCES main.cpp)
+set(SOURCES main.cpp CommandDispatcher.cpp)
 
 # Create the executable
 add_executable(sample_app ${SOURCES})
