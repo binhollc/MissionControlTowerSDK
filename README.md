@@ -1,6 +1,23 @@
 # MissionControlTowerSDK
 A C++ dynamic library for launching and interacting with MissionControlTower system
 
+## Installing the development environment
+
+1. Clone this repo.
+
+   ```shell
+   git clone git@github.com:binhollc/MissionControlTowerSDK.git
+   ```
+
+2. Navigate to the project folder.
+
+3. Initialize the submodules.
+
+   ```shell
+   git submodule update --init
+   ```
+
+
 ## Building the Python Backend
 
 To build the Python backend, which is contained in the `python-backend` folder, we use cx_Freeze, a Python packaging tool. The following instructions guide you through the process.
@@ -36,25 +53,51 @@ To build the Python backend, which is contained in the `python-backend` folder, 
 
 6. Verify that `requirements.txt` has been created in the base folder of the project.
 
-7. Run the following command to build the executable:
+7. Install the requirements.
 
    ```shell
-   $(venv)> python3 setup.py build
+   $(venv)> pip install -r requirements.txt
+
+8. Run the following command to build the executable:
+
+   ```shell
+   $(venv)> python setup.py build
    ```
 
    This command invokes cx_Freeze using the `setup.py` script, which contains the necessary configuration to freeze the Python backend into an executable.
 
-8. After the build process completes, the executable and its dependencies will be located in the `build_bridge` directory.
+9. After the build process completes, the executable and its dependencies will be located in the `build_bridge` directory.
 
-### Running the Executable
+### Testing the bridge
 
-To run the executable, navigate to the `build` directory and execute the `bridge.exe` on Windows, or `bridge` on Mac/Linux.
+10. Navigate to the `build_bridge` directory and test that the bridge works properly.
 
-**Note:** If you encounter any issues during the build process or when running the executable, ensure that you have the necessary dependencies and that your environment is correctly set up.
+   ```shell
+   cd build_bridge
+   ./bridge BinhoNova
+   ```
 
-Feel free to adjust the instructions as needed based on your project's specific requirements or directory structure.
+   Now the ListUsbDevices should be ready and waiting to receive JSON commands.
 
-### Killing the Executable
+11. Send the command to open the Nova simulator:
+
+   ```json
+   {"command":"open","params":{"address":"SIM"},"transaction_id":"0"}
+   ```
+
+12. Verify that the bridge returns the following command response:
+
+   ```json
+   {"transaction_id": "0", "status": "success", "is_promise": false, "data": {"command": "open", "id": "BINHONOVASIM001", "port": "SIM", "productName": "Binho Nova", "firmwareVersion": "0.2.8", "hardwareVersion": "1.0", "mode": "normal"}}
+   ```
+
+13. Exit the bridge using the following command:
+
+   ```json
+   {"command":"exit","transaction_id":"0"}
+   ```
+
+### Killing the bridge
 
 On Mac/Linux you can kill the bridge executable by pressing Command+C on Mac, or Control+C on Linux.
 
@@ -64,7 +107,7 @@ On Windows, if you are using PowerShell you can open a different PowerShell wind
 Stop-Process -Name "bridge"
 ```
 
-### Building the Library
+### Building the library
 
 1. Open a terminal or command prompt.
 

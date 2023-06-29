@@ -42,21 +42,21 @@ struct CommandResponse {
 };
 
 // Nlohmann json serialization and deserialization functions
-void to_json(json& j, const CommandRequest& p) {
+inline void to_json(json& j, const CommandRequest& p) {
     j = json{{"transaction_id", p.transaction_id}, {"command", p.command}, {"params", p.params}};
 }
 
-void from_json(const json& j, CommandRequest& p) {
+inline void from_json(const json& j, CommandRequest& p) {
     j.at("transaction_id").get_to(p.transaction_id);
     j.at("command").get_to(p.command);
     j.at("params").get_to(p.params);
 }
 
-void to_json(json& j, const CommandResponse& p) {
+inline void to_json(json& j, const CommandResponse& p) {
     j = json{{"transaction_id", p.transaction_id}, {"status", p.status}, {"is_promise", p.is_promise}, {"data", p.data}};
 }
 
-void from_json(const json& j, CommandResponse& p) {
+inline void from_json(const json& j, CommandResponse& p) {
     j.at("transaction_id").get_to(p.transaction_id);
     j.at("status").get_to(p.status);
     j.at("is_promise").get_to(p.is_promise);
