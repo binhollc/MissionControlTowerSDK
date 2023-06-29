@@ -16,7 +16,7 @@ To build the Python backend, which is contained in the `python-backend` folder, 
 2. Activate the virtual environment:
 
    ```shell
-   ./venv/bin/activate
+   source ./venv/bin/activate
    ```
 
 3. Verify that your command prompt has an indicator that the virtual environment is active.
