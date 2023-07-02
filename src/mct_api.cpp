@@ -8,14 +8,14 @@
     #include <unistd.h>
 #endif
 
-CommandManager::CommandManager() : isRunningWriteThread(false), isRunningReadThread(false), isRunningCallbackThread(false) {}
-
 void CommandManager::start() {
     // Start the bridge process
     #ifdef _WIN32
-        bridgeProcess = _popen("bridge.exe BinhoNova", "r+");
+        std::string command = "bridge.exe " + targetCommandAdaptor;
+        bridgeProcess = _popen(command.c_str(), "r+");
     #else
-        bridgeProcess = popen("bridge BinhoNova", "r+");
+        std::string command = "bridge " + targetCommandAdaptor;
+        bridgeProcess = popen(command.c_str(), "r+");
     #endif
 
     // Initialize the bridge reader class

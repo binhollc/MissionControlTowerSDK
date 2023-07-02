@@ -19,6 +19,7 @@ private:
     std::unordered_map<std::string, std::function<void(CommandResponse)>> callbacks;
 
 public:
+    CommandDispatcher(const std::string &targetCommandAdaptorName) : commandManager(targetCommandAdaptorName) {}
     void start();
     void stop();
     void invokeCommand(const std::string& id, const std::string& cmd, const json& params = json::object(), std::function<void(CommandResponse)> fn = nullptr);

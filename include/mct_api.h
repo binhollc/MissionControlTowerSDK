@@ -66,12 +66,13 @@ inline void from_json(const json& j, CommandResponse& p) {
 // CommandManager class definition
 class CommandManager {
 public:
-    CommandManager();  // Constructor
+    CommandManager(const std::string &targetCommandAdaptorName) : targetCommandAdaptor(targetCommandAdaptorName), isRunningWriteThread(false), isRunningReadThread(false), isRunningCallbackThread(false) {}
     void start();
     void stop();
     void invoke_command(const CommandRequest& request);
     void on_command_response(std::function<void(CommandResponse)> fn);
 private:
+    std::string targetCommandAdaptor;
     FILE* bridgeProcess;
     std::queue<CommandRequest> requestQueue;
     std::queue<CommandResponse> responseQueue;
