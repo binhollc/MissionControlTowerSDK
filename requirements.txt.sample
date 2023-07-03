@@ -23,7 +23,7 @@ psutil==5.9.5
 ptyprocess==0.7.0
 pure-eval==0.2.2
 Pygments==2.15.1
-pyserial==3.5
+pyserial
 requests==2.31.0
 six==1.16.0
 stack-data==0.6.2
