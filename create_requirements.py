@@ -2,7 +2,7 @@ import os
 import re
 
 # Get the current directory
-current_directory = os.getcwd()
+current_directory = os.getcwd().replace('\\', '\\\\') # Escape backslashes for Windows file names
 
 # Path to the file
 file_path = os.path.join(current_directory, "requirements.txt.sample")

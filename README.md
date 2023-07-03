@@ -22,6 +22,36 @@ A C++ dynamic library for launching and interacting with MissionControlTower sys
 
 To build the Python backend, which is contained in the `python-backend` folder, we use cx_Freeze, a Python packaging tool. The following instructions guide you through the process.
 
+### Special note for Windows users
+
+> :warning: ** On Windows 64 **: Make sure that Python 64, and not 32, is installed in your system.
+
+#### How do I know if my Windows installation is 32 or 64 bits?
+
+1. Press the Windows key + R to open the Run dialog box.
+
+2. Type "msinfo32" and press Enter.
+
+3. The System Information window will open. Look for the "System Type" field, which will indicate whether your Windows is 32-bit or 64-bit.
+
+### How can I know if I'm using Python 32 or 64 bits on windows?
+
+To determine whether you're using a 32-bit or 64-bit version of Python on Windows, you can follow these steps:
+
+1. Open the Command Prompt: Press the Windows key, type "Command Prompt," and select the Command Prompt application.
+
+2. In the Command Prompt, type the following command and press Enter:
+
+   ```shell
+   python --version
+   ```
+
+   This command will display the version of Python you have installed, along with additional information.
+
+   If you see something like `Python 3.x.x`, where `x.x` represents the version number, without any mention of "64-bit" or "32-bit," it means you have the 32-bit version of Python installed.
+
+   If you see something like `Python 3.x.x [MSC v.1916 64 bit (AMD64)]`, where `x.x` represents the version number, and it includes "64 bit" or "AMD64," it indicates that you have the 64-bit version of Python installed.
+
 ### Creating a virtual environment
 
 1. Create a virtual environment and save it in the `venv` folder:

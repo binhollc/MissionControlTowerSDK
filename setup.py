@@ -2,6 +2,10 @@ import sys
 import os
 from cx_Freeze import setup, Executable
 
+base = None
+if sys.platform == "win32":
+    base = "Win32GUI"
+
 # Define the submodule folder path
 SUBMODULE_FOLDER = "python-backend"
 
