@@ -137,22 +137,60 @@ On Windows, if you are using PowerShell you can open a different PowerShell wind
 Stop-Process -Name "bridge"
 ```
 
+## Dynamic library
+
+### Special note for Windows developers
+
+```
+Ensure that your application and all its dependent libraries are compiled for the same architecture, either all for 32-bit or all for 64-bit. Mixing 32-bit and 64-bit applications and libraries often leads to errors like the one you're seeing.
+```
+
+If you get an error code `0xc000007b` when executing your app, it is most likely because the DLL was compiled for a different architecture.
+
+#### How to solve this issue
+
+1. For Windows users, we recommend downloading CMake's command line tool from the [official download page](https://cmake.org/download/). Make sure that you download the right installer for your system architecture - e.g. CMake 64 bits for your Windows 64 bits.
+
+2. When building the DLL you can specify the target architecture when you run cmake, like so:
+
+   - For 32-bit: cmake -DCMAKE_GENERATOR_PLATFORM=x86 ..
+   - For 64-bit: cmake -DCMAKE_GENERATOR_PLATFORM=x64 ..
+
+### Prerequisites
+
+- CMake
+- Make
+- C++ 17
+  - For Windows users, we recommend downloading the [build tools for Visual Studio](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022).
+
 ### Building the library
 
-1. Open a terminal or command prompt.
+1. Navigate to the root of your project (where the `CMakeLists.txt` file is).
 
-2. Navigate to the root directory of the project.
+2. Create a new directory for the build files. You can call it `build` or anything you like.
 
-3. Run the following commands to build the library:
+    ```bash
+    mkdir build
+    ```
+3. Then navigate into this directory.
 
-   ```shell
-   cmake .
+    ```bash
+    cd build
+    ```
+4. Run `cmake` from within this new directory, pointing it to the parent directory, which is where the `CMakeLists.txt` file is.
+
+    ```bash
+    cmake ..
+    ```
+
+   ```
+   For Windows developers we strongly recommend you to explicitly specify the platform (x32 or x64) when building the library and the sample_app. See special note above.
    ```
 
-4. Build the library:
+5. Navigate to the base folder and execute the following command:
 
    ```shell
-   make
+   cmake --build build/
    ```
 
 After the build process completes, the library file libmct_api.so (or libmct_api.dylib on macOS) will be located in the lib directory.
@@ -165,16 +203,18 @@ To build the sample app that demonstrates how to use the mct_api library, follow
 
 2. Navigate to the sample_app directory.
 
-3. Run the following commands to build the sample app:
+3. As you may notice, there is a CMakeLists.txt file under the folder `sample_app`. We are going to follow the same steps that we did for building the library, but this time we will use the `sample_app` folder as the base folder instead of the project folder as we did before.
 
-   ```shell
-   cmake .
+4. Have you followed the same steps that we did for building the library? ;)
+
+   ```
+   For Windows developers we strongly recommend you to explicitly specify the platform (x32 or x64) when building the library and the sample_app. See special note above.
    ```
 
-4. Build the app:
+5. Navigate to the `sample_app` folder and execute the following command:
 
    ```shell
-   make
+   cmake --build build/
    ```
 
 After the build process completes, the executable file sample_app will be located in the build directory.
