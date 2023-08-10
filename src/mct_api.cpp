@@ -187,14 +187,23 @@ void CommandManager::handleReadBridgeThread() {
         if (!jsonString.empty()) {
             std::cout << "Command response read from bridge: " << jsonString << "\n";
 
-            // Parse the JSON string and enqueue a CommandResponse
-            nlohmann::json j = nlohmann::json::parse(jsonString);
-            CommandResponse response;
-            from_json(j, response);
-
-            std::lock_guard<std::mutex> lock(responseMutex);
-            responseQueue.push(response);
-            responseCV.notify_one();
+            try {
+                nlohmann::json j = nlohmann::json::parse(jsonString);
+                CommandResponse response;
+                std::cout << "!!!" << "\n";
+                from_json(j, response);
+                std::cout << "Command response parsed!" << "\n";
+                
+                std::lock_guard<std::mutex> lock(responseMutex);
+                responseQueue.push(response);
+                std::cout << "responseQueue.push(response)" << "\n";
+                responseCV.notify_one();
+            }
+            catch (const nlohmann::json::exception& e) {
+                std::cout << "Exception during parsing: " << e.what() << "\n";
+                std::cout << "Failed to parse: " << jsonString << "\n";
+                // handle error or rethrow
+            }
         }
     }
 }
@@ -207,6 +216,8 @@ void CommandManager::handleCallbackOnResponseThread() {
         // Process the response and pass it to the callback function
         CommandResponse response = responseQueue.front();
         responseQueue.pop();
+
+        std::cout << "Command response passed to callback_fn" << "\n";
 
         std::string responseStatus = response.status;
 
