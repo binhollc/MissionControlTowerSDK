@@ -112,13 +112,13 @@ To determine whether you're using a 32-bit or 64-bit version of Python on Window
 11. Send the command to open the Nova simulator:
 
    ```json
-   {"command":"open","params":{"address":"SIM"},"transaction_id":"0"}
+   {"command":"open","params":{"address":"NovaSimulatedPort"},"transaction_id":"0"}
    ```
 
 12. Verify that the bridge returns the following command response:
 
    ```json
-   {"transaction_id": "0", "status": "success", "is_promise": false, "data": {"command": "open", "id": "BINHONOVASIM001", "port": "SIM", "productName": "Binho Nova", "firmwareVersion": "0.2.8", "hardwareVersion": "1.0", "mode": "normal"}}
+   {"transaction_id": "0", "status": "success", "is_promise": false, "data": {"command": "open", "id": "BINHONOVASIM001", "port": "NovaSimulatedPort", "productName": "Binho Nova", "firmwareVersion": "0.2.8", "hardwareVersion": "1.0", "vendorId": "1240", "productId": "60724", "mode": "normal"}}
    ```
 
 13. Exit the bridge using the following command:
