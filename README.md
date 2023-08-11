@@ -234,6 +234,15 @@ the command execution:
 
 2. Add the PATH as a prefix of the command execution:
 
+On Mac or Linux:
+
 ```shell
 PATH=$PATH:/path/to/MissionControlTowerSDK/build_bridge/ ./sample_app
+```
+
+On Windows:
+
+```shell
+set PATH=%PATH%;\path\to\MissionControlTowerSDK\build_bridge\
+sample_app.exe
 ```
