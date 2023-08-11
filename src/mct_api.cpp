@@ -114,8 +114,12 @@ void CommandManager::start() {
 }
 
 void CommandManager::stop() {
+    std::cout << "CommandManager::stop()";
+
     // Wait until the threads have finished running
     while (isRunningWriteThread || isRunningReadThread || isRunningCallbackThread);
+
+    std::cout << "CommandManager::stop() - Threads have finished running" << "\n";
 
     requestCV.notify_all();
     responseCV.notify_all();
@@ -133,6 +137,7 @@ void CommandManager::stop() {
         callbackOnResponseThread.join();
     }
 
+    std::cout << "About to close read and write handles";
     #ifdef _WIN32
         if (bridgeProcessRead != NULL) {
             CloseHandle(bridgeProcessRead);
@@ -145,6 +150,7 @@ void CommandManager::stop() {
             pclose(bridgeProcess);
         }
     #endif
+    std::cout << "Handles closed";
 }
 
 void CommandManager::handleWriteBridgeThread() {
@@ -198,6 +204,7 @@ void CommandManager::handleReadBridgeThread() {
 
         // Break the loop upon receiving EOF
         if (jsonString == "__EOF__") {
+            std::cout << "CommandManager::handleReadBridgeThread() EOF" << "\n";
             isRunningReadThread = false;
             break;
         }
@@ -216,6 +223,11 @@ void CommandManager::handleReadBridgeThread() {
                 responseQueue.push(response);
                 std::cout << "responseQueue.push(response)" << "\n";
                 responseCV.notify_one();
+
+                if (response.status == "exit") {
+                    isRunningReadThread = false;
+                    break;
+                }
             }
             catch (const nlohmann::json::exception& e) {
                 std::cout << "Exception during parsing: " << e.what() << "\n";
@@ -236,6 +248,9 @@ void CommandManager::handleCallbackOnResponseThread() {
         responseQueue.pop();
 
         std::cout << "Command response passed to callback_fn" << "\n";
+        nlohmann::json j;
+        to_json(j, response);
+        std::cout << j.dump() << "\n";
 
         std::string responseStatus = response.status;
 
@@ -249,6 +264,7 @@ void CommandManager::handleCallbackOnResponseThread() {
             break;
         }
     }
+    std::cout << "CommandManager::handleCallbackOnResponseThread() EXIT" << "\n";
 }
 
 void CommandManager::invoke_command(const CommandRequest& request) {
