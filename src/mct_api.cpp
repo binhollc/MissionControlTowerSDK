@@ -19,18 +19,36 @@ void CommandManager::start() {
     // Start the bridge process
     #ifdef _WIN32
         // Create pipes for input and output
-        HANDLE hRead, hWrite;
+        HANDLE BridgeProcess_IN_Rd = NULL;
+        HANDLE BridgeProcess_IN_Wr = NULL;
+        HANDLE BridgeProcess_OUT_Rd = NULL;
+        HANDLE BridgeProcess_OUT_Wr = NULL;
+
         SECURITY_ATTRIBUTES saAttr = { sizeof(SECURITY_ATTRIBUTES) };
         saAttr.bInheritHandle = TRUE;
         saAttr.lpSecurityDescriptor = NULL;
-        if (!CreatePipe(&hRead, &hWrite, &saAttr, 0)) {
-            std::cerr << "CreatePipe failed" << std::endl;
+
+        // Create a pipe for the child process's STDOUT.
+        if (!CreatePipe(&BridgeProcess_OUT_Rd, &BridgeProcess_OUT_Wr, &saAttr, 0)) {
+            std::cerr << "STDOUT CreatePipe failed" << std::endl;
             return;
         }
 
         // Ensure the read handle to the pipe for STDOUT is not inherited.
-        if (!SetHandleInformation(hRead, HANDLE_FLAG_INHERIT, 0)) {
+        if (!SetHandleInformation(BridgeProcess_OUT_Rd, HANDLE_FLAG_INHERIT, 0)) {
             std::cerr << "Stdout SetHandleInformation" << std::endl;
+            return;
+        }
+
+        // Create a pipe for the child process's STDIN. 
+        if (!CreatePipe(&BridgeProcess_IN_Rd, &BridgeProcess_IN_Wr, &saAttr, 0)) {
+            std::cerr << "STDIN CreatePipe failed" << std::endl;
+            return;
+        }
+
+        // Ensure the read handle to the pipe for STDIN is not inherited.
+        if (!SetHandleInformation(BridgeProcess_IN_Wr, HANDLE_FLAG_INHERIT, 0)) {
+            std::cerr << "STDIN SetHandleInformation" << std::endl;
             return;
         }
 
@@ -41,9 +59,9 @@ void CommandManager::start() {
         // This structure specifies the STDIN and STDOUT handles for redirection.
         STARTUPINFO startInfo = { 0 };
         startInfo.cb = sizeof(STARTUPINFO);
-        startInfo.hStdError = hWrite;
-        startInfo.hStdOutput = hWrite;
-        startInfo.hStdInput = hRead;
+        startInfo.hStdError = BridgeProcess_OUT_Wr;
+        startInfo.hStdOutput = BridgeProcess_OUT_Wr;
+        startInfo.hStdInput = BridgeProcess_IN_Rd;
         startInfo.dwFlags |= STARTF_USESTDHANDLES;
 
         // Create the child process.
@@ -67,8 +85,8 @@ void CommandManager::start() {
         else {
             CloseHandle(procInfo.hProcess);
             CloseHandle(procInfo.hThread);
-            bridgeProcessWrite = hWrite;
-            bridgeProcessRead = hRead;
+            bridgeProcessWrite = BridgeProcess_IN_Wr;
+            bridgeProcessRead = BridgeProcess_OUT_Rd;
         }
     #else
         std::string command = "bridge " + targetCommandAdaptor;
