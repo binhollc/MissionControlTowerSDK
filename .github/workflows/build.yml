@@ -1,9 +1,7 @@
 name: Build and Package BMC SDK
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch
 
 jobs:
   build:
