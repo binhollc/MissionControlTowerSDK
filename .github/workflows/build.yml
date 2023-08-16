@@ -28,7 +28,7 @@ jobs:
     - name: Copy artifacts to staging directory
       run: |
         mkdir staging
-        copy lib\libmct_api.dll staging\
+        copy lib\Release\mct_api.dll staging\
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v2
