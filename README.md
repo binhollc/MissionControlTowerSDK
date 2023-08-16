@@ -218,7 +218,7 @@ If you get an error code `0xc000007b` when executing your app, it is most likely
    cmake --build build/
    ```
 
-After the build process completes, the library file libmct_api.so (or libmct_api.dylib on macOS) will be located in the lib directory.
+After the build process completes, the library file libmct_api.so (libmct_api.dylib on macOS, mct_api.dll on Windows) will be located in the lib directory.
 
 ### Building the Sample App
 
