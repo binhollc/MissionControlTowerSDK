@@ -18,12 +18,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -G "Ninja"
-
-    - name: Build
-      run: |
-        cd build
-        ninja
+        cmake .. -G "Visual Studio 16 2019" -A x64
 
     - name: Build
       run: |
