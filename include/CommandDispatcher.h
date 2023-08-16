@@ -8,9 +8,15 @@
 
 using json = nlohmann::json;
 
+#ifdef BUILD_MCT_API  // This macro is defined when building the library
+    #define MCT_API __declspec(dllexport)
+#else
+    #define MCT_API __declspec(dllimport)
+#endif
+
 class CommandManager;
 
-class CommandDispatcher {
+class MCT_API CommandDispatcher {
 private:
     CommandManager commandManager;
     std::mutex mtx;

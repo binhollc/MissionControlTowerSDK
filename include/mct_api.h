@@ -16,12 +16,6 @@
 
 using json = nlohmann::json;
 
-#ifdef BUILD_MCT_API  // This macro is defined when building the library
-    #define MCT_API __declspec(dllexport)
-#else
-    #define MCT_API __declspec(dllimport)
-#endif
-
 // CommandRequest struct definition
 struct CommandRequest {
     std::string transaction_id;
@@ -75,7 +69,7 @@ inline void from_json(const json& j, CommandResponse& p) {
 }
 
 // CommandManager class definition
-class MCT_API CommandManager {
+class CommandManager {
 public:
     CommandManager(const std::string &targetCommandAdaptorName) : targetCommandAdaptor(targetCommandAdaptorName), isRunningWriteThread(false), isRunningReadThread(false), isRunningCallbackThread(false) {}
     void start();

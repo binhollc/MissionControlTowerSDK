@@ -14,7 +14,7 @@ include_directories(../include)
 include_directories(.)
 
 # Specify the source files for the sample_app executable
-set(SOURCES main.cpp CommandDispatcher.cpp)
+set(SOURCES main.cpp)
 
 # Create the executable
 add_executable(sample_app ${SOURCES})

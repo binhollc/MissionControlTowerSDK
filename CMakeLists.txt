@@ -9,6 +9,7 @@ add_definitions(-DBUILD_MCT_API)
 # Plarform-independent files
 set(SOURCE_FILES
     src/mct_api.cpp
+    src/CommandDispatcher.cpp
 )
 
 # Add platform-dependent files
