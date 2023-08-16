@@ -118,9 +118,18 @@ To determine whether you're using a 32-bit or 64-bit version of Python on Window
 
 10. Navigate to the `build_bridge` directory and test that the bridge works properly.
 
+   On Linux / Mac:
+
    ```shell
    cd build_bridge
    ./bridge BinhoNova
+   ```
+
+   On Windows:
+
+   ```shell
+   cd build_bridge
+   bridge.exe BinhoNova
    ```
 
    Now the ListUsbDevices should be ready and waiting to receive JSON commands.
