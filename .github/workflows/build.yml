@@ -1,0 +1,45 @@
+name: Build and Package BMC SDK
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup CMake and Ninja
+      uses: lukka/get-cmake@latest
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake .. -G "Ninja"
+
+    - name: Build
+      run: |
+        cd build
+        ninja
+
+    - name: Build
+      run: |
+        cd build
+        cmake --build . --config Release
+
+    - name: Copy artifacts to staging directory
+      run: |
+        mkdir staging
+        copy lib\mct_api.dll staging\
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: windows-artifacts
+        path: staging/
+
