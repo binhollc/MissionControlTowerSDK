@@ -56,14 +56,30 @@ To determine whether you're using a 32-bit or 64-bit version of Python on Window
 
 1. Create a virtual environment and save it in the `venv` folder:
 
+   On Linux / Mac:
+
    ```shell
    python3 -m venv venv
    ```
 
+   On Windows:
+
+   ```shell
+   python -m venv venv
+   ```
+
 2. Activate the virtual environment:
+
+   On Linux / Mac:
 
    ```shell
    source ./venv/bin/activate
+   ```
+
+   On Windows:
+
+   ```shell
+   venv\\Scripts\\Activate
    ```
 
 3. Verify that your command prompt has an indicator that the virtual environment is active.
