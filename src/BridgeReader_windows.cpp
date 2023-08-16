@@ -1,6 +1,7 @@
 #include "BridgeReader_windows.h"
 #include <string>
 #include <vector>
+#include <algorithm>
 
 BridgeReader::BridgeReader(HANDLE bridgeProcessRead) : bridgeProcessRead(bridgeProcessRead) {}
 
