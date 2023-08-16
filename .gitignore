@@ -39,6 +39,8 @@ Makefile
 install_manifest.txt
 _deps/
 build/
+*.exp
+lib/
 
 # Built Python backend
 build_bridge/
@@ -47,6 +49,7 @@ requirements.txt
 # Python
 __pycache__/
 venv/
+.venv/
 
 # macOS specific files
 .DS_Store

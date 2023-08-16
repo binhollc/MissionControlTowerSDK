@@ -7,9 +7,20 @@
 #include <condition_variable>
 #include <thread>
 #include <nlohmann/json.hpp>
-#include "bridge_reader.h"
+#ifdef _WIN32
+    #include <windows.h>
+    #include "BridgeReader_windows.h"
+#else
+    #include "bridge_reader.h"
+#endif
 
 using json = nlohmann::json;
+
+#ifdef BUILD_MCT_API  // This macro is defined when building the library
+    #define MCT_API __declspec(dllexport)
+#else
+    #define MCT_API __declspec(dllimport)
+#endif
 
 // CommandRequest struct definition
 struct CommandRequest {
@@ -64,7 +75,7 @@ inline void from_json(const json& j, CommandResponse& p) {
 }
 
 // CommandManager class definition
-class CommandManager {
+class MCT_API CommandManager {
 public:
     CommandManager(const std::string &targetCommandAdaptorName) : targetCommandAdaptor(targetCommandAdaptorName), isRunningWriteThread(false), isRunningReadThread(false), isRunningCallbackThread(false) {}
     void start();
@@ -73,7 +84,11 @@ public:
     void on_command_response(std::function<void(CommandResponse)> fn);
 private:
     std::string targetCommandAdaptor;
-    FILE* bridgeProcess;
+    #ifdef _WIN32
+        HANDLE bridgeProcessWrite, bridgeProcessRead;
+    #else
+        FILE* bridgeProcess;
+    #endif
     std::queue<CommandRequest> requestQueue;
     std::queue<CommandResponse> responseQueue;
     std::mutex requestMutex;

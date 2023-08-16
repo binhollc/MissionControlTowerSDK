@@ -6,7 +6,7 @@ int main() {
 
   dispatcher.start();
 
-  dispatcher.invokeCommandSync("1", "open", {{"address", "SIM"}}, [](CommandResponse cr) {
+  dispatcher.invokeCommandSync("1", "open", {{"address", "NovaSimulatedPort"}}, [](CommandResponse cr) {
       std::cout << cr.transaction_id << cr.status << cr.is_promise << cr.data.dump() << "\n";
   });
 

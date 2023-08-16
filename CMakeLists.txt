@@ -4,10 +4,19 @@ project(mission_control_tower)
 
 set(CMAKE_BUILD_TYPE Debug)
 
+add_definitions(-DBUILD_MCT_API)
+
+# Plarform-independent files
 set(SOURCE_FILES
     src/mct_api.cpp
-    src/bridge_reader.cpp
 )
+
+# Add platform-dependent files
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    list(APPEND SOURCE_FILES src/BridgeReader_windows.cpp)
+else()
+    list(APPEND SOURCE_FILES src/bridge_reader.cpp)
+endif()
 
 add_library(mct_api SHARED ${SOURCE_FILES})
 
