@@ -17,6 +17,13 @@ if "%~1" == "lib" (
     exit /b 1
 )
 
+:: Set platform
+if not "%~2"=="" (
+    set PLATFORM=%~2
+) else (
+    set PLATFORM=win32
+)
+
 :: Configure CMake
 cd %SUBPROJECT_DIR%
 
@@ -30,7 +37,7 @@ if not exist "%BUILD_DIR%\" (
 )
 
 cd %BUILD_DIR%
-cmake .. -G "Visual Studio 17 2022" -A win32
+cmake .. -G "Visual Studio 17 2022" -A %PLATFORM%
 
 :: Build
 cd %SUBPROJECT_DIR%
