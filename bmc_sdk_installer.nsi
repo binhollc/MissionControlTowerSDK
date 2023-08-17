@@ -10,6 +10,7 @@ Section "Main Files"
     ; Library and Sample App
     SetOutPath $INSTDIR
     File "staging\bmc_sdk.dll"
+    File "staging\bmc_sdk.lib"
     File "staging\sample_app.exe"
 
     ; Bridge
