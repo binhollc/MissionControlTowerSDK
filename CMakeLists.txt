@@ -44,16 +44,6 @@ set_target_properties(mct_api PROPERTIES
     SOVERSION 1
 )
 
-# Set the output directory for the library
-set_target_properties(mct_api PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib
-)
-
-# Set the output directory for the runtime files (e.g., DLL on Windows)
-set_target_properties(mct_api PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib
-)
-
 target_compile_features(mct_api PUBLIC cxx_std_17)
 
 install(TARGETS mct_api DESTINATION lib)
