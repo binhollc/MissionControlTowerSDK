@@ -25,10 +25,3 @@ target_link_libraries(sample_app PRIVATE mct_api nlohmann_json::nlohmann_json)
 # Set the location of the dynamic library
 set_target_properties(sample_app PROPERTIES INSTALL_RPATH mct_api)
 
-# Only add the custom command on Windows
-if(WIN32)
-  add_custom_command(TARGET sample_app POST_BUILD
-                     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                     "${CMAKE_SOURCE_DIR}/../lib/Debug/mct_api.dll"
-                     "$<TARGET_FILE_DIR:sample_app>/mct_api.dll")
-endif()
