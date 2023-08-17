@@ -5,13 +5,13 @@
 #include <unordered_map>
 #include <functional>
 #include "definitions.h"
-#include "mct_api.h"
+#include "CommandManager.h"
 
 using json = nlohmann::json;
 
 class CommandManager;
 
-class MCT_API CommandDispatcher {
+class BMC_SDK CommandDispatcher {
 private:
     CommandManager commandManager;
     std::mutex mtx;

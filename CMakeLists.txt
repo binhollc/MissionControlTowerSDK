@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.8)
 
-project(mission_control_tower)
+project(BinhoMissionControlSDK)
 
 set(CMAKE_BUILD_TYPE Debug)
 
-add_definitions(-DBUILD_MCT_API)
+add_definitions(-DBUILD_BMC_SDK)
 
 # Plarform-independent files
 set(SOURCE_FILES
-    src/mct_api.cpp
+    src/CommandManager.cpp
     src/CommandDispatcher.cpp
 )
 
@@ -19,9 +19,9 @@ else()
     list(APPEND SOURCE_FILES src/bridge_reader.cpp)
 endif()
 
-add_library(mct_api SHARED ${SOURCE_FILES})
+add_library(bmc_sdk SHARED ${SOURCE_FILES})
 
-target_include_directories(mct_api PUBLIC
+target_include_directories(bmc_sdk PUBLIC
     ${PROJECT_SOURCE_DIR}/include
 )
 
@@ -35,15 +35,15 @@ FetchContent_MakeAvailable(json)
 # Add link libraries
 
 target_link_libraries(
-    mct_api PRIVATE
+    bmc_sdk PRIVATE
     nlohmann_json::nlohmann_json
 )
 
-set_target_properties(mct_api PROPERTIES
+set_target_properties(bmc_sdk PROPERTIES
     VERSION 0.1.0
     SOVERSION 1
 )
 
-target_compile_features(mct_api PUBLIC cxx_std_17)
+target_compile_features(bmc_sdk PUBLIC cxx_std_17)
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION include)

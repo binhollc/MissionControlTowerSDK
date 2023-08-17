@@ -6,7 +6,7 @@
 
 using json = nlohmann::json;
 
-struct MCT_API CommandResponse {
+struct BMC_SDK CommandResponse {
     std::string transaction_id;
     std::string status;
     bool is_promise;
@@ -19,11 +19,11 @@ struct MCT_API CommandResponse {
         : transaction_id(id), status(st), is_promise(pr), data(dt) {}
 };
 
-MCT_API inline void to_json(json& j, const CommandResponse& p) {
+BMC_SDK inline void to_json(json& j, const CommandResponse& p) {
     j = json{{"transaction_id", p.transaction_id}, {"status", p.status}, {"is_promise", p.is_promise}, {"data", p.data}};
 }
 
-MCT_API inline void from_json(const json& j, CommandResponse& p) {
+BMC_SDK inline void from_json(const json& j, CommandResponse& p) {
     j.at("transaction_id").get_to(p.transaction_id);
     j.at("status").get_to(p.status);
     j.at("is_promise").get_to(p.is_promise);

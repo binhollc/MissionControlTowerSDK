@@ -47,7 +47,7 @@ jobs:
 
     - name: Set up environment
       run: |
-        echo "ARTIFACT_NAME=mct_api${{ matrix.extension.lib }}" >> $GITHUB_ENV
+        echo "ARTIFACT_NAME=bmc_sdk${{ matrix.extension.lib }}" >> $GITHUB_ENV
         echo "SUBPROJECT_DIR=${{ github.workspace }}" >> $GITHUB_ENV
         if [ "${{ matrix.artifact }}" = "sample_app" ]; then
           echo "ARTIFACT_NAME=sample_app${{ matrix.extension.sample_app }}" >> $GITHUB_ENV

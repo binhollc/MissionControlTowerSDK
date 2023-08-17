@@ -1,5 +1,5 @@
-#ifdef BUILD_MCT_API  // This macro is defined when building the library
-    #define MCT_API __declspec(dllexport)
+#ifdef BUILD_BMC_SDK  // This macro is defined when building the library
+    #define BMC_SDK __declspec(dllexport)
 #else
-    #define MCT_API __declspec(dllimport)
+    #define BMC_SDK __declspec(dllimport)
 #endif

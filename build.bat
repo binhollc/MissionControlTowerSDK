@@ -13,7 +13,7 @@ if "%~1" == "stage_includes" (
 
 :: Check the command line argument to decide which project to build
 if "%~1" == "lib" (
-    set ARTIFACT_NAME=mct_api.dll
+    set ARTIFACT_NAME=bmc_sdk.dll bmc_sdk.lib
     set SUBPROJECT_DIR=%PROJECT_DIR%
 ) else if "%~1" == "sample_app" (
     set ARTIFACT_NAME=sample_app.exe
@@ -56,7 +56,11 @@ if not exist "%STAGING_DIR%\" (
     mkdir %STAGING_DIR%
 )
 cd %SUBPROJECT_DIR%
-copy "%BUILD_DIR%\Release\%ARTIFACT_NAME%" "%PROJECT_DIR%\%STAGING_DIR%\"
+for %%i in (%ARTIFACT_NAME%) do (
+    if exist "%BUILD_DIR%\Release\%%i" (
+        copy "%BUILD_DIR%\Release\%%i" "%PROJECT_DIR%\%STAGING_DIR%\"
+    )
+)
 
 goto End
 
@@ -73,9 +77,7 @@ if exist "%INCLUDE_TARGET_DIR%\" (
 if not exist "%INCLUDE_TARGET_DIR%\" (
     mkdir "%INCLUDE_TARGET_DIR%"
 )
-copy /Y "%INCLUDE_ORIGIN_DIR%\CommandRequest.h" "%INCLUDE_TARGET_DIR%\"
-copy /Y "%INCLUDE_ORIGIN_DIR%\CommandResponse.h" "%INCLUDE_TARGET_DIR%\"
-copy /Y "%INCLUDE_ORIGIN_DIR%\CommandDispatcher.h" "%INCLUDE_TARGET_DIR%\"
+xcopy /E /I /Y "%INCLUDE_ORIGIN_DIR%" "%INCLUDE_TARGET_DIR%"
 
 :End
 
