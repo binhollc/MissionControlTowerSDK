@@ -5,6 +5,12 @@ set PROJECT_DIR=%CD%
 set BUILD_DIR=build
 set STAGING_DIR=staging
 
+:: Check the command line argument to decide which project to build or to skip building
+if "%~1" == "stage_includes" (
+    echo Skipping build, staging include files...
+    goto StagingIncludesStep
+)
+
 :: Check the command line argument to decide which project to build
 if "%~1" == "lib" (
     set ARTIFACT_NAME=mct_api.dll
@@ -52,7 +58,29 @@ if not exist "%STAGING_DIR%\" (
 cd %SUBPROJECT_DIR%
 copy "%BUILD_DIR%\Release\%ARTIFACT_NAME%" "%PROJECT_DIR%\%STAGING_DIR%\"
 
+goto End
+
+:StagingIncludesStep
+
+cd %PROJECT_DIR%
+
+set INCLUDE_ORIGIN_DIR=%PROJECT_DIR%\include
+set INCLUDE_TARGET_DIR=%STAGING_DIR%\include
+
+if exist "%INCLUDE_TARGET_DIR%\" (
+    rmdir /s /q "%INCLUDE_TARGET_DIR%\"
+)
+if not exist "%INCLUDE_TARGET_DIR%\" (
+    mkdir "%INCLUDE_TARGET_DIR%"
+)
+copy /Y "%INCLUDE_ORIGIN_DIR%\CommandRequest.h" "%INCLUDE_TARGET_DIR%\"
+copy /Y "%INCLUDE_ORIGIN_DIR%\CommandResponse.h" "%INCLUDE_TARGET_DIR%\"
+copy /Y "%INCLUDE_ORIGIN_DIR%\CommandDispatcher.h" "%INCLUDE_TARGET_DIR%\"
+
+:End
+
 cd %PROJECT_DIR%
 
 echo Done!
+
 endlocal
