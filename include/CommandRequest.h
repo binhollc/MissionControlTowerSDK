@@ -2,10 +2,11 @@
 
 #include <string>
 #include <nlohmann/json.hpp>
+#include "definitions.h"
 
 using json = nlohmann::json;
 
-struct CommandRequest {
+struct MCT_API CommandRequest {
     std::string transaction_id;
     std::string command;
     json params;
@@ -20,11 +21,11 @@ struct CommandRequest {
         : transaction_id(id), command(cmd), params(prms) {}
 };
 
-inline void to_json(json& j, const CommandRequest& p) {
+MCT_API inline void to_json(json& j, const CommandRequest& p) {
     j = json{{"transaction_id", p.transaction_id}, {"command", p.command}, {"params", p.params}};
 }
 
-inline void from_json(const json& j, CommandRequest& p) {
+MCT_API inline void from_json(const json& j, CommandRequest& p) {
     j.at("transaction_id").get_to(p.transaction_id);
     j.at("command").get_to(p.command);
     j.at("params").get_to(p.params);

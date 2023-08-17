@@ -4,15 +4,10 @@
 #include <condition_variable>
 #include <unordered_map>
 #include <functional>
+#include "definitions.h"
 #include "mct_api.h"
 
 using json = nlohmann::json;
-
-#ifdef BUILD_MCT_API  // This macro is defined when building the library
-    #define MCT_API __declspec(dllexport)
-#else
-    #define MCT_API __declspec(dllimport)
-#endif
 
 class CommandManager;
 
