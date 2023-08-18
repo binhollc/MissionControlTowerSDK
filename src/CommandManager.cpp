@@ -1,4 +1,4 @@
-#include "mct_api.h"
+#include "CommandManager.h"
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
@@ -114,12 +114,12 @@ void CommandManager::start() {
 }
 
 void CommandManager::stop() {
-    std::cout << "CommandManager::stop()";
+    DEBUG_MSG("CommandManager::stop()");
 
     // Wait until the threads have finished running
     while (isRunningWriteThread || isRunningReadThread || isRunningCallbackThread);
 
-    std::cout << "CommandManager::stop() - Threads have finished running" << "\n";
+    DEBUG_MSG("CommandManager::stop() - Threads have finished running");
 
     requestCV.notify_all();
     responseCV.notify_all();
@@ -137,7 +137,8 @@ void CommandManager::stop() {
         callbackOnResponseThread.join();
     }
 
-    std::cout << "About to close read and write handles";
+    DEBUG_MSG("About to close read and write handles");
+
     #ifdef _WIN32
         if (bridgeProcessRead != NULL) {
             CloseHandle(bridgeProcessRead);
@@ -150,7 +151,8 @@ void CommandManager::stop() {
             pclose(bridgeProcess);
         }
     #endif
-    std::cout << "Handles closed";
+
+    DEBUG_MSG("Handles closed");
 }
 
 void CommandManager::handleWriteBridgeThread() {
@@ -170,7 +172,7 @@ void CommandManager::handleWriteBridgeThread() {
 
         std::string jsonString = j.dump() + "\n";
 
-        std::cout << "Command read from queue: " << jsonString << "\n";
+        DEBUG_MSG("Command read from queue: " << jsonString);
 
         // write jsonString to bridge's stdin
         #ifdef _WIN32
@@ -204,24 +206,21 @@ void CommandManager::handleReadBridgeThread() {
 
         // Break the loop upon receiving EOF
         if (jsonString == "__EOF__") {
-            std::cout << "CommandManager::handleReadBridgeThread() EOF" << "\n";
+            DEBUG_MSG("CommandManager::handleReadBridgeThread() EOF");
             isRunningReadThread = false;
             break;
         }
 
         if (!jsonString.empty()) {
-            std::cout << "Command response read from bridge: " << jsonString << "\n";
+            DEBUG_MSG("Command response read from bridge: " << jsonString);
 
             try {
                 nlohmann::json j = nlohmann::json::parse(jsonString);
                 CommandResponse response;
-                std::cout << "!!!" << "\n";
                 from_json(j, response);
-                std::cout << "Command response parsed!" << "\n";
                 
                 std::lock_guard<std::mutex> lock(responseMutex);
                 responseQueue.push(response);
-                std::cout << "responseQueue.push(response)" << "\n";
                 responseCV.notify_one();
 
                 if (response.status == "exit") {
@@ -230,8 +229,8 @@ void CommandManager::handleReadBridgeThread() {
                 }
             }
             catch (const nlohmann::json::exception& e) {
-                std::cout << "Exception during parsing: " << e.what() << "\n";
-                std::cout << "Failed to parse: " << jsonString << "\n";
+                std::cerr << "Exception during parsing: " << e.what() << "\n";
+                std::cerr << "Failed to parse: " << jsonString << "\n";
                 // handle error or rethrow
             }
         }
@@ -247,10 +246,12 @@ void CommandManager::handleCallbackOnResponseThread() {
         CommandResponse response = responseQueue.front();
         responseQueue.pop();
 
-        std::cout << "Command response passed to callback_fn" << "\n";
+        DEBUG_MSG("Command response passed to callback_fn");
+
         nlohmann::json j;
         to_json(j, response);
-        std::cout << j.dump() << "\n";
+
+        DEBUG_MSG(j.dump());
 
         std::string responseStatus = response.status;
 
@@ -264,7 +265,7 @@ void CommandManager::handleCallbackOnResponseThread() {
             break;
         }
     }
-    std::cout << "CommandManager::handleCallbackOnResponseThread() EXIT" << "\n";
+    DEBUG_MSG("CommandManager::handleCallbackOnResponseThread() EXIT");
 }
 
 void CommandManager::invoke_command(const CommandRequest& request) {

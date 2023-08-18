@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Set the path to the bmc_sdk library directory
-set(BMC_SDK_PATH "../staging")
+set(BMC_SDK_PATH "c:\\Program Files (x86)\\BinhoMissionControlSDK")
 
 include_directories(${BMC_SDK_PATH}/include)
 include_directories(.)

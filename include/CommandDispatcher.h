@@ -4,19 +4,14 @@
 #include <condition_variable>
 #include <unordered_map>
 #include <functional>
-#include "mct_api.h"
+#include "definitions.h"
+#include "CommandManager.h"
 
 using json = nlohmann::json;
 
-#ifdef BUILD_MCT_API  // This macro is defined when building the library
-    #define MCT_API __declspec(dllexport)
-#else
-    #define MCT_API __declspec(dllimport)
-#endif
-
 class CommandManager;
 
-class MCT_API CommandDispatcher {
+class BMC_SDK CommandDispatcher {
 private:
     CommandManager commandManager;
     std::mutex mtx;

@@ -61,3 +61,6 @@ venv/
 
 # Compiled sample app
 sample_app/sample_app
+
+# Packaging
+staging/
