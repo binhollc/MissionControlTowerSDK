@@ -19,6 +19,13 @@ if "%~1" == "stage_docs" (
     goto StageAssets
 )
 
+if "%~1" == "stage_examples" (
+    echo Skipping build, staging examples...
+    set ASSETS_SOURCE_DIR=%PROJECT_DIR%\examples
+    set ASSETS_TARGET_DIR=%STAGING_DIR%\examples
+    goto StageAssets
+)
+
 :: Check the command line argument to decide which project to build
 if "%~1" == "lib" (
     set ARTIFACT_NAME=bmc_sdk.dll bmc_sdk.lib
@@ -27,7 +34,7 @@ if "%~1" == "lib" (
     set ARTIFACT_NAME=sample_app.exe
     set SUBPROJECT_DIR=%PROJECT_DIR%\sample_app
 ) else (
-    echo Invalid argument. Use "lib", "sample_app", "stage_includes" or "stage_docs".
+    echo Invalid argument. Use "lib", "sample_app", "stage_includes", "stage_docs", "example_docs".
     exit /b 1
 )
 
