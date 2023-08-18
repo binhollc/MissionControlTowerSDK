@@ -163,3 +163,17 @@ Once all tasks are done, ensure to stop the dispatcher:
 ```cpp
 dispatcher.stop();
 ```
+
+## Changelog
+
+### v0.1.0
+
+- Now supports Windows.
+- Introduced the CommandDispatcher: Streamlines and improves synchronization handling.
+- Released a new sample application: supernova_101.
+- Enhanced the user experience and functionality of the existing sample app: nova_breathing_leds.
+- Library renamed to BinhoMissionControlSDK (BMC_SDK) for clarity and improved recognition.
+- Included a comprehensive README.md for users to better understand the distribution.
+- Fully automated the build and distribution process for Windows.
+- Implemented a macro that prints debug messages only when the NDEBUG flag is enabled by the developer.
+- Adjusted the CommandResponse’s from_json function: Now accepts both numeric and string-typed transaction IDs for greater flexibility.
