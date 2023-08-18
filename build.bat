@@ -13,10 +13,9 @@ if "%~1" == "stage_includes" (
 )
 
 if "%~1" == "stage_docs" (
-    echo Skipping build, staging include files...
-    set ASSETS_SOURCE_DIR=%PROJECT_DIR%\docs
-    set ASSETS_TARGET_DIR=%STAGING_DIR%\docs
-    goto StageAssets
+    echo Skipping build, staging README file...
+    copy %PROJECT_DIR%\docs\README.md %STAGING_DIR%
+    goto End
 )
 
 if "%~1" == "stage_examples" (
