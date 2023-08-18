@@ -5,10 +5,18 @@ set PROJECT_DIR=%CD%
 set BUILD_DIR=build
 set STAGING_DIR=staging
 
-:: Check the command line argument to decide which project to build or to skip building
 if "%~1" == "stage_includes" (
     echo Skipping build, staging include files...
-    goto StagingIncludesStep
+    set ASSETS_SOURCE_DIR=%PROJECT_DIR%\include
+    set ASSETS_TARGET_DIR=%STAGING_DIR%\include
+    goto StageAssets
+)
+
+if "%~1" == "stage_docs" (
+    echo Skipping build, staging include files...
+    set ASSETS_SOURCE_DIR=%PROJECT_DIR%\docs
+    set ASSETS_TARGET_DIR=%STAGING_DIR%\docs
+    goto StageAssets
 )
 
 :: Check the command line argument to decide which project to build
@@ -19,7 +27,7 @@ if "%~1" == "lib" (
     set ARTIFACT_NAME=sample_app.exe
     set SUBPROJECT_DIR=%PROJECT_DIR%\sample_app
 ) else (
-    echo Invalid argument. Use "lib" or "sample_app".
+    echo Invalid argument. Use "lib", "sample_app", "stage_includes" or "stage_docs".
     exit /b 1
 )
 
@@ -64,20 +72,19 @@ for %%i in (%ARTIFACT_NAME%) do (
 
 goto End
 
-:StagingIncludesStep
+:StageAssets
 
 cd %PROJECT_DIR%
 
-set INCLUDE_ORIGIN_DIR=%PROJECT_DIR%\include
-set INCLUDE_TARGET_DIR=%STAGING_DIR%\include
+if exist "%ASSETS_TARGET_DIR%\" (
+    rmdir /s /q "%ASSETS_TARGET_DIR%\"
+)
+if not exist "%ASSETS_TARGET_DIR%\" (
+    mkdir "%ASSETS_TARGET_DIR%"
+)
+xcopy /E /I /Y "%ASSETS_SOURCE_DIR%" "%ASSETS_TARGET_DIR%"
 
-if exist "%INCLUDE_TARGET_DIR%\" (
-    rmdir /s /q "%INCLUDE_TARGET_DIR%\"
-)
-if not exist "%INCLUDE_TARGET_DIR%\" (
-    mkdir "%INCLUDE_TARGET_DIR%"
-)
-xcopy /E /I /Y "%INCLUDE_ORIGIN_DIR%" "%INCLUDE_TARGET_DIR%"
+goto End
 
 :End
 
