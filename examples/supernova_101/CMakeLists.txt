@@ -1,0 +1,32 @@
+cmake_minimum_required(VERSION 3.5)
+project(sample_app)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# Set the path to the bmc_sdk library directory
+set(BMC_SDK_PATH "c:\\Program Files (x86)\\BinhoMissionControlSDK")
+
+include_directories(${BMC_SDK_PATH}/include)
+include_directories(.)
+
+# Install JSON library
+
+include(FetchContent)
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
+FetchContent_MakeAvailable(json)
+
+# Try to find the bmc_sdk library using the path variable
+find_library(BMC_SDK_LIB NAMES bmc_sdk PATHS ${BMC_SDK_PATH})
+
+# Specify the source files for the sample_app executable
+set(SOURCES main.cpp)
+
+# Create the executable
+add_executable(sample_app ${SOURCES})
+
+# Link found library and other libraries
+target_link_libraries(sample_app PRIVATE ${BMC_SDK_LIB} nlohmann_json::nlohmann_json)
+
+# Set the location of the dynamic library for runtime using the path variable
+set_target_properties(sample_app PROPERTIES INSTALL_RPATH ${BMC_SDK_PATH})
