@@ -1,7 +1,13 @@
-#ifdef BUILD_BMC_SDK
-    #define BMC_SDK __declspec(dllexport)
+#if defined(_WIN32) || defined(_WIN64)
+    #ifdef BUILD_BMC_SDK
+        #define BMC_SDK __declspec(dllexport)
+    #else
+        #define BMC_SDK __declspec(dllimport)
+    #endif
+#elif defined(__APPLE__) || defined(__MACH__) || defined(__linux__)
+    #define BMC_SDK __attribute__((visibility("default")))
 #else
-    #define BMC_SDK __declspec(dllimport)
+    #define BMC_SDK
 #endif
 
 #ifndef NDEBUG
