@@ -6,6 +6,8 @@ set(CMAKE_BUILD_TYPE Debug)
 
 add_definitions(-DBUILD_BMC_SDK)
 
+# add_definitions(-DNDEBUG)
+
 # Plarform-independent files
 set(SOURCE_FILES
     src/CommandManager.cpp
