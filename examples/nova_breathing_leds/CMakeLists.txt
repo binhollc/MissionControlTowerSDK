@@ -5,7 +5,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Set the path to the bmc_sdk library directory
-set(BMC_SDK_PATH "c:\\Program Files (x86)\\BinhoMissionControlSDK")
+
+# Check if BMC_SDK_PATH is passed in from command line, if not, throw an error
+if(NOT DEFINED BMC_SDK_PATH)
+    message(FATAL_ERROR "BMC_SDK_PATH is not defined.
+    On Windows, the path is typically 'c:\\Program Files (x86)\\BinhoMissionControlSDK'
+    and in Dev Mode the path is typically '../../staging'.
+    Set it using: cmake .. -DBMC_SDK_PATH=<your-path-here>")
+endif()
 
 include_directories(${BMC_SDK_PATH}/include)
 include_directories(.)

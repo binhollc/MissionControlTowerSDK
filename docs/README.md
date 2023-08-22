@@ -73,7 +73,7 @@ We provide a set of sample applications to demonstrate how to use the library. B
 
 4. **Generate Project Files using CMake**:
    ```bash
-   cmake .. -G "Visual Studio 17 2022" -A win32
+   cmake .. -G "Visual Studio 17 2022" -A win32 -DBMC_SDK_PATH=c:\Program Files (x86)\BinhoMissionControlSDK
    ```
 
 5. **Build the Project**:
