@@ -46,25 +46,46 @@ echo "---"
 echo "Staging the library and include dirs"
 echo "---"
 
-cp build/libbmc_sdk.dylib staging
+cp build/libbmc_sdk.*.dylib staging
 cp -R include staging
+
+# Build examples
+
+echo "---"
+echo "Building examples"
+echo "---"
+
+if [ ! -d "staging/examples" ]; then
+    mkdir staging/examples
+fi
 
 # Loop through each subdirectory in examples/ and build the sample app
 for SAMPLE_DIR in "$PROJECT_DIR"/examples/*; do
     if [ -d "$SAMPLE_DIR" ]; then
         echo "---"
-        echo "Building sample in directory: $SAMPLE_DIR"
+        echo "Building example in directory: $SAMPLE_DIR"
         echo "---"
-        
+        echo
+
         cd "$SAMPLE_DIR"
-        
+
+        echo " * Removing $SAMPLE_DIR/build..."
         if [ -d "build" ]; then
             rm -rf build
         fi
+
+        echo " * Staging $SAMPLE_DIR..."
+        cp -R "$SAMPLE_DIR" "$PROJECT_DIR"/staging/examples
+
+        echo " * Creating $SAMPLE_DIR/build..."
         mkdir build
         cd build
+
+        echo " * Building $SAMPLE_DIR..."
         cmake .. -DBMC_SDK_PATH=../../staging
         cmake --build . --config Release
+
+        echo
     fi
 done
 
