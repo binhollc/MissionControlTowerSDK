@@ -57,6 +57,8 @@ We provide a set of sample applications to demonstrate how to use the library. B
   
 - **supernova_101**: Demonstrates basic operations such as fetching USB strings like `MANUFACTURER`, `PRODUCT_NAME`, and others from a `BinhoSupernova` host adapter.
 
+- **supernova_i2C**: Demonstrates I2C operations using the `BinhoSupernova` host adapter.
+
 ### Building the Sample Applications
 
 1. **Navigate to the folder of the sample app**
