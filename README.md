@@ -222,52 +222,79 @@ After the build process completes, the library file libmct_api.so (libmct_api.dy
 
 ### Building the Sample App
 
-To build the sample app that demonstrates how to use the mct_api library, follow these steps:
+To build the sample app that demonstrates how to use the libbmc_sdk library, follow these steps:
 
 1. Open a terminal or command prompt.
 
-2. Navigate to the sample_app directory.
+2. Navigate to the `MissionControlTowerSDK` project’s base directory.
 
-3. As you may notice, there is a CMakeLists.txt file under the folder `sample_app`. We are going to follow the same steps that we did for building the library, but this time we will use the `sample_app` folder as the base folder instead of the project folder as we did before.
-
-4. Have you followed the same steps that we did for building the library? ;)
-
-   ```
-   For Windows developers we strongly recommend you to explicitly specify the platform (x32 or x64) when building the library and the sample_app. See special note above.
-   ```
-
-5. Navigate to the `sample_app` folder and execute the following command:
+3. Copy the necessary files and directories to the `staging` directory:
 
    ```shell
-   cmake --build build/
+   cp -R build_bridge staging
+   cp build/libbmc_sdk.*.dylib staging
+   cp -R include staging
    ```
 
-After the build process completes, the executable file sample_app will be located in the build directory.
+4. Navigate to the `sample_app` directory and create a `build` directory:
 
-Note: Make sure you have already built the mct_api library as described in the 'Building the Library' section before building the sample app. The sample app depends on the library.
+   ```shell
+   cd sample_app
+   mkdir build
+   ```
+
+5. Navigate to the `build` directory:
+
+   ```shell
+   cd build
+   ```
+
+6. Run cmake to configure the project, specifying the `BMC_SDK_PATH`:
+
+   ```shell
+   cmake .. -DBMC_SDK_PATH=../../staging
+   ```
+
+7. Build the sample app:
+
+   ```shell
+   cmake --build .
+   ```
+
+After the build process completes, the executable file `sample_app` will be located in the `build` directory.
+
+Note: Make sure you have already built the libbmc_sdk library as described in the 'Building the Library' section before building the sample app. The sample app depends on the library.
+
+For Windows developers, the steps are the same but ensure that you open the Command Prompt or PowerShell and adapt the commands to the Windows environment. Also, specify the platform (x32 or x64) when running cmake commands.
 
 ### Executing the Sample App
 
-The sample app uses the dynamic library, which executes the bridge. This means that the bridge executable must
-be reacheable in the path. Before executing the app, you should add the directory that contains the bridge executable
-to the PATH environment variable.
+The sample app uses the dynamic library, which executes the bridge. This means that the bridge executable must be reachable in the path. Before executing the app, you should add the directory that contains the bridge executable to the PATH environment variable.
 
-Alternatively, if you are using bash or zsh, you can prepend the PATH variable to
-the command execution:
+Alternatively, you can prepend the PATH variable to the command execution:
 
-1. Navigate to the folder containing the sample app.
+1. Navigate to the folder containing the sample app’s built executable.
 
-2. Add the PATH as a prefix of the command execution:
+2. Update the PATH and execute the app:
 
-On Mac or Linux:
+   On Mac or Linux:
 
-```shell
-PATH=$PATH:/path/to/MissionControlTowerSDK/build_bridge/ ./sample_app
-```
+   ```shell
+   PATH=$PATH:/path/to/MissionControlTowerSDK/staging/build_bridge/ ./sample_app
+   ```
 
-On Windows:
+   On Windows (using Command Prompt):
 
-```shell
-set PATH=%PATH%;\path\to\MissionControlTowerSDK\build_bridge\
-sample_app.exe
-```
+   ```shell
+   set PATH=%PATH%;\path\to\MissionControlTowerSDK\staging\build_bridge\
+   sample_app.exe
+   ```
+
+   Or on Windows (using PowerShell):
+
+   ```shell
+   $env:PATH += ";\path\to\MissionControlTowerSDK\staging\build_bridge\"
+   .\sample_app.exe
+   ```
+
+   Replace `/path/to/MissionControlTowerSDK` and `\path\to\MissionControlTowerSDK` with the actual path to your `MissionControlTowerSDK` directory. Ensure you use the correct slashes for your operating system (`/` for Mac/Linux, `\` for Windows).
