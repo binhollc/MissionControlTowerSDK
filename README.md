@@ -273,7 +273,7 @@ For Windows developers, the steps are the same but ensure that you open the Comm
 
 ### Executing the Sample App
 
-The sample app uses the dynamic library, which executes the bridge. This means that the bridge executable must be reachable in the path. Before executing the app, you should add the directory that contains the bridge executable to the PATH environment variable.
+The sample app uses the dynamic library, which executes the bridge. This means that BOTH the bridge executable AND the library must be reachable in the path. Before executing the app, you should add the directory that contains the bridge executable AND the directory that contains the library to the PATH environment variable.
 
 Alternatively, you can prepend the PATH variable to the command execution:
 
@@ -284,20 +284,20 @@ Alternatively, you can prepend the PATH variable to the command execution:
    On Mac or Linux:
 
    ```shell
-   PATH=$PATH:/path/to/MissionControlTowerSDK/staging/bridge/ ./sample_app
+   PATH=$PATH:/path/to/MissionControlTowerSDK/staging/bridge/:/path/to/MissionControlTowerSDK/staging/ ./sample_app
    ```
 
    On Windows (using Command Prompt):
 
    ```shell
-   set PATH=%PATH%;\path\to\MissionControlTowerSDK\staging\bridge\
+   set PATH=%PATH%;\path\to\MissionControlTowerSDK\staging\bridge\;\path\to\MissionControlTowerSDK\staging\
    sample_app.exe
    ```
 
    Or on Windows (using PowerShell):
 
    ```shell
-   $env:PATH += ";\path\to\MissionControlTowerSDK\staging\bridge\"
+   $env:PATH += ";\path\to\MissionControlTowerSDK\staging\bridge\;\path\to\MissionControlTowerSDK\staging\"
    .\sample_app.exe
    ```
 
@@ -310,6 +310,30 @@ Alternatively, you can prepend the PATH variable to the command execution:
    Additionally, you can find a script that automates the build and distribution process in the project folder.
 
    Certainly! Below is the section "Distributing the Tool" that provides an overview of the folder structure after executing the `build.sh` script, as represented in the provided image:
+
+## Troubleshooting
+
+### The system can't find the library
+
+Error:
+
+```
+---------------------------
+sample_app.exe - System Error
+---------------------------
+The code execution cannot proceed because bmc_sdk.dll was not found. Reinstalling the program may fix this problem. 
+```
+
+Solution:
+
+Add `/path/to/MissionControlTowerSDK/staging/` to the PATH environment variable.
+
+### CreateProcess failed
+
+Solution:
+
+Add `/path/to/MissionControlTowerSDK/staging/bridge` to the PATH environment variable.
+
 
 ## Distributing the Tool
 
