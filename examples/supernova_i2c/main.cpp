@@ -21,7 +21,7 @@ int main() {
     dispatcher.start();
 
     // Open device
-    dispatcher.invokeCommandSync("0", "open", {{"address", "DevSrvsID:4295040111"}}, process_response);
+    dispatcher.invokeCommandSync("0", "open", {}, process_response);
 
     // Set bus voltage
     dispatcher.invokeCommandSync("0", "i2c_spi_uart_set_bus_voltage", {{"busVoltageInV", "3.3"}}, process_response);

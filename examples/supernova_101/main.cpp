@@ -17,7 +17,7 @@ int main() {
     std::cout << "Starting Command Dispatcher for BinhoSupernova...\n";
 
     // Open the SupernovaSimulatedPort
-    dispatcher.invokeCommandSync("0", "open", {{"address", "SupernovaSimulatedPort"}}, [](CommandResponse cr) {
+    dispatcher.invokeCommandSync("0", "open", {}, [](CommandResponse cr) {
         printCommandResponse(cr, "Opening SupernovaSimulatedPort");
     });
 
