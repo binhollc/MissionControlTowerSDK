@@ -49,6 +49,10 @@ echo "---"
 cp build/libbmc_sdk.*.dylib staging
 cp -R include staging
 
+# Stage README.md for end users
+
+cp docs/README.md staging
+
 # Build examples
 
 echo "---"
