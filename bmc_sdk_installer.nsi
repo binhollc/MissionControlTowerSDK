@@ -1,5 +1,7 @@
+!define APP_VERSION "0.2.0"
+
 ; Define the name of the installer
-Outfile "BinhoMissionControlSDK.exe"
+Outfile "BinhoMissionControlSDK-${APP_VERSION}.exe"
 
 ; Set the default installation directory
 InstallDir $PROGRAMFILES\BinhoMissionControlSDK
@@ -12,6 +14,7 @@ Section "Main Files"
     File "staging\bmc_sdk.dll"
     File "staging\bmc_sdk.lib"
     File "staging\sample_app.exe"
+    File "staging\README.md"
 
     ; Bridge
     SetOutPath $INSTDIR\bridge
@@ -20,5 +23,9 @@ Section "Main Files"
     ; Includes
     SetOutPath $INSTDIR\include
     File /r "staging\include\*.*"
+
+    ; Includes
+    SetOutPath $INSTDIR\examples
+    File /r "staging\examples\*.*"
 
 SectionEnd
