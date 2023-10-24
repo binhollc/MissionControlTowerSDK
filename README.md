@@ -91,20 +91,12 @@ To determine whether you're using a 32-bit or 64-bit version of Python on Window
    ```
    Note: inside the virtual environment you can safely use `python` to execute the interpreter.
 
-5. Execute the script that creates the `requirements.txt` file:
+5. Install the requirements.
 
    ```shell
-   $(venv)> python create_requirements.py
-   ```
+   $(venv)> pip install -r python-backend/requirements.txt
 
-6. Verify that `requirements.txt` has been created in the base folder of the project.
-
-7. Install the requirements.
-
-   ```shell
-   $(venv)> pip install -r requirements.txt
-
-8. Run the following command to build the executable:
+6. Run the following command to build the executable:
 
    ```shell
    $(venv)> python setup.py build
@@ -112,7 +104,7 @@ To determine whether you're using a 32-bit or 64-bit version of Python on Window
 
    This command invokes cx_Freeze using the `setup.py` script, which contains the necessary configuration to freeze the Python backend into an executable.
 
-9. After the build process completes, the executable and its dependencies will be located in the `build_bridge` directory.
+7. After the build process completes, the executable and its dependencies will be located in the `build_bridge` directory.
 
 ### Testing the bridge
 
