@@ -284,20 +284,20 @@ Alternatively, you can prepend the PATH variable to the command execution:
    On Mac or Linux:
 
    ```shell
-   PATH=$PATH:/path/to/MissionControlTowerSDK/staging/build_bridge/ ./sample_app
+   PATH=$PATH:/path/to/MissionControlTowerSDK/staging/bridge/ ./sample_app
    ```
 
    On Windows (using Command Prompt):
 
    ```shell
-   set PATH=%PATH%;\path\to\MissionControlTowerSDK\staging\build_bridge\
+   set PATH=%PATH%;\path\to\MissionControlTowerSDK\staging\bridge\
    sample_app.exe
    ```
 
    Or on Windows (using PowerShell):
 
    ```shell
-   $env:PATH += ";\path\to\MissionControlTowerSDK\staging\build_bridge\"
+   $env:PATH += ";\path\to\MissionControlTowerSDK\staging\bridge\"
    .\sample_app.exe
    ```
 
