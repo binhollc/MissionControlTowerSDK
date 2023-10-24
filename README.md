@@ -91,12 +91,24 @@ To determine whether you're using a 32-bit or 64-bit version of Python on Window
    ```
    Note: inside the virtual environment you can safely use `python` to execute the interpreter.
 
-5. Install the requirements.
+5. Set the GH_TOKEN evironment variable.
+
+   On Mac/Linux:
+   ```shell
+   export GH_TOKEN=[GitHub Personal Access Token]
+   ```
+
+   On Windows:
+   ```shell
+   set GH_TOKEN=[GitHub Personal Access Token]
+   ```
+
+6. Install the requirements.
 
    ```shell
    $(venv)> pip install -r python-backend/requirements.txt
 
-6. Run the following command to build the executable:
+7. Run the following command to build the executable:
 
    ```shell
    $(venv)> python setup.py build
@@ -104,7 +116,7 @@ To determine whether you're using a 32-bit or 64-bit version of Python on Window
 
    This command invokes cx_Freeze using the `setup.py` script, which contains the necessary configuration to freeze the Python backend into an executable.
 
-7. After the build process completes, the executable and its dependencies will be located in the `build_bridge` directory.
+8. After the build process completes, the executable and its dependencies will be located in the `build_bridge` directory.
 
 ### Testing the bridge
 
