@@ -298,3 +298,42 @@ Alternatively, you can prepend the PATH variable to the command execution:
    ```
 
    Replace `/path/to/MissionControlTowerSDK` and `\path\to\MissionControlTowerSDK` with the actual path to your `MissionControlTowerSDK` directory. Ensure you use the correct slashes for your operating system (`/` for Mac/Linux, `\` for Windows).
+
+   ### Additional Examples
+
+   The repository includes several examples under the `examples` folder. The instructions to build and execute the examples are analogous to the ones for the sample app.
+
+   Additionally, you can find a script that automates the build and distribution process in the project folder.
+
+   Certainly! Below is the section "Distributing the Tool" that provides an overview of the folder structure after executing the `build.sh` script, as represented in the provided image:
+
+## Distributing the Tool
+
+### Using the build.sh script on Mac/Linux
+
+After executing the `build.sh` script, the resulting folder structure will be organized for ease of distribution and usage. Below is an overview of the directory structure on Mac/Linux systems:
+
+```
+├── staging
+│   ├── README.md
+│   ├── build_bridge
+│   │   ├── bridge [Bridge executable]
+│   │   ├── ...
+│   ├── examples
+│   │   ├── list_devices
+│   │   ├── nova_breathing_leds
+│   │   ├── supernova_101
+│   │   ├── supernova_i2c
+│   ├── include
+│   │   ├── bridge_reader.h
+│   │   ├── BridgeReader_windows.h
+│   │   ├── CommandDispatcher.h
+│   │   ├── CommandManager.h
+│   │   ├── CommandRequest.h
+│   │   ├── CommandResponse.h
+│   │   ├── definitions.h
+│   ├── libbmc_sdk.0.1.0.dylib /  libbmc_sdk.so.0.1.0
+│   ├── libbmc_sdk.dylib / libbmc_sdk.so
+```
+
+When distributing this tool, package the entire `staging` directory. Users can then access the tool's functionalities, its examples, and all the required dependencies in a structured manner.
