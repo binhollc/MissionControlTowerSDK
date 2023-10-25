@@ -8,9 +8,6 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        include:
-          - os: windows-latest
-            architecture: ['win32', 'x64']
 
     runs-on: ${{ matrix.os }}
 
@@ -40,7 +37,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: |
         dir
-        .\build.bat ${{ matrix.architecture }}
+        .\build.bat win32
 
     - name: Stage artifacts (Windows)
       if: matrix.os == 'windows-latest'
@@ -51,5 +48,5 @@ jobs:
       if: matrix.os == 'windows-latest'
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ matrix.os }}-${{ matrix.architecture }}-artifacts
+        name: ${{ matrix.os }}-artifacts
         path: staging/
