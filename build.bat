@@ -13,10 +13,6 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo "%~dp0build\Release"
-echo %CD%
-echo ------
-
 call build_examples.bat "%~dp0build\Release" "%~dp0include" %PLATFORM%
 if errorlevel 1 (
     echo Failed to build the examples. Check the errors above.
