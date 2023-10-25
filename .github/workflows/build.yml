@@ -40,13 +40,13 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: |
         cd $SUBPROJECT_DIR
-        build.bat ${{ matrix.architecture }}
+        .\build.bat ${{ matrix.architecture }}
 
     - name: Stage artifacts (Windows)
       if: matrix.os == 'windows-latest'
       run: |
         cd $SUBPROJECT_DIR
-        stage.bat
+        .\stage.bat
 
     - name: Upload build artifacts (Windows)
       if: matrix.os == 'windows-latest'
