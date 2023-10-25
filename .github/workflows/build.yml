@@ -48,7 +48,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       uses: joncloud/makensis-action@v4
       with:
-        script-file: bmc_sdk_installer.msi
+        script-file: bmc_sdk_installer.nsi
 
     - name: Upload build artifacts (Windows)
       if: matrix.os == 'windows-latest'
