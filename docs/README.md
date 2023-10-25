@@ -11,40 +11,40 @@ Welcome to the Binho Mission Control SDK (BMC_SDK), a set of software tools spec
 The Binho Mission Control SDK installer will install the necessary components for the SDK on your system. This includes:
 
 - The core SDK library (`bmc_sdk.dll` and `bmc_sdk.lib`).
-- A sample application (`sample_app.exe`) to test the SDK.
+- Example applications to test the SDK.
 - The "bridge" service used by the library.
 - Header files for integration (`include` directory).
 
 ### Instructions
 
-1. **Download the Installer**  
+1. **Download the Installer**
    Get the Binho Mission Control SDK installer named `BinhoMissionControlSDK.exe`.
 
-2. **Run the Installer**  
+2. **Run the Installer**
    Double-click on `BinhoMissionControlSDK.exe` and follow the on-screen prompts.
 
-3. **Installation Directories**  
+3. **Installation Directories**
    By default, the SDK will be installed into the `c:\Program Files (x86)\BinhoMissionControlSDK` directory. Inside this directory, you will find:
    - `bmc_sdk.dll`: The SDK dynamic link library.
    - `bmc_sdk.lib`: The SDK static library.
-   - `sample_app.exe`: A sample application to demonstrate the SDK's usage.
+   - `examples`: A directory containing example applications.
    - `bridge`: A directory containing components for the bridge service used by the library.
    - `include`: A directory containing various header files necessary for SDK integration.
 
-4. **Add to PATH Environment Variable**  
+4. **Add to PATH Environment Variable**
    For the sample application to function correctly, the `bridge` directory must be added to your system's PATH environment variable. See the steps bellow.
 
-5. **Integration**  
+5. **Integration**
    To integrate the Binho Mission Control SDK into your project:
    - Reference the SDK library using the `bmc_sdk.lib` file.
    - Include necessary headers from the `include` directory.
 
-6. **Test the Sample Application**  
+6. **Test the Example Applications**
    After setting up the PATH, you can run `sample_app.exe` to check the installation and get an understanding of how the SDK functions.
 
 ## Usage Examples
 
-We provide a set of sample applications to demonstrate how to use the library. Below are the steps to build and run each sample application:
+We provide a set of example applications to demonstrate how to use the library. Below are the steps to build and run each sample application:
 
 ### Prerequisites
 
@@ -54,7 +54,7 @@ We provide a set of sample applications to demonstrate how to use the library. B
 ### Example Use Cases
 
 - **nova_breathing_leds**: This application simulates an LED's breathing effect by progressively increasing and decreasing its brightness using PWM on a `BinhoNova` host adapter.
-  
+
 - **supernova_101**: Demonstrates basic operations such as fetching USB strings like `MANUFACTURER`, `PRODUCT_NAME`, and others from a `BinhoSupernova` host adapter.
 
 - **supernova_i2C**: Demonstrates I2C operations using the `BinhoSupernova` host adapter.
@@ -75,7 +75,7 @@ We provide a set of sample applications to demonstrate how to use the library. B
 
 4. **Generate Project Files using CMake**:
    ```bash
-   cmake .. -G "Visual Studio 17 2022" -A win32 -DBMC_SDK_PATH=c:\Program Files (x86)\BinhoMissionControlSDK
+   cmake .. -G "Visual Studio 17 2022" -A win32 -DBMC_SDK_PATH=c:\Program Files (x86)\BinhoMissionControlSDK -DBMC_INCLUDE_PATH=c:\Program Files (x86)\BinhoMissionControlSDK\include
    ```
 
 5. **Build the Project**:
