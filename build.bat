@@ -7,6 +7,12 @@ set "PLATFORM=win32"
 :: If a platform argument is provided to build.bat, use it.
 if not "%~1"=="" set "PLATFORM=%~1"
 
+call build_bridge.bat
+if errorlevel 1 (
+    echo Failed to build the Bridge. Check the errors above.
+    exit /b 1
+)
+
 call build_lib.bat %PLATFORM%
 if errorlevel 1 (
     echo Failed to build the library. Check the errors above.

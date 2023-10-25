@@ -1,9 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
 
-set PROJECT_DIR=%CD%
-set STAGING_DIR=staging
-
 :: Step 1: Create a virtual environment in the 'venv' folder
 echo Creating virtual environment...
 python -m venv .venv
@@ -26,15 +23,5 @@ python setup.py build
 
 :: Step 7: Inform the user where the executable is located
 echo Build process completed. 
-
-:: Copy build_bridge directory to the staging directory
-if not exist "%STAGING_DIR%" (
-    mkdir %STAGING_DIR%
-)
-
-echo Copying build_bridge to staging...
-xcopy /E /I /Y build_bridge "%PROJECT_DIR%\%STAGING_DIR%\bridge"
-
-echo Check the '%STAGING_DIR%\bridge' directory for the executable.
 
 endlocal

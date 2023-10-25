@@ -9,6 +9,18 @@ if not exist "%STAGING_DIR%\" (
 )
 
 echo :: ---
+echo Staging the Bridge...
+echo :: ---
+
+if not exist build_bridge (
+    echo "Couldn't find build_bridge directory. Did you build it?"
+    exit /b 1
+)
+
+echo Copying build_bridge to staging...
+xcopy /E /I /Y build_bridge "%STAGING_DIR%\bridge"
+
+echo :: ---
 echo Staging include files...
 echo :: ---
 
