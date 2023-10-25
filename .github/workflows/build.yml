@@ -44,9 +44,21 @@ jobs:
       run: |
         .\stage.bat
 
+    - name: Create Windows installer
+      uses: joncloud/makensis-action@v4
+      with:
+        script-file: bmc_sdk_installer.msi
+
     - name: Upload build artifacts (Windows)
       if: matrix.os == 'windows-latest'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.os }}-artifacts
         path: staging/
+
+    - name: Upload Windows installer
+      if: matrix.os == 'windows-latest'
+      uses: actions/upload-artifact@v3
+      with:
+        name: BinhoMissionControlSDK-0.3.0.exe
+        path: BinhoMissionControlSDK-0.3.0.exe
