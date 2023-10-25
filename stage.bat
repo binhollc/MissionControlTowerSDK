@@ -59,17 +59,4 @@ for %%i in (%ARTIFACT_NAME%) do (
 
 echo Done!
 
-echo :: ---
-echo Staging the sample_app...
-echo :: ---
-
-if not exist "sample_app\build\Release\sample_app.exe" (
-    echo Couldn't find the sample_app. Did you build it with build_example.bat?
-    exit /b 1
-)
-
-copy "sample_app\build\Release\sample_app.exe" "%STAGING_DIR%"
-
-echo Done!
-
 endlocal
