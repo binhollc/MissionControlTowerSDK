@@ -14,7 +14,15 @@ if(NOT DEFINED BMC_SDK_PATH)
     Set it using: cmake .. -DBMC_SDK_PATH=<your-path-here>")
 endif()
 
-include_directories(${BMC_SDK_PATH}/include)
+# Check if BMC_INCLUDE_PATH is passed in from command line, if not, throw an error
+if(NOT DEFINED BMC_INCLUDE_PATH)
+    message(FATAL_ERROR "BMC_INCLUDE_PATH is not defined.
+    On Windows, the path is typically 'c:\\Program Files (x86)\\BinhoMissionControlSDK\\include'
+    and in Dev Mode the path is typically '../../staging/include'.
+    Set it using: cmake .. -DBMC_INCLUDE_PATH=<your-path-here>")
+endif()
+
+include_directories(${BMC_INCLUDE_PATH})
 include_directories(.)
 
 # Install JSON library
