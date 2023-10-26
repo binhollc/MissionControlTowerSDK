@@ -29,6 +29,11 @@ jobs:
     - name: Get CMake
       uses: lukka/get-cmake@latest
 
+    - name: Build and stage the Bridge, library and examples (Mac and Linux)
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+      run: |
+        ./build_and_stage.sh
+
     - name: Build the Bridge, library and examples (Windows)
       if: matrix.os == 'windows-latest'
       run: |
@@ -46,8 +51,7 @@ jobs:
       with:
         script-file: bmc_sdk_installer.nsi
 
-    - name: Upload build artifacts (Windows)
-      if: matrix.os == 'windows-latest'
+    - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.os }}-artifacts
