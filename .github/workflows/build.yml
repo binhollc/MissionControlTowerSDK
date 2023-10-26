@@ -29,10 +29,6 @@ jobs:
     - name: Get CMake
       uses: lukka/get-cmake@latest
 
-    - name: Set up environment
-      run: |
-        echo "SUBPROJECT_DIR=${{ github.workspace }}" >> $GITHUB_ENV
-
     - name: Build the Bridge, library and examples (Windows)
       if: matrix.os == 'windows-latest'
       run: |
