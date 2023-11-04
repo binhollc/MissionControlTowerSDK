@@ -42,7 +42,7 @@ target_link_libraries(
 )
 
 set_target_properties(bmc_sdk PROPERTIES
-    VERSION 0.3.0
+    VERSION 0.3.1
     SOVERSION 1
 )
 

@@ -1,4 +1,4 @@
-!define APP_VERSION "0.3.0"
+!define APP_VERSION "0.3.1"
 
 ; Define the name of the installer
 Outfile "BinhoMissionControlSDK-${APP_VERSION}.exe"
