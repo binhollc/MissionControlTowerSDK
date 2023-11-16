@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.8)
-project(BMC_SDK_SampleLibrary)
+cmake_minimum_required(VERSION 3.5)
+project(sample_app)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -22,6 +22,13 @@ if(NOT DEFINED BMC_INCLUDE_PATH)
     Set it using: cmake .. -DBMC_INCLUDE_PATH=<your-path-here>")
 endif()
 
+set(SAMPLE_LIBRARY_INCLUDE_PATH ../sample_library)
+set(SAMPLE_LIBRARY_BINARY_PATH ../sample_library/build/Release)
+
+include_directories(${BMC_INCLUDE_PATH})
+include_directories(${SAMPLE_LIBRARY_INCLUDE_PATH})
+include_directories(.)
+
 # Install JSON library
 
 include(FetchContent)
@@ -31,17 +38,22 @@ FetchContent_MakeAvailable(json)
 # Try to find the bmc_sdk library using the path variable
 find_library(BMC_SDK_LIB NAMES bmc_sdk PATHS ${BMC_SDK_PATH})
 
-# Source files
-set(SOURCE_FILES sample_library.cpp)
+# Try to find the sample_library library using the SAMPLE_LIBRARY_BINARY_PATH variable
+find_library(SAMPLE_LIBRARY NAMES sample_library PATHS ${SAMPLE_LIBRARY_BINARY_PATH})
 
-# Create the library
-add_library(sample_library SHARED ${SOURCE_FILES})
+# Specify the source files for the sample_app executable
+set(SOURCES main.cpp)
 
-# Include directories for sample_library
-target_include_directories(sample_library PUBLIC . ${BMC_INCLUDE_PATH})
+# Create the executable
+add_executable(sample_app ${SOURCES})
 
-target_link_libraries(sample_library PRIVATE ${BMC_SDK_LIB} nlohmann_json::nlohmann_json)
+# Link found library and other libraries
+target_link_libraries(
+    sample_app PRIVATE
+    ${BMC_SDK_LIB}
+    nlohmann_json::nlohmann_json
+    ${SAMPLE_LIBRARY}
+)
 
-target_compile_features(sample_library PUBLIC cxx_std_17)
-
-set(LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+# Set the location of the dynamic library for runtime using the path variable
+set_target_properties(sample_app PROPERTIES INSTALL_RPATH ${BMC_SDK_PATH})

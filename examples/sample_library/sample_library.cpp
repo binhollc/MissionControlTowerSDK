@@ -1,7 +1,8 @@
 #include "sample_library.h"
 #include "CommandDispatcher.h"
+#include "CommandResponse.h"
 
-void SampleLibrary::get_address() {
+std::string SampleLibrary::get_address() {
     CommandDispatcher dispatcher("ListUsbDevices");
 
     dispatcher.start();
@@ -13,7 +14,7 @@ void SampleLibrary::get_address() {
         if (cr.status == "success") {
           for (auto& device : cr.data) {
             if (device["product"].template get<std::string>() == "Binho Supernova") {
-              device_address = device["product"].template get<std::string>();
+              device_address = device["port"].template get<std::string>();
               break;
             }
           }
@@ -25,6 +26,8 @@ void SampleLibrary::get_address() {
     dispatcher.invokeCommand("0", "exit", {});
 
     dispatcher.stop();
+
+    return device_address;
 }
 
 void SampleLibrary::load_values() {
@@ -37,7 +40,9 @@ void SampleLibrary::load_values() {
     dispatcher.start();
 
     dispatcher.invokeCommandSync("0", "open", {{"address", device_address}}, [this](CommandResponse cr) {
-      open_ok = true;
+      if (!cr.is_promise) {
+        open_ok = true;
+      }
     });
 
     if (!open_ok) {
@@ -45,18 +50,36 @@ void SampleLibrary::load_values() {
     }
 
     dispatcher.invokeCommandSync("0", "get_usb_string", {{"subCommand", "HW_VERSION"}}, [this](CommandResponse cr) {
-      hw_version = cr.data["data"];
+      if (!cr.is_promise) {
+        hw_version = cr.data["data"];
+      }
     });
 
     dispatcher.invokeCommandSync("0", "get_usb_string", {{"subCommand", "FW_VERSION"}}, [this](CommandResponse cr) {
-      fw_version = cr.data["data"];
+      if (!cr.is_promise) {
+        fw_version = cr.data["data"];
+      }
     });
 
     dispatcher.invokeCommandSync("0", "get_usb_string", {{"subCommand", "SERIAL_NUMBER"}}, [this](CommandResponse cr) {
-      serial_number = cr.data["data"];
+      if (!cr.is_promise) {
+        serial_number = cr.data["data"];
+      }
     });
 
     dispatcher.waitForAllCommands();
     dispatcher.invokeCommand("0", "exit", {});
     dispatcher.stop();
+}
+
+std::string SampleLibrary::get_fw_version() {
+  return fw_version;
+}
+
+std::string SampleLibrary::get_hw_version() {
+  return hw_version;
+}
+
+std::string SampleLibrary::get_serial_number() {
+  return serial_number;
 }
