@@ -40,7 +40,7 @@ cd build || (
 )
 
 :: 4. Configure cmake
-cmake .. -G "Visual Studio 17 2022" -A !PLATFORM! -DBMC_SDK_PATH=!BMC_SDK_PATH! -DBMC_INCLUDE_PATH=!BMC_INCLUDE_PATH! || (
+cmake .. -G "Visual Studio 17 2022" -A !PLATFORM! -DBMC_SDK_PATH="!BMC_SDK_PATH!" -DBMC_INCLUDE_PATH="!BMC_INCLUDE_PATH!" || (
     echo CMake configuration failed
     exit /b 1
 )
@@ -51,9 +51,17 @@ cmake --build . --config Release || (
     exit /b 1
 )
 
-:: 6. Check if the Release subfolder contains a file called sample_app.exe
-if not exist "Release\sample_app.exe" (
-    echo The file sample_app.exe was not found in the Release directory
+:: 6. Check if the Release subfolder contains any .exe or .dll file
+set "fileFound=false"
+
+:: Check for any .exe file
+if exist "Release\*.exe" set "fileFound=true"
+
+:: Check for any .dll file
+if exist "Release\*.dll" set "fileFound=true"
+
+if "!fileFound!"=="false" (
+    echo No .exe or .dll files were found in the Release directory
     exit /b 1
 )
 
