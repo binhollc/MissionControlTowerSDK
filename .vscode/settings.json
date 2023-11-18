@@ -80,11 +80,8 @@
     "xutility": "cpp"
   },
   "cmake.buildArgs": [
-    "--target install",
-    "--config Release"
+    "--target install"
   ],
-  "cmake.configureArgs": [
-    "-DCMAKE_BUILD_TYPE=Release"
-  ],
-  "cmake.platform": "win32"
+  "cmake.platform": "win32",
+  "cmake.setBuildTypeOnMultiConfig": true
 }
