@@ -78,5 +78,13 @@
     "xtr1common": "cpp",
     "xtree": "cpp",
     "xutility": "cpp"
-  }
+  },
+  "cmake.buildArgs": [
+    "--target install",
+    "--config Release"
+  ],
+  "cmake.configureArgs": [
+    "-DCMAKE_BUILD_TYPE=Release"
+  ],
+  "cmake.platform": "win32"
 }
