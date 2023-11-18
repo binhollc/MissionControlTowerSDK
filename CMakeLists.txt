@@ -54,12 +54,9 @@ set_target_properties(bmc_sdk PROPERTIES
 
 target_compile_definitions(bmc_sdk PRIVATE BUILD_BMC_SDK)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  add_compile_options(-g)
-elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-  add_compile_options(-O3)
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
   target_compile_definitions(bmc_sdk PRIVATE NDEBUG)
-  endif()
+endif()
 
 target_include_directories(bmc_sdk PUBLIC
     ${PROJECT_SOURCE_DIR}/include
