@@ -6,28 +6,30 @@ project(ListDevices)
 # ---
 
 set(SOURCES main.cpp)
+set(TARGET_NAME list_devices)
 
 # ---
 # Target Definition, Properties and Commands
 # ---
 
-add_executable(sample_app ${SOURCES})
+add_executable(${TARGET_NAME} ${SOURCES})
+set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME sample_app)
 
 # Include needed headers
-target_include_directories(sample_app PRIVATE 
+target_include_directories(${TARGET_NAME} PRIVATE 
     ${CMAKE_SOURCE_DIR}/include
     .
 )
 
 # Link against needed libraries from the parent project
-target_link_libraries(sample_app bmc_sdk nlohmann_json::nlohmann_json)
+target_link_libraries(${TARGET_NAME} bmc_sdk nlohmann_json::nlohmann_json)
 
 # ---
 # Installation instructions
 # ---
 
 # Install the executable
-install(TARGETS sample_app RUNTIME DESTINATION examples/list_devices)
+install(TARGETS ${TARGET_NAME} RUNTIME DESTINATION examples/${TARGET_NAME})
 
 # Install the source files
-install(FILES ${SOURCES} DESTINATION examples/list_devices)
+install(FILES ${SOURCES} DESTINATION examples/${TARGET_NAME})
