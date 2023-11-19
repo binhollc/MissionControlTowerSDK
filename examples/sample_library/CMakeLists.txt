@@ -28,8 +28,12 @@ target_link_libraries(${TARGET_NAME} bmc_sdk nlohmann_json::nlohmann_json)
 # Installation instructions
 # ---
 
-# Install the executable
-install(TARGETS ${TARGET_NAME} RUNTIME DESTINATION examples/${TARGET_NAME})
+# Install the library (e.g. .dll, .lib, .so files)
+install(TARGETS sample_library
+        RUNTIME DESTINATION examples/${TARGET_NAME}
+        ARCHIVE DESTINATION examples/${TARGET_NAME}
+        LIBRARY DESTINATION examples/${TARGET_NAME}
+)
 
 # Install the source files
 install(FILES ${SOURCES} DESTINATION examples/${TARGET_NAME})
