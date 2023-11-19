@@ -68,7 +68,7 @@ void SampleLibrary::load_values() {
     });
 
     dispatcher.waitForAllCommands();
-    dispatcher.invokeCommand("0", "exit", {});
+    dispatcher.invokeCommandSync("0", "exit", {});
     dispatcher.stop();
 }
 

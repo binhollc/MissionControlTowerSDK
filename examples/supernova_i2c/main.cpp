@@ -50,7 +50,7 @@ int main() {
     }, process_response);
 
     // Exit
-    dispatcher.invokeCommand("0", "exit", {});
+    dispatcher.invokeCommandSync("0", "exit", {});
 
     dispatcher.stop();
 

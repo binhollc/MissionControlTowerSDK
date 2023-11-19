@@ -33,7 +33,7 @@ int main() {
     std::cout << "All commands executed. Waiting for all responses...\n";
 
     // Exit the command dispatcher
-    dispatcher.invokeCommand("0", "exit", {});
+    dispatcher.invokeCommandSync("0", "exit", {});
     std::cout << "Exiting Command Dispatcher...\n";
 
     dispatcher.stop();
