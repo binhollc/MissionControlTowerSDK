@@ -4,7 +4,7 @@ setlocal enabledelayedexpansion
 :: Set the default platform
 set "PLATFORM=win32"
 
-:: If a platform argument is provided to build.bat, use it.
+:: If a platform argument is provided to build_and_stage.bat, use it.
 if not "%~1"=="" set "PLATFORM=%~1"
 
 echo :: ---
@@ -41,7 +41,7 @@ mkdir staging
 
 cd build
 
-cmake -DCMAKE_BUILD_TYPE=Release .. -G "Visual Studio 17 2022" -A win32 || (
+cmake -DCMAKE_BUILD_TYPE=Release .. -G "Visual Studio 17 2022" -A %PLATFORM% || (
     echo CMake configuration failed
     exit /b 1
 )
