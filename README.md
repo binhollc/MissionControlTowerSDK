@@ -17,16 +17,35 @@ A C++ dynamic library for launching and interacting with MissionControlTower sys
    git submodule update --init
    ```
 
+## Quick Start with Script
 
-## Building the Python Backend
+For developers who prefer a quicker setup, we provide convenient scripts that automate the build and staging process. Depending on your operating system, use the appropriate script to skip manual steps:
+
+- **Mac/Linux**: Run `build_and_stage.sh` to automatically build and stage the application. Use the following command in your terminal:
+
+  ```bash
+  ./build_and_stage.sh
+  ```
+
+- **Windows**: Use `build_and_stage.bat` for an automated setup in Windows environments. Execute the script in your Command Prompt:
+
+  ```cmd
+  build_and_stage.bat
+  ```
+
+These scripts are designed to handle all necessary steps, ensuring a seamless setup process. If you encounter any issues or need to understand the steps being automated, refer to the detailed instructions in the preceding sections.
+
+## Detailed Build and Stage Instructions
+
+### Building the Python Backend
 
 To build the Python backend, which is contained in the `python-backend` folder, we use cx_Freeze, a Python packaging tool. The following instructions guide you through the process.
 
-### Special note for Windows users
+#### Special note for Windows users
 
 > :warning: ** On Windows 64 **: Make sure that Python 64, and not 32, is installed in your system.
 
-#### How do I know if my Windows installation is 32 or 64 bits?
+##### How do I know if my Windows installation is 32 or 64 bits?
 
 1. Press the Windows key + R to open the Run dialog box.
 
@@ -34,7 +53,7 @@ To build the Python backend, which is contained in the `python-backend` folder, 
 
 3. The System Information window will open. Look for the "System Type" field, which will indicate whether your Windows is 32-bit or 64-bit.
 
-### How can I know if I'm using Python 32 or 64 bits on windows?
+#### How can I know if I'm using Python 32 or 64 bits on windows?
 
 To determine whether you're using a 32-bit or 64-bit version of Python on Windows, you can follow these steps:
 
@@ -52,7 +71,7 @@ To determine whether you're using a 32-bit or 64-bit version of Python on Window
 
    If you see something like `Python 3.x.x [MSC v.1916 64 bit (AMD64)]`, where `x.x` represents the version number, and it includes "64 bit" or "AMD64," it indicates that you have the 64-bit version of Python installed.
 
-### Creating a virtual environment
+#### Creating a virtual environment
 
 1. Create a virtual environment and save it in the `venv` folder:
 
@@ -118,7 +137,7 @@ To determine whether you're using a 32-bit or 64-bit version of Python on Window
 
 8. After the build process completes, the executable and its dependencies will be located in the `build_bridge` directory.
 
-### Testing the bridge
+#### Testing the bridge
 
 10. Navigate to the `build_bridge` directory and test that the bridge works properly.
 
@@ -156,7 +175,7 @@ To determine whether you're using a 32-bit or 64-bit version of Python on Window
    {"command":"exit","transaction_id":"0"}
    ```
 
-### Killing the bridge
+#### Killing the bridge
 
 On Mac/Linux you can kill the bridge executable by pressing Command+C on Mac, or Control+C on Linux.
 
@@ -166,9 +185,9 @@ On Windows, if you are using PowerShell you can open a different PowerShell wind
 Stop-Process -Name "bridge"
 ```
 
-## Dynamic library
+### Dynamic library
 
-### Special note for Windows developers
+#### Special note for Windows developers
 
 ```
 Ensure that your application and all its dependent libraries are compiled for the same architecture, either all for 32-bit or all for 64-bit. Mixing 32-bit and 64-bit applications and libraries often leads to errors like the one you're seeing.
@@ -176,23 +195,18 @@ Ensure that your application and all its dependent libraries are compiled for th
 
 If you get an error code `0xc000007b` when executing your app, it is most likely because the DLL was compiled for a different architecture.
 
-#### How to solve this issue
+##### How to solve this issue
 
-1. For Windows users, we recommend downloading CMake's command line tool from the [official download page](https://cmake.org/download/). Make sure that you download the right installer for your system architecture - e.g. CMake 64 bits for your Windows 64 bits.
+For Windows users, we recommend downloading CMake's command line tool from the [official download page](https://cmake.org/download/). Make sure that you download the right installer for your system architecture - e.g. CMake 64 bits for your Windows 64 bits.
 
-2. When building the DLL you can specify the target architecture when you run cmake, like so:
-
-   - For 32-bit: cmake -DCMAKE_GENERATOR_PLATFORM=x86 ..
-   - For 64-bit: cmake -DCMAKE_GENERATOR_PLATFORM=x64 ..
-
-### Prerequisites
+#### Prerequisites
 
 - CMake
 - Make
 - C++ 17
   - For Windows users, we recommend downloading the [build tools for Visual Studio](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022).
 
-### Building the library
+#### Building the library
 
 1. Navigate to the root of your project (where the `CMakeLists.txt` file is).
 
@@ -201,145 +215,52 @@ If you get an error code `0xc000007b` when executing your app, it is most likely
     ```bash
     mkdir build
     ```
+
 3. Then navigate into this directory.
 
     ```bash
     cd build
     ```
-4. Run `cmake` from within this new directory, pointing it to the parent directory, which is where the `CMakeLists.txt` file is.
 
-    ```bash
-    cmake ..
-    ```
+4. Configure `cmake`.
 
+   You can select the Release or Debug variant by setting the CMAKE_BUILD_TYPE parameter. For example, if you want to generate debug symbols and messages:
+
+   ```bash
+   cmake -DCMAKE_BUILD_TYPE=Debug ..
    ```
-   For Windows developers we strongly recommend you to explicitly specify the platform (x32 or x64) when building the library and the sample_app. See special note above.
+
+   Alternatively, if you want to optimize for speed and disable debug information:
+
+   ```bash
+   cmake -DCMAKE_BUILD_TYPE=Release ..
    ```
 
-5. Navigate to the base folder and execute the following command:
+   On Windows it is recommended to select the generator (-G argument) and the platform (-A argument). The platform can be "win32" or "win64":
+
+   ```bash
+   cmake -DCMAKE_BUILD_TYPE=Debug .. -G "Visual Studio 17 2022" -A win32
+   ```
+
+5. Within the build folder, execute the following command:
 
    ```shell
-   cmake --build build/
+   cmake --build . --config Release --target install
    ```
 
-After the build process completes, the library file libmct_api.so (libmct_api.dylib on macOS, mct_api.dll on Windows) will be located in the lib directory.
+After the build process completes, all the generated files, including the shared library, examples and docs will be installed in the staging/ directory.
 
-### Building the Sample App
+#### Staging the Bridge
 
-To build the sample app that demonstrates how to use the libbmc_sdk library, follow these steps:
-
-1. Open a terminal or command prompt.
-
-2. Navigate to the `MissionControlTowerSDK` project’s base directory.
-
-3. Copy the necessary files and directories to the `staging` directory:
+1. If you want to stage the Bridge, execute:
 
    ```shell
-   cp -R build_bridge staging
-   cp build/libbmc_sdk.*.dylib staging
-   cp -R include staging
+   cp -R bridge staging
    ```
 
-4. Navigate to the `sample_app` directory and create a `build` directory:
+## Staging Directory
 
-   ```shell
-   cd sample_app
-   mkdir build
-   ```
-
-5. Navigate to the `build` directory:
-
-   ```shell
-   cd build
-   ```
-
-6. Run cmake to configure the project, specifying the `BMC_SDK_PATH`:
-
-   ```shell
-   cmake .. -DBMC_SDK_PATH=../../staging
-   ```
-
-7. Build the sample app:
-
-   ```shell
-   cmake --build .
-   ```
-
-After the build process completes, the executable file `sample_app` will be located in the `build` directory.
-
-Note: Make sure you have already built the libbmc_sdk library as described in the 'Building the Library' section before building the sample app. The sample app depends on the library.
-
-For Windows developers, the steps are the same but ensure that you open the Command Prompt or PowerShell and adapt the commands to the Windows environment. Also, specify the platform (x32 or x64) when running cmake commands.
-
-### Executing the Sample App
-
-The sample app uses the dynamic library, which executes the bridge. This means that BOTH the bridge executable AND the library must be reachable in the path. Before executing the app, you should add the directory that contains the bridge executable AND the directory that contains the library to the PATH environment variable.
-
-Alternatively, you can prepend the PATH variable to the command execution:
-
-1. Navigate to the folder containing the sample app’s built executable.
-
-2. Update the PATH and execute the app:
-
-   On Mac or Linux:
-
-   ```shell
-   PATH=$PATH:/path/to/MissionControlTowerSDK/staging/bridge/:/path/to/MissionControlTowerSDK/staging/ ./sample_app
-   ```
-
-   On Windows (using Command Prompt):
-
-   ```shell
-   set PATH=%PATH%;\path\to\MissionControlTowerSDK\staging\bridge\;\path\to\MissionControlTowerSDK\staging\
-   sample_app.exe
-   ```
-
-   Or on Windows (using PowerShell):
-
-   ```shell
-   $env:PATH += ";\path\to\MissionControlTowerSDK\staging\bridge\;\path\to\MissionControlTowerSDK\staging\"
-   .\sample_app.exe
-   ```
-
-   Replace `/path/to/MissionControlTowerSDK` and `\path\to\MissionControlTowerSDK` with the actual path to your `MissionControlTowerSDK` directory. Ensure you use the correct slashes for your operating system (`/` for Mac/Linux, `\` for Windows).
-
-   ### Additional Examples
-
-   The repository includes several examples under the `examples` folder. The instructions to build and execute the examples are analogous to the ones for the sample app.
-
-   Additionally, you can find a script that automates the build and distribution process in the project folder.
-
-   Certainly! Below is the section "Distributing the Tool" that provides an overview of the folder structure after executing the `build.sh` script, as represented in the provided image:
-
-## Troubleshooting
-
-### The system can't find the library
-
-Error:
-
-```
----------------------------
-sample_app.exe - System Error
----------------------------
-The code execution cannot proceed because bmc_sdk.dll was not found. Reinstalling the program may fix this problem. 
-```
-
-Solution:
-
-Add `/path/to/MissionControlTowerSDK/staging/` to the PATH environment variable.
-
-### CreateProcess failed
-
-Solution:
-
-Add `/path/to/MissionControlTowerSDK/staging/bridge` to the PATH environment variable.
-
-
-## Distributing the Tool
-
-### Using the build.sh script on Mac/Linux
-
-After executing the `build.sh` script, the resulting folder structure will be organized for ease of distribution and usage. Below is an overview of the directory structure on Mac/Linux systems:
+After executing the build scripts or manually building and installing the library and examples, the resulting folder structure will be organized for ease of distribution and usage. Below is an approximate overview of the directory structure on Mac/Linux systems:
 
 ```
 ├── staging
@@ -365,3 +286,66 @@ After executing the `build.sh` script, the resulting folder structure will be or
 ```
 
 When distributing this tool, package the entire `staging` directory. Users can then access the tool's functionalities, its examples, and all the required dependencies in a structured manner.
+
+## Executing the Sample Apps
+
+The sample app uses the dynamic library, which executes the bridge. This means that BOTH the bridge executable AND the library must be reachable in the path. Before executing the app, you should add the directory that contains the bridge executable AND the directory that contains the library to the PATH environment variable.
+
+Alternatively, you can prepend the PATH variable to the command execution:
+
+1. Navigate to the folder containing the sample app’s built executable.
+
+2. Update the PATH and execute the app:
+
+   On Mac:
+
+   ```shell
+   DYLD_LIBRARY_PATH=/path/to/staging/lib PATH=$PATH:/path/to/staging/build_bridge ./sample_app
+   ```
+
+   On Linux:
+
+   [TO DO]
+
+   On Windows (using Command Prompt):
+
+   ```shell
+   set PATH=%PATH%;\path\to\staging\build_bridge;\path\to\staging\bin
+   sample_app.exe
+   ```
+
+   Or on Windows (using PowerShell):
+
+   ```shell
+   $env:PATH += ";\path\to\staging\build_bridge\;\path\to\staging\bin"
+   .\sample_app.exe
+   ```
+
+   Replace `/path/to/staging` with the actual path to your `staging` directory. Ensure you use the correct slashes for your operating system (`/` for Mac/Linux, `\` for Windows).
+
+   ### Additional Examples
+
+   The repository includes several examples under the `examples` folder. The instructions to build and execute the examples are analogous to the ones for the sample app.
+
+## Troubleshooting
+
+### The system can't find the library
+
+Error:
+
+```
+---------------------------
+sample_app.exe - System Error
+---------------------------
+The code execution cannot proceed because bmc_sdk.dll was not found. Reinstalling the program may fix this problem.
+```
+
+Solution:
+
+Add `/path/to/staging/` to the PATH environment variable.
+
+### CreateProcess failed
+
+Solution:
+
+Add `/path/to/staging/bridge` to the PATH environment variable.
