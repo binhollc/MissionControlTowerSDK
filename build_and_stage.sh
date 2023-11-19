@@ -56,54 +56,13 @@ if [ ! -f "build_bridge/bridge" ]; then
     exit 1
 fi
 
-# Build library
+# Clean the staging directory
 
-print_colored_message "${INFO}" "Building the library"
-
-cd "$PROJECT_DIR"
-
-if [ -d "build" ]; then
-    rm -rf build
+if [ -d "staging" ]; then
+    rm -rf staging
 fi
-mkdir build
-cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
-cmake --build . --config Release
 
-# Build examples
-
-print_colored_message "${INFO}" "Building examples"
-
-# Loop through each subdirectory in examples/ and build the sample app
-for SAMPLE_DIR in "$PROJECT_DIR"/examples/*; do
-    if [ -d "$SAMPLE_DIR" ]; then
-        print_colored_message "${INFO}" "Building example in directory: $SAMPLE_DIR"
-
-        cd "$SAMPLE_DIR"
-
-        echo " * Removing $SAMPLE_DIR/build..."
-        if [ -d "build" ]; then
-            rm -rf build
-        fi
-
-        echo " * Creating $SAMPLE_DIR/build..."
-        mkdir build
-        cd build
-
-        echo " * Building $SAMPLE_DIR..."
-        cmake .. -DBMC_SDK_PATH="$PROJECT_DIR"/build/ -DBMC_INCLUDE_PATH="$PROJECT_DIR"/include
-        cmake --build . --config Release
-
-        echo
-    fi
-done
-
-# Create staging directory
-
-print_colored_message "${INFO}" "Creating staging directory"
-
-cd "$PROJECT_DIR"
-mkdir -p staging
+mkdir staging
 
 # Stage the bridge
 
@@ -112,39 +71,23 @@ print_colored_message "${INFO}" "Staging the bridge"
 cd "$PROJECT_DIR"
 cp -R build_bridge staging
 
-# Stage library and include dirs
+# Build library and examples
 
-print_colored_message "${INFO}" "Staging the library and include dirs"
+print_colored_message "${INFO}" "Building the bmc_sdk library and examples"
 
-cp build/libbmc_sdk.*.dylib staging
-cp -R include staging
+cd "$PROJECT_DIR"
 
-# Stage README.md for end users
+if [ -d "build" ]; then
+    rm -rf build
+fi
+mkdir build
 
-cp docs/README.md staging
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake --build . --config Release --target install
 
-# Stage examples
-
-print_colored_message "${INFO}" "Staging examples"
-
-mkdir -p staging/examples
-
-# Loop through each subdirectory in examples/ and stage the examples
-for SAMPLE_DIR in "$PROJECT_DIR"/examples/*; do
-    if [ -d "$SAMPLE_DIR" ]; then
-        echo " * Staging $SAMPLE_DIR..."
-
-        TARGET_DIR="$PROJECT_DIR"/staging/examples/$(basename "$SAMPLE_DIR")
-        mkdir -p $TARGET_DIR
-        cp "$SAMPLE_DIR"/CMakeLists.txt $TARGET_DIR
-        cp "$SAMPLE_DIR"/main.cpp $TARGET_DIR
-        cp "$SAMPLE_DIR"/build/sample_app $TARGET_DIR
-        chmod +x $TARGET_DIR/sample_app
-
-        echo
-    fi
-done
+# Stage library, docs and examples
 
 print_colored_message "${SUCCESS}" "All done!"
 
-cd $PROJECT_DIR
+cd "$PROJECT_DIR"
