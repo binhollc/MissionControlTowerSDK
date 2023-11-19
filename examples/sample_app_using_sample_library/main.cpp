@@ -15,7 +15,7 @@ int main() {
     try {
         auto address = device_api.get_address();
         if (address.empty()) {
-            outfile << "Error: No device address found.\n";
+            std::cerr << "Error: No device address found.\n";
             return 1;
         }
         outfile << address << "\n";
@@ -27,15 +27,15 @@ int main() {
         outfile << device_api.get_serial_number() << "\n";
     }
     catch (const std::runtime_error& e) {
-        outfile << "Runtime error: " << e.what() << "\n";
+        std::cerr << "Runtime error: " << e.what() << "\n";
         return 1;
     }
     catch (const std::exception& e) {
-        outfile << "Exception: " << e.what() << "\n";
+        std::cerr << "Exception: " << e.what() << "\n";
         return 1;
     }
     catch (...) {
-        outfile << "An unknown error occurred.\n";
+        std::cerr << "An unknown error occurred.\n";
         return 1;
     }
 
