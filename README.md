@@ -255,7 +255,7 @@ After the build process completes, all the generated files, including the shared
 1. If you want to stage the Bridge, execute:
 
    ```shell
-   cp -R bridge staging
+   cp -R build_bridge staging
    ```
 
 ## Staging Directory
@@ -265,7 +265,7 @@ After executing the build scripts or manually building and installing the librar
 ```
 ├── staging
 │   ├── README.md
-│   ├── build_bridge
+│   ├── bridge
 │   │   ├── bridge [Bridge executable]
 │   │   ├── ...
 │   ├── examples
@@ -300,7 +300,7 @@ Alternatively, you can prepend the PATH variable to the command execution:
    On Mac:
 
    ```shell
-   DYLD_LIBRARY_PATH=/path/to/staging/lib PATH=$PATH:/path/to/staging/build_bridge ./sample_app
+   DYLD_LIBRARY_PATH=/path/to/staging/lib PATH=$PATH:/path/to/staging/bridge ./sample_app
    ```
 
    On Linux:
@@ -310,14 +310,14 @@ Alternatively, you can prepend the PATH variable to the command execution:
    On Windows (using Command Prompt):
 
    ```shell
-   set PATH=%PATH%;\path\to\staging\build_bridge;\path\to\staging\bin
+   set PATH=%PATH%;\path\to\staging\bridge;\path\to\staging\bin
    sample_app.exe
    ```
 
    Or on Windows (using PowerShell):
 
    ```shell
-   $env:PATH += ";\path\to\staging\build_bridge\;\path\to\staging\bin"
+   $env:PATH += ";\path\to\staging\bridge\;\path\to\staging\bin"
    .\sample_app.exe
    ```
 

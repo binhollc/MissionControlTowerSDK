@@ -11,9 +11,9 @@ Section "Main Files"
 
     ; Library and Sample App
     SetOutPath $INSTDIR
-    File "staging\bmc_sdk.dll"
-    File "staging\bmc_sdk.lib"
-    File "staging\README.md"
+    File "staging\bin\bmc_sdk.dll"
+    File "staging\lib\bmc_sdk.lib"
+    File "staging\docs\README.md"
 
     ; Bridge
     SetOutPath $INSTDIR\bridge
