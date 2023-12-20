@@ -255,7 +255,7 @@ After the build process completes, all the generated files, including the shared
 1. If you want to stage the Bridge, execute:
 
    ```shell
-   cp -R build_bridge staging
+   cp -R build_bridge staging\bridge
    ```
 
 ## Staging Directory
