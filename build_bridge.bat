@@ -1,6 +1,12 @@
 @echo off
 setlocal enabledelayedexpansion
 
+:: Check if .venv exists and delete if it does
+if exist ".venv" (
+    echo Existing virtual environment found. Removing...
+    rmdir /s /q ".venv"
+)
+
 :: Step 1: Create a virtual environment in the 'venv' folder
 echo Creating virtual environment...
 python -m venv .venv
@@ -22,6 +28,6 @@ echo Building the executable...
 python setup.py build
 
 :: Step 7: Inform the user where the executable is located
-echo Build process completed. 
+echo Build process completed.
 
 endlocal
