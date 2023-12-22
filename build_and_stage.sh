@@ -35,6 +35,15 @@ PYTHON=${1:-python}
 
 print_colored_message "${WARNING}" "HEADS UP: $($PYTHON --version 2>&1). Is this what you want?\nIf not, provide the right interpreter as the first argument of this script."
 
+# Deactivate virtual environment (if active) and remove its folder
+if [ -n "$VIRTUAL_ENV" ]; then
+    deactivate
+fi
+
+if [ -d ".venv" ]; then
+    rm -rf .venv
+fi
+
 # Create Python virtual environment using $PYTHON
 $PYTHON -m venv .venv
 
@@ -69,7 +78,7 @@ mkdir staging
 print_colored_message "${INFO}" "Staging the bridge"
 
 cd "$PROJECT_DIR"
-cp -R build_bridge staging
+cp -R build_bridge staging/bridge
 
 # Build library and examples
 
