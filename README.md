@@ -271,8 +271,11 @@ After executing the build scripts or manually building and installing the librar
 │   ├── examples
 │   │   ├── list_devices
 │   │   ├── nova_breathing_leds
+│   │   ├── sample_app_using_sample_library
+│   │   ├── sample_library
 │   │   ├── supernova_101
 │   │   ├── supernova_i2c
+│   │   ├── supernova_i2c_benchmark
 │   ├── include
 │   │   ├── bridge_reader.h
 │   │   ├── BridgeReader_windows.h
@@ -281,8 +284,12 @@ After executing the build scripts or manually building and installing the librar
 │   │   ├── CommandRequest.h
 │   │   ├── CommandResponse.h
 │   │   ├── definitions.h
-│   ├── libbmc_sdk.0.1.0.dylib /  libbmc_sdk.so.0.1.0
-│   ├── libbmc_sdk.dylib / libbmc_sdk.so
+│   ├── bin (Windows)
+│   │   ├── bmc_sdk.dll (Windows)
+│   ├── lib
+│   │   ├── bmc_sdk.lib (Windows)
+│   │   ├── libbmc_sdk.dylib (Mac)
+│   │   ├── libbmc_sdk.so (Linux)
 ```
 
 When distributing this tool, package the entire `staging` directory. Users can then access the tool's functionalities, its examples, and all the required dependencies in a structured manner.
