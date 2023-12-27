@@ -18,9 +18,6 @@ executables = [Executable(script=SUBMODULE_FOLDER + "/bridge.py")]
 base_dir = os.path.dirname(__file__)
 
 sub_dirs = [
-    "python-deps/mission_control_tower",
-    "python-deps/nova_sdk",
-    "python-deps/supernova_sdk/SupernovaSDK",
     "python-backend"
 ]
 
@@ -38,7 +35,7 @@ options = {
 # Perform the freezing process
 setup(
     name="MissionControlTowerSDK",
-    version="0.1",
+    version="0.3.1",
     description="MissionControlTower SDK Standalone Distribution",
     executables=executables,
     options=options

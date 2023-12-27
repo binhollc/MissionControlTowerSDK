@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.5)
-project(ListDevices)
+project(SupernovaI2CBenchmark)
 
 # ---
 # Source Files Declaration
 # ---
 
 set(SOURCES main.cpp)
-set(TARGET_NAME list_devices)
+set(TARGET_NAME supernova_i2c_benchmark)
 
 # ---
 # Target Definition, Properties and Commands

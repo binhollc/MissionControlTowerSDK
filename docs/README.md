@@ -11,91 +11,74 @@ Welcome to the Binho Mission Control SDK (BMC_SDK), a set of software tools spec
 The Binho Mission Control SDK installer will install the necessary components for the SDK on your system. This includes:
 
 - The core SDK library (`bmc_sdk.dll` and `bmc_sdk.lib`).
-- A sample application (`sample_app.exe`) to test the SDK.
+- Example applications to test the SDK.
 - The "bridge" service used by the library.
 - Header files for integration (`include` directory).
 
 ### Instructions
 
-1. **Download the Installer**  
+1. **Download the Installer**
    Get the Binho Mission Control SDK installer named `BinhoMissionControlSDK.exe`.
 
-2. **Run the Installer**  
+2. **Run the Installer**
    Double-click on `BinhoMissionControlSDK.exe` and follow the on-screen prompts.
 
-3. **Installation Directories**  
+3. **Installation Directories**
    By default, the SDK will be installed into the `c:\Program Files (x86)\BinhoMissionControlSDK` directory. Inside this directory, you will find:
    - `bmc_sdk.dll`: The SDK dynamic link library.
    - `bmc_sdk.lib`: The SDK static library.
-   - `sample_app.exe`: A sample application to demonstrate the SDK's usage.
+   - `examples`: A directory containing example applications.
    - `bridge`: A directory containing components for the bridge service used by the library.
    - `include`: A directory containing various header files necessary for SDK integration.
 
-4. **Add to PATH Environment Variable**  
+4. **Add to PATH Environment Variable**
    For the sample application to function correctly, the `bridge` directory must be added to your system's PATH environment variable. See the steps bellow.
 
-5. **Integration**  
+5. **Integration**
    To integrate the Binho Mission Control SDK into your project:
    - Reference the SDK library using the `bmc_sdk.lib` file.
    - Include necessary headers from the `include` directory.
 
-6. **Test the Sample Application**  
+6. **Test the Example Applications**
    After setting up the PATH, you can run `sample_app.exe` to check the installation and get an understanding of how the SDK functions.
 
 ## Usage Examples
 
-We provide a set of sample applications to demonstrate how to use the library. Below are the steps to build and run each sample application:
+We provide a set of example applications to demonstrate how to use the library. These examples are designed to be built with your preferred development tools. Below are the general steps to build and run each sample application, along with a brief description of what each application demonstrates.
 
 ### Prerequisites
 
-- Ensure you have `Visual Studio 2022` installed on your system.
-- Navigate to the directory of the desired sample app (`supernova_101/` or `nova_breathing_leds/`).
+- A development environment compatible with C++17.
+- The Binho Mission Control SDK installed on your system.
 
 ### Example Use Cases
 
-- **nova_breathing_leds**: This application simulates an LED's breathing effect by progressively increasing and decreasing its brightness using PWM on a `BinhoNova` host adapter.
-  
-- **supernova_101**: Demonstrates basic operations such as fetching USB strings like `MANUFACTURER`, `PRODUCT_NAME`, and others from a `BinhoSupernova` host adapter.
+**Nova Host Adapter**
+
+- **nova_breathing_leds**: Simulates a breathing LED effect, showcasing PWM control with a BinhoNova host adapter.
+
+**Supernova Host Adapter**
+
+- **list_devices**: Lists connected USB devices, displaying details such as the product name, type, port, and manufacturer. This example highlights the capability to query and process information about connected devices using the CommandDispatcher framework.
+- **supernova_101**: Demonstrates fetching USB strings like `MANUFACTURER`, `PRODUCT_NAME`, etc., from a BinhoSupernova host adapter.
+- **supernova_i2C**: Showcases I2C operations using the BinhoSupernova host adapter.
+- **supernova_i2c_benchmark**: Performs benchmarking of I2C communication with the BinhoSupernova host adapter. It measures and displays the average round-trip time for a series of I2C write operations, offering insight into the performance and efficiency of I2C communications.
+- **sample_library**: A custom library that provides a simplified interface for interacting with Binho devices. It includes functions for retrieving device information such as firmware and hardware versions, and serial numbers.
+- **sample_app_using_sample_library**: An application that demonstrates how to use the `sample_library` to interact with Binho devices. It shows how to integrate the custom library into a larger application, retrieve device information, and handle different types of exceptions.
 
 ### Building the Sample Applications
 
-1. **Navigate to the folder of the sample app**
+1. **Open the Project**:
+   Navigate to the directory of the desired sample application (e.g., `supernova_101/`).
 
-2. **Create a Build Directory**:
-   ```bash
-   mkdir build
-   ```
+2. **Prepare for Build**:
+   Set up your build environment. This might involve generating project files or configuring your build system. Ensure the Binho Mission Control SDK is properly referenced, including the library and header files.
 
-3. **Navigate to the Build Directory**:
-   ```bash
-   cd build
-   ```
+3. **Build the Application**:
+   Compile the application using your build system or IDE. You might need to specify build configurations such as the target platform or build type.
 
-4. **Generate Project Files using CMake**:
-   ```bash
-   cmake .. -G "Visual Studio 17 2022" -A win32 -DBMC_SDK_PATH=c:\Program Files (x86)\BinhoMissionControlSDK
-   ```
-
-5. **Build the Project**:
-   ```bash
-   cmake --build . --config Release
-   ```
-
-6. **Navigate to the Release Directory**:
-   ```bash
-   cd Release
-   ```
-
-7. **Update the PATH**:
-   Make sure the BinhoMissionControlSDK and bridge directories are included in your `PATH`:
-   ```bash
-   set PATH=%PATH%;c:\Program Files (x86)\BinhoMissionControlSDK;c:\Program Files (x86)\BinhoMissionControlSDK\bridge
-   ```
-
-8. **Run the Sample Application**:
-   ```bash
-   sample_app.exe
-   ```
+4. **Run the Sample Application**:
+   After building, execute the sample application to test and explore its functionality. Ensure any required runtime dependencies or environment variables are set up correctly.
 
 ## Using the Library - General Structure
 
@@ -177,3 +160,9 @@ dispatcher.stop();
 - Fully automated the build and distribution process for Windows.
 - Implemented a macro that prints debug messages only when the NDEBUG flag is enabled by the developer.
 - Adjusted the CommandResponse’s from_json function: Now accepts both numeric and string-typed transaction IDs for greater flexibility.
+
+### v0.3.1
+
+- Reduces roundtrip time.
+- Adds more examples.
+- Enhances supernova_i2c example.

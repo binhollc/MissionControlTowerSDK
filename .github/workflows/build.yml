@@ -7,75 +7,54 @@ jobs:
   build:
     strategy:
       matrix:
-        artifact: ['lib', 'sample_app']
         os: [windows-latest, ubuntu-latest, macos-latest]
-
-        include:
-          - os: windows-latest
-            cmake_generator: "Visual Studio 17 2022"
-            cmake_architecture_arg: "-A" # Argument prefix for architecture
-            architecture: ['win32', 'x64']
-            config: "Release"
-            extension:
-              lib: ".dll"
-              sample_app: ".exe"
-          - os: ubuntu-latest
-            cmake_generator: "Unix Makefiles"
-            cmake_architecture_arg: "" # No architecture specification for Unix Makefiles
-            architecture: ['']
-            config: "Release"
-            extension:
-              lib: ".so"
-              sample_app: ""
-          - os: macos-latest
-            cmake_generator: "Unix Makefiles"
-            cmake_architecture_arg: "" # No architecture specification for Unix Makefiles
-            architecture: ['']
-            config: "Release"
-            extension:
-              lib: ".dylib"
-              sample_app: ""
 
     runs-on: ${{ matrix.os }}
 
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v3
+      with:
+        token: ${{ env.GH_TOKEN }}
+        submodules: recursive
+
+    - name: Install Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
 
     - name: Get CMake
       uses: lukka/get-cmake@latest
 
-    - name: Set up environment
+    - name: Build and stage the Bridge, library and examples (Mac and Linux)
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
       run: |
-        echo "ARTIFACT_NAME=bmc_sdk${{ matrix.extension.lib }}" >> $GITHUB_ENV
-        echo "SUBPROJECT_DIR=${{ github.workspace }}" >> $GITHUB_ENV
-        if [ "${{ matrix.artifact }}" = "sample_app" ]; then
-          echo "ARTIFACT_NAME=sample_app${{ matrix.extension.sample_app }}" >> $GITHUB_ENV
-          echo "SUBPROJECT_DIR=${{ github.workspace }}/sample_app" >> $GITHUB_ENV
-        fi
-        echo "BUILD_DIR=${{ github.workspace }}/build" >> $GITHUB_ENV
-        echo "STAGING_DIR=${{ github.workspace }}/staging" >> $GITHUB_ENV
+        ./build_and_stage.sh
 
-    - name: Configure CMake
-      run: |
-        cd $SUBPROJECT_DIR
-        if [ -d "$BUILD_DIR" ]; then
-          rm -r "$BUILD_DIR"
-        fi
-        mkdir $BUILD_DIR
-        cd $BUILD_DIR
-        cmake .. -G "${{ matrix.cmake_generator }}" ${{ matrix.cmake_architecture_arg }} ${{ matrix.architecture }}  
-
-    - name: Upload build artifacts (Windows)
+    - name: Build the Bridge, library and examples (Windows)
       if: matrix.os == 'windows-latest'
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ matrix.os }}-${{ matrix.architecture }}-artifacts
-        path: staging/
+      run: |
+        dir
+        .\build_and_stage.bat win32
 
-    - name: Upload build artifacts (Linux/Mac)
-      if: matrix.os != 'windows-latest'
-      uses: actions/upload-artifact@v2
+    - name: Create Windows installer
+      if: matrix.os == 'windows-latest'
+      uses: joncloud/makensis-action@v4
+      with:
+        script-file: bmc_sdk_installer.nsi
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.os }}-artifacts
         path: staging/
+
+    - name: Upload Windows installer
+      if: matrix.os == 'windows-latest'
+      uses: actions/upload-artifact@v3
+      with:
+        name: BinhoMissionControlSDK-0.3.1.exe
+        path: BinhoMissionControlSDK-0.3.1.exe

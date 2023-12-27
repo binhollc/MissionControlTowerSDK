@@ -17,7 +17,7 @@ int main() {
     std::cout << "Starting Command Dispatcher for BinhoSupernova...\n";
 
     // Open the SupernovaSimulatedPort
-    dispatcher.invokeCommandSync("0", "open", {{"address", "SupernovaSimulatedPort"}}, [](CommandResponse cr) {
+    dispatcher.invokeCommandSync("0", "open", {}, [](CommandResponse cr) {
         printCommandResponse(cr, "Opening SupernovaSimulatedPort");
     });
 
@@ -33,7 +33,7 @@ int main() {
     std::cout << "All commands executed. Waiting for all responses...\n";
 
     // Exit the command dispatcher
-    dispatcher.invokeCommand("0", "exit", {});
+    dispatcher.invokeCommandSync("0", "exit", {});
     std::cout << "Exiting Command Dispatcher...\n";
 
     dispatcher.stop();

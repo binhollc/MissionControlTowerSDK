@@ -1,15 +1,3 @@
-[submodule "mission-control-tower"]
-	path = mission-control-tower
-	url = git@github.com:binhollc/MissionControlTower
 [submodule "python-backend"]
 	path = python-backend
 	url = git@github.com:binhollc/MissionControlBridge.git
-[submodule "mission_control_tower"]
-	path = python-deps/mission_control_tower
-	url = git@github.com:binhollc/MissionControlTower.git
-[submodule "supernova_sdk"]
-	path = python-deps/supernova_sdk
-	url = git@github.com:binhollc/BinhoPythonSDK.git
-[submodule "nova_sdk"]
-	path = python-deps/nova_sdk
-	url = git@github.com:binhollc/binho-python-package.git
