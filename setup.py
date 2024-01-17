@@ -35,7 +35,7 @@ options = {
 # Perform the freezing process
 setup(
     name="MissionControlTowerSDK",
-    version="0.3.1",
+    version="0.4.0",
     description="MissionControlTower SDK Standalone Distribution",
     executables=executables,
     options=options
