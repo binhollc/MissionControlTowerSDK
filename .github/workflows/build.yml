@@ -26,9 +26,6 @@ jobs:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     steps:
-    - name: Set Installer File Name
-      if: matrix.os == 'windows-latest'
-      run: echo "INSTALLER_FILE_NAME=BinhoMissionControlSDK-${{ env.VERSION }}-${{ matrix.arch_nsis }}.exe" >> $GITHUB_ENV
 
     - name: Checkout repository and submodules
       uses: actions/checkout@v3
@@ -61,7 +58,7 @@ jobs:
       uses: joncloud/makensis-action@v4
       with:
         script-file: bmc_sdk_installer.nsi
-        arguments: /DOUTFILE=${{ env.INSTALLER_FILE_NAME }}
+        arguments: /DOUTFILE=BinhoMissionControlSDK-${{ env.VERSION }}-${{ matrix.arch_nsis }}.exe
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
@@ -73,5 +70,5 @@ jobs:
       if: matrix.os == 'windows-latest'
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.INSTALLER_FILE_NAME }}
-        path: ${{ env.INSTALLER_FILE_NAME }}
+        name: BinhoMissionControlSDK-${{ env.VERSION }}-${{ matrix.arch_nsis }}.exe
+        path: BinhoMissionControlSDK-${{ env.VERSION }}-${{ matrix.arch_nsis }}.exe
