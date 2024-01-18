@@ -1,7 +1,10 @@
-!define APP_VERSION "0.3.1"
+; Initialize OUTFILE with a default value
+!ifndef OUTFILE
+    !define OUTFILE "bmc_sdk_installer.exe"
+!endif
 
 ; Define the name of the installer
-Outfile "BinhoMissionControlSDK-${APP_VERSION}.exe"
+Outfile "${OUTFILE}"
 
 ; Set the default installation directory
 InstallDir $PROGRAMFILES\BinhoMissionControlSDK
