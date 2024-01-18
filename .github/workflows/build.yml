@@ -19,6 +19,8 @@ jobs:
             arch_python: x64
             arch_cmake: x64
             arch_nsis: 64
+          - os: ubuntu-latest
+          - os: macos-latest
 
     runs-on: ${{ matrix.os }}
 
