@@ -11,7 +11,8 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 
-set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/staging")
+set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}")
+set(STAGING_DIR ${CMAKE_INSTALL_PREFIX}/staging)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -38,18 +39,8 @@ set(SOURCE_FILES
 # ---
 
 include(FetchContent)
-
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
-
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-)
-
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-FetchContent_MakeAvailable(json googletest)
+FetchContent_MakeAvailable(json)
 
 # ---
 # Target Definition, Properties and Commands
@@ -81,18 +72,18 @@ target_compile_features(bmc_sdk PUBLIC cxx_std_17)
 # ---
 
 # Installation path for headers
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION include)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION ${STAGING_DIR}/include)
 
 # Install the library (e.g. .dll, .lib, .so files)
 install(TARGETS bmc_sdk
-        RUNTIME DESTINATION bin
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION ${STAGING_DIR}/bin
+        ARCHIVE DESTINATION ${STAGING_DIR}/lib
+        LIBRARY DESTINATION ${STAGING_DIR}/lib
 )
 
 # Install documentation
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/docs/
-        DESTINATION docs
+        DESTINATION ${STAGING_DIR}/docs
         FILES_MATCHING PATTERN "*.md"
 )
 
@@ -101,6 +92,7 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/docs/
 # ---
 
 add_subdirectory(examples)
+# add_subdirectory(tests)
 
 # ---
 # Define custom targets
@@ -109,10 +101,10 @@ add_subdirectory(examples)
 # Custom command to clean the staging directory
 if (WIN32)
     add_custom_target(clean-staging
-        COMMAND cmd /c "if exist \"${CMAKE_INSTALL_PREFIX}\" rmdir /S /Q \"${CMAKE_INSTALL_PREFIX}\" && mkdir \"${CMAKE_INSTALL_PREFIX}\""
+        COMMAND cmd /c "if exist \"${STAGING_DIR}\" rmdir /S /Q \"${STAGING_DIR}\" && mkdir \"${CMAKE_INSTALL_PREFIX}\""
     )
 else()
     add_custom_target(clean-staging
-        COMMAND rm -rf ${CMAKE_INSTALL_PREFIX}
+        COMMAND rm -rf ${STAGING_DIR}
     )
 endif()

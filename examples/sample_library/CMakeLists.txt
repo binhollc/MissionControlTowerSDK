@@ -30,13 +30,13 @@ target_link_libraries(${TARGET_NAME} bmc_sdk nlohmann_json::nlohmann_json)
 
 # Install the library (e.g. .dll, .lib, .so files)
 install(TARGETS sample_library
-        RUNTIME DESTINATION examples/${TARGET_NAME}
-        ARCHIVE DESTINATION examples/${TARGET_NAME}
-        LIBRARY DESTINATION examples/${TARGET_NAME}
+        RUNTIME DESTINATION ${STAGING_DIR}/examples/${TARGET_NAME}
+        ARCHIVE DESTINATION ${STAGING_DIR}/examples/${TARGET_NAME}
+        LIBRARY DESTINATION ${STAGING_DIR}/examples/${TARGET_NAME}
 )
 
 # Install the source files
-install(FILES ${SOURCES} DESTINATION examples/${TARGET_NAME})
+install(FILES ${SOURCES} DESTINATION ${STAGING_DIR}/examples/${TARGET_NAME})
 
 # Install the header files
-install(FILES sample_library.h DESTINATION examples/${TARGET_NAME})
+install(FILES sample_library.h DESTINATION ${STAGING_DIR}/examples/${TARGET_NAME})
