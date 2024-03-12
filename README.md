@@ -334,6 +334,19 @@ Alternatively, you can prepend the PATH variable to the command execution:
 
    The repository includes several examples under the `examples` folder. The instructions to build and execute the examples are analogous to the ones for the sample app.
 
+## Automated Tests
+
+### Build
+
+Pre: the project is built and staged.
+
+```shell
+cd tests
+cmake -S . -B build
+cmake --build build
+cd build && ctest
+```
+
 ## Troubleshooting
 
 ### The system can't find the library
