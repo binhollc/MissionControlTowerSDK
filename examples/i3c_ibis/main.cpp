@@ -13,6 +13,14 @@ void printCommandResponse(const CommandResponse &cr, const std::string &action)
   std::cout << "----------------------------------\n";
 }
 
+// Utility function to simplify command invocation
+void invokeI3CWriteUsingSubaddress(CommandDispatcher& dispatcher, const std::string& transactionId,
+                                   const std::string& subaddress, const std::string& writeBuffer,
+                                   const std::string& mode = "SDR", const std::string& pushPullClockFrequencyInMHz = "5",
+                                   const std::string& openDrainClockFrequencyInKHz = "1250", const std::string& address = "08") {
+    dispatcher.invokeCommandSync(transactionId, "i3c_write_using_subaddress", {{"address", address}, {"subaddress", subaddress}, {"writeBuffer", writeBuffer}, {"mode", mode}, {"pushPullClockFrequencyInMHz", pushPullClockFrequencyInMHz}, {"openDrainClockFrequencyInKHz", openDrainClockFrequencyInKHz}});
+}
+
 int main()
 {
   CommandDispatcher dispatcher("BinhoSupernova");
@@ -38,22 +46,22 @@ int main()
   // Command to enable IBIs on the target device
   dispatcher.invokeCommandSync("100", "i3c_ibi_enable", {{"address","08"}});
 
-  // Commands to write using subaddress
-  dispatcher.invokeCommandSync("3", "i3c_write_using_subaddress", {{"address","08"}, {"subaddress","76"}, {"writeBuffer","00"}, {"mode","SDR"}, {"pushPullClockFrequencyInMHz","5"}, {"openDrainClockFrequencyInKHz","1250"}});
-  dispatcher.invokeCommandSync("4", "i3c_write_using_subaddress", {{"address","08"}, {"subaddress","4E"}, {"writeBuffer","20"}, {"mode","SDR"}, {"pushPullClockFrequencyInMHz","5"}, {"openDrainClockFrequencyInKHz","1250"}});
-  dispatcher.invokeCommandSync("5", "i3c_write_using_subaddress", {{"address","08"}, {"subaddress","13"}, {"writeBuffer","05"}, {"mode","SDR"}, {"pushPullClockFrequencyInMHz","5"}, {"openDrainClockFrequencyInKHz","1250"}});
-  dispatcher.invokeCommandSync("6", "i3c_write_using_subaddress", {{"address","08"}, {"subaddress","16"}, {"writeBuffer","40"}, {"mode","SDR"}, {"pushPullClockFrequencyInMHz","5"}, {"openDrainClockFrequencyInKHz","1250"}});
-  dispatcher.invokeCommandSync("7", "i3c_write_using_subaddress", {{"address","08"}, {"subaddress","5F"}, {"writeBuffer","61"}, {"mode","SDR"}, {"pushPullClockFrequencyInMHz","5"}, {"openDrainClockFrequencyInKHz","1250"}});
-  dispatcher.invokeCommandSync("8", "i3c_write_using_subaddress", {{"address","08"}, {"subaddress","60"}, {"writeBuffer","0F00"}, {"mode","SDR"}, {"pushPullClockFrequencyInMHz","5"}, {"openDrainClockFrequencyInKHz","1250"}});
-  dispatcher.invokeCommandSync("9", "i3c_write_using_subaddress", {{"address","08"}, {"subaddress","50"}, {"writeBuffer","0E"}, {"mode","SDR"}, {"pushPullClockFrequencyInMHz","5"}, {"openDrainClockFrequencyInKHz","1250"}});
-  dispatcher.invokeCommandSync("10", "i3c_write_using_subaddress", {{"address","08"}, {"subaddress","76"}, {"writeBuffer","01"}, {"mode","SDR"}, {"pushPullClockFrequencyInMHz","5"}, {"openDrainClockFrequencyInKHz","1250"}});
-  dispatcher.invokeCommandSync("11", "i3c_write_using_subaddress", {{"address","08"}, {"subaddress","03"}, {"writeBuffer","38"}, {"mode","SDR"}, {"pushPullClockFrequencyInMHz","5"}, {"openDrainClockFrequencyInKHz","1250"}});
-  dispatcher.invokeCommandSync("12", "i3c_write_using_subaddress", {{"address","08"}, {"subaddress","7A"}, {"writeBuffer","02"}, {"mode","SDR"}, {"pushPullClockFrequencyInMHz","5"}, {"openDrainClockFrequencyInKHz","1250"}});
-  dispatcher.invokeCommandSync("13", "i3c_write_using_subaddress", {{"address","08"}, {"subaddress","7C"}, {"writeBuffer","1F"}, {"mode","SDR"}, {"pushPullClockFrequencyInMHz","5"}, {"openDrainClockFrequencyInKHz","1250"}});
-  dispatcher.invokeCommandSync("14", "i3c_write_using_subaddress", {{"address","08"}, {"subaddress","76"}, {"writeBuffer","04"}, {"mode","SDR"}, {"pushPullClockFrequencyInMHz","5"}, {"openDrainClockFrequencyInKHz","1250"}});
-  dispatcher.invokeCommandSync("15", "i3c_write_using_subaddress", {{"address","08"}, {"subaddress","4F"}, {"writeBuffer","04"}, {"mode","SDR"}, {"pushPullClockFrequencyInMHz","5"}, {"openDrainClockFrequencyInKHz","1250"}});
-  dispatcher.invokeCommandSync("16", "i3c_write_using_subaddress", {{"address","08"}, {"subaddress","76"}, {"writeBuffer","00"}, {"mode","SDR"}, {"pushPullClockFrequencyInMHz","5"}, {"openDrainClockFrequencyInKHz","1250"}});
-  dispatcher.invokeCommandSync("17", "i3c_write_using_subaddress", {{"address","08"}, {"subaddress","4E"}, {"writeBuffer","02"}, {"mode","SDR"}, {"pushPullClockFrequencyInMHz","5"}, {"openDrainClockFrequencyInKHz","1250"}});
+  // Refactored commands to write using subaddress
+  invokeI3CWriteUsingSubaddress(dispatcher, "3", "76", "00");
+  invokeI3CWriteUsingSubaddress(dispatcher, "4", "4E", "20");
+  invokeI3CWriteUsingSubaddress(dispatcher, "5", "13", "05");
+  invokeI3CWriteUsingSubaddress(dispatcher, "6", "16", "40");
+  invokeI3CWriteUsingSubaddress(dispatcher, "7", "5F", "61");
+  invokeI3CWriteUsingSubaddress(dispatcher, "8", "60", "0F00");
+  invokeI3CWriteUsingSubaddress(dispatcher, "9", "50", "0E");
+  invokeI3CWriteUsingSubaddress(dispatcher, "10", "76", "01");
+  invokeI3CWriteUsingSubaddress(dispatcher, "11", "03", "38");
+  invokeI3CWriteUsingSubaddress(dispatcher, "12", "7A", "02");
+  invokeI3CWriteUsingSubaddress(dispatcher, "13", "7C", "1F");
+  invokeI3CWriteUsingSubaddress(dispatcher, "14", "76", "04");
+  invokeI3CWriteUsingSubaddress(dispatcher, "15", "4F", "04");
+  invokeI3CWriteUsingSubaddress(dispatcher, "16", "76", "00");
+  invokeI3CWriteUsingSubaddress(dispatcher, "17", "4E", "02");
 
   std::this_thread::sleep_for(std::chrono::milliseconds(10000));
 
