@@ -28,6 +28,7 @@ int main() {
     dispatcher.invokeCommandSync("1000", "exit", {});
     
     dispatcher.waitForAllCommands();
+
     dispatcher.stop();
 
   return 0;
