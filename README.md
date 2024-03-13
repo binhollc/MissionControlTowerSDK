@@ -338,7 +338,9 @@ Alternatively, you can prepend the PATH variable to the command execution:
 
 ### Build
 
-Pre: the project is built and staged.
+Preconditions:
+   - The project is built and staged.
+   - PATH (and DYLD_LIBRARY_PATH in Mac) environment variables are correctly set.
 
 ```shell
 cd tests
