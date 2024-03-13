@@ -4,6 +4,12 @@ void CommandDispatcher::start() {
     commandManager.start();
     commandManager.on_command_response([this](CommandResponse cr) {
         std::lock_guard<std::mutex> lock(mtx);
+
+        // If there is a notification callback, call it
+        if (notificationCallback) {
+            notificationCallback(cr);
+        }
+
         if (!cr.is_promise) {
             if (callbacks.count(cr.transaction_id) > 0) {
                 callbacks[cr.transaction_id](cr);
@@ -55,4 +61,9 @@ void CommandDispatcher::waitForAllCommands() {
 void CommandDispatcher::invokeCommandSync(const std::string& id, const std::string& cmd, const json& params, std::function<void(CommandResponse)> fn) {
     invokeCommand(id, cmd, params, fn);
     waitFor({id});
+}
+
+void CommandDispatcher::onNotification(std::function<void(CommandResponse)> fn) {
+    std::lock_guard<std::mutex> lock(mtx); // Protect the callback setup with mutex
+    notificationCallback = fn;
 }

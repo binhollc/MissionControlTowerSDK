@@ -29,7 +29,11 @@ FetchContent_MakeAvailable(json googletest)
 # Source Files Declaration
 # ---
 
-set(SOURCES SupernovaGenericFlowTest.cpp)
+set(SOURCES
+  SupernovaGenericFlowTest.cpp
+  NotificationFlowTest.cpp
+)
+
 set(TARGET_NAME tests)
 
 # ---
