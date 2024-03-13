@@ -29,7 +29,7 @@ FetchContent_MakeAvailable(json googletest)
 # Source Files Declaration
 # ---
 
-set(SOURCES test.cpp)
+set(SOURCES CommandDispatcherGenericFlowTest.cpp)
 set(TARGET_NAME tests)
 
 # ---
