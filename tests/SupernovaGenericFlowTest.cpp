@@ -7,11 +7,11 @@
 // Global constant for minimum tolerable waiting time for a command
 constexpr std::chrono::milliseconds MIN_TOLERABLE_CMD_WAIT_MS(300);
 
-class GenericCommandFlowTest : public ::testing::Test {
+class SupernovaGenericCommandFlowTest : public ::testing::Test {
 protected:
     CommandDispatcher dispatcher;
 
-    GenericCommandFlowTest() : dispatcher("BinhoSupernova") {}
+    SupernovaGenericCommandFlowTest() : dispatcher("BinhoSupernova") {}
 
     void SetUp() override {
       dispatcher.start();
@@ -23,7 +23,7 @@ protected:
     }
 };
 
-TEST_F(GenericCommandFlowTest, OpenCloseExit_SimulatedPort_OperationsCompleteSuccessfully) {
+TEST_F(SupernovaGenericCommandFlowTest, OpenCloseExit_SimulatedPort_OperationsCompleteSuccessfully) {
     bool openInvoked = false;
     bool closeInvoked = false;
     bool exitInvoked = false;
