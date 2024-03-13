@@ -16,7 +16,6 @@ private:
     CommandManager commandManager;
     std::mutex mtx;
     std::condition_variable cv;
-    std::unordered_map<std::string, int> activeCommands;
     std::unordered_map<std::string, std::function<void(CommandResponse)>> callbacks;
     std::function<void(CommandResponse)> notificationCallback;
 

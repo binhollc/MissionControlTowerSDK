@@ -16,12 +16,6 @@ void CommandDispatcher::start() {
                 callbacks[cr.transaction_id](cr);
                 callbacks.erase(cr.transaction_id);
             }
-            if (activeCommands.count(cr.transaction_id) > 0) {
-                --activeCommands[cr.transaction_id];
-                if (activeCommands[cr.transaction_id] == 0) {
-                    activeCommands.erase(cr.transaction_id);
-                }
-            }
             cv.notify_all();
         } else {
             if (callbacks.count(cr.transaction_id) > 0) {
@@ -37,7 +31,6 @@ void CommandDispatcher::stop() {
 
 void CommandDispatcher::invokeCommand(const std::string& id, const std::string& cmd, const json& params, std::function<void(CommandResponse)> fn) {
     std::lock_guard<std::mutex> lock(mtx);
-    ++activeCommands[id];
     if (fn != nullptr) {
         callbacks[id] = fn;
     }
@@ -47,13 +40,13 @@ void CommandDispatcher::invokeCommand(const std::string& id, const std::string& 
 void CommandDispatcher::waitFor(const std::vector<std::string>& ids) {
     std::unique_lock<std::mutex> lock(mtx);
 
-    if (std::all_of(ids.begin(), ids.end(), [this](const std::string& id){ return activeCommands.count(id) == 0; })) {
-        return; // All specified commands are already inactive, return immediately.
+    if (std::all_of(ids.begin(), ids.end(), [this](const std::string& id){ return callbacks.count(id) == 0; })) {
+        return; // All specified callbacks are already inactive, return immediately.
     }
 
     cv.wait(lock, [this, &ids]() {
         for (const auto& id : ids) {
-            if (activeCommands.count(id) > 0) {
+            if (callbacks.count(id) > 0) {
                 return false;
             }
         }
@@ -64,11 +57,11 @@ void CommandDispatcher::waitFor(const std::vector<std::string>& ids) {
 void CommandDispatcher::waitForAllCommands() {
     std::unique_lock<std::mutex> lock(mtx);
 
-    if (activeCommands.empty()) {
-        return; // No active commands, return immediately.
+    if (callbacks.empty()) {
+        return; // No active callbacks, return immediately.
     }
 
-    cv.wait(lock, [this]() { return activeCommands.empty(); });
+    cv.wait(lock, [this]() { return callbacks.empty(); });
 }
 
 void CommandDispatcher::invokeCommandSync(const std::string& id, const std::string& cmd, const json& params, std::function<void(CommandResponse)> fn) {
