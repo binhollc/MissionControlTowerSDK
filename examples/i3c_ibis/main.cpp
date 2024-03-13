@@ -5,12 +5,19 @@
 
 void printCommandResponse(const CommandResponse &cr, const std::string &action)
 {
-  std::cout << "Action: " << action << "\n";
-  std::cout << "Transaction ID: " << cr.transaction_id << "\n";
-  std::cout << "Status: " << cr.status << "\n";
-  std::cout << "Is Promise: " << (cr.is_promise ? "True" : "False") << "\n";
-  std::cout << "Data: " << cr.data.dump() << "\n";
-  std::cout << "----------------------------------\n";
+    std::cout << "Action: " << action << "\n";
+    std::cout << "Transaction ID: " << cr.transaction_id << "\n";
+    std::cout << "Status: " << cr.status << "\n";
+    std::cout << "Is Promise: " << (cr.is_promise ? "True" : "False") << "\n";
+    std::cout << "Data: " << cr.data.dump() << "\n";
+    std::cout << "----------------------------------\n";
+}
+
+auto handleCommandResponse(const std::string &action)
+{
+    return [action](const CommandResponse &cr) {
+      printCommandResponse(cr, action);
+    };
 }
 
 class CommandIDGenerator {
@@ -48,14 +55,10 @@ int main()
   });
 
   // Open device
-  dispatcher.invokeCommandSync(idGenerator.nextID(), "open", {}, [](CommandResponse cr) {
-      printCommandResponse(cr, "Supernova Opened");
-  });
+  dispatcher.invokeCommandSync(idGenerator.nextID(), "open", {}, handleCommandResponse("Supernova Opened"));
 
   // Set bus voltage
-  dispatcher.invokeCommandSync(idGenerator.nextID(), "i3c_init_bus", {{"busVoltageInV", "3.3"}}, [](CommandResponse cr) {
-      printCommandResponse(cr, "Bus Voltage Set");
-  });
+  dispatcher.invokeCommandSync(idGenerator.nextID(), "i3c_init_bus", {{"busVoltageInV", "3.3"}}, handleCommandResponse("Bus Voltage Set"));
 
   // Command to enable IBIs on the target device
   dispatcher.invokeCommandSync(idGenerator.nextID(), "i3c_ibi_enable", {{"address", "08"}});
