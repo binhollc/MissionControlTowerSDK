@@ -48,7 +48,7 @@ FetchContent_MakeAvailable(json)
 add_library(bmc_sdk SHARED ${SOURCE_FILES})
 
 set_target_properties(bmc_sdk PROPERTIES
-    VERSION 0.3.1
+    VERSION 1.0.0
     SOVERSION 1
 )
 
