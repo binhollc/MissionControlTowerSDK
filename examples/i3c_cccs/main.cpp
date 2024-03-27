@@ -67,13 +67,20 @@ int main()
   // Set bus voltage
   dispatcher.invokeCommandSync(idGenerator.nextID(), "i3c_init_bus", {{"busVoltageInV", "3.3"}}, handleCommandResponse("Bus Voltage Set"));
 
-  // Refactored commands to write using subaddress with auto-generated IDs
+  // Gets target Provisioned ID
   invokeI3CSendCCC(dispatcher, idGenerator.nextID(), "GETPID");
+  // Gets target Max read length
   invokeI3CSendCCC(dispatcher, idGenerator.nextID(), "GETMRL");
+  // Gets target Max write length
   invokeI3CSendCCC(dispatcher, idGenerator.nextID(), "GETMWL");
+
+  // Sets target Max read length to 3
   invokeI3CSendCCC(dispatcher, idGenerator.nextID(), "DIRECTSETMRL", "03");
+  // We check if it effectively changed
   invokeI3CSendCCC(dispatcher, idGenerator.nextID(), "GETMRL");
+  // Sets target Max write length to 2
   invokeI3CSendCCC(dispatcher, idGenerator.nextID(), "BROADCASTSETMWL", "02");
+  // We check if it effectively changed
   invokeI3CSendCCC(dispatcher, idGenerator.nextID(), "GETMWL");
 
   std::this_thread::sleep_for(std::chrono::milliseconds(3000));
