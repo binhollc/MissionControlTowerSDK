@@ -5,12 +5,14 @@
 
 void printCommandResponse(const CommandResponse &cr, const std::string &action)
 {
-    std::cout << "Action: " << action << "\n";
-    std::cout << "Transaction ID: " << cr.transaction_id << "\n";
-    std::cout << "Status: " << cr.status << "\n";
-    std::cout << "Is Promise: " << (cr.is_promise ? "True" : "False") << "\n";
-    std::cout << "Data: " << cr.data.dump() << "\n";
-    std::cout << "----------------------------------\n";
+    if (!cr.is_promise) {
+        std::cout << "Action: " << action << "\n";
+        std::cout << "Transaction ID: " << cr.transaction_id << "\n";
+        std::cout << "Status: " << cr.status << "\n";
+        std::cout << "Is Promise: " << (cr.is_promise ? "True" : "False") << "\n";
+        std::cout << "Data: " << cr.data.dump() << "\n";
+        std::cout << "----------------------------------\n";
+    }
 }
 
 auto handleCommandResponse(const std::string &action)
@@ -66,7 +68,6 @@ int main()
 
   // Set bus voltage
   dispatcher.invokeCommandSync(idGenerator.nextID(), "i3c_init_bus", {{"busVoltageInV", "3.3"}}, handleCommandResponse("Bus Voltage Set"));
-  //invokeI3CWriteUsingSubaddress(dispatcher, idGenerator.nextID(), "4E", "00");
 
   dispatcher.invokeCommandSync(idGenerator.nextID(), "i3c_read_using_subaddress", {{"address", "08"}, {"subaddress", "75"}, {"bytesToRead", "1"}, {"mode", "SDR"}, {"pushPullClockFrequencyInMHz", "5"}, {"openDrainClockFrequencyInKHz", "1250"}}, handleCommandResponse("Read 'Who Am I'"));
   invokeI3CReadUsingSubaddress(dispatcher, idGenerator.nextID(), "75", "01");
