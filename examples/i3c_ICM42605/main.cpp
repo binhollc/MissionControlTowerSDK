@@ -69,21 +69,22 @@ int main()
   // Set bus voltage
   dispatcher.invokeCommandSync(idGenerator.nextID(), "i3c_init_bus", {{"busVoltageInV", "3.3"}}, handleCommandResponse("Bus Voltage Set"));
 
-  dispatcher.invokeCommandSync(idGenerator.nextID(), "i3c_read_using_subaddress", {{"address", "08"}, {"subaddress", "75"}, {"bytesToRead", "1"}, {"mode", "SDR"}, {"pushPullClockFrequencyInMHz", "5"}, {"openDrainClockFrequencyInKHz", "1250"}}, handleCommandResponse("Read 'Who Am I'"));
+  // Reading Who Am I register
   invokeI3CReadUsingSubaddress(dispatcher, idGenerator.nextID(), "75", "01");
 
+  // Initializing the sensor:
+
+  // Enable gyro and accel in low noise mode
   std::cout << "Power Management Register: \n";
   invokeI3CReadUsingSubaddress(dispatcher, idGenerator.nextID(), "4E", "01");
-
   std::cout << "Write Power Management Register: \n";
   invokeI3CWriteUsingSubaddress(dispatcher, idGenerator.nextID(), "4E", "0F");
-
+  // Gyro full scale and data rate
   std::cout << "Gyro Config Register: \n";
   invokeI3CReadUsingSubaddress(dispatcher, idGenerator.nextID(), "4F", "01");
-
   std::cout << "Write Gyro Config Register: \n";
   invokeI3CWriteUsingSubaddress(dispatcher, idGenerator.nextID(), "4F", "66");
-
+  // Accel full scale and data rate
   std::cout << "Set accel full scale and data rate: \n";
   invokeI3CWriteUsingSubaddress(dispatcher, idGenerator.nextID(), "50", "66");
   std::cout << "Set temperature sensor low pass filter to 5Hz, use first order gyro filter: \n";
@@ -94,7 +95,7 @@ int main()
   invokeI3CWriteUsingSubaddress(dispatcher, idGenerator.nextID(), "64", "00");
   std::cout << "Route data ready interrupt to INT1: \n";
   invokeI3CWriteUsingSubaddress(dispatcher, idGenerator.nextID(), "65", "18");
-  std::cout << "Route data ready interrupt to INT2: \n";
+  std::cout << "Route AGC interrupt to INT2: \n";
   invokeI3CWriteUsingSubaddress(dispatcher, idGenerator.nextID(), "68", "01");
   std::cout << "Select Bank 4: \n";
   invokeI3CWriteUsingSubaddress(dispatcher, idGenerator.nextID(), "76", "04");
@@ -103,7 +104,7 @@ int main()
   std::cout << "Select Bank 0: \n";
   invokeI3CWriteUsingSubaddress(dispatcher, idGenerator.nextID(), "76", "00");
 
-
+  // Get some raw readings from the IMU
   std::cout << "Read data from IMU: \n";
   invokeI3CReadUsingSubaddress(dispatcher, idGenerator.nextID(), "1D", "14");
   std::cout << "Read data from IMU: \n";
