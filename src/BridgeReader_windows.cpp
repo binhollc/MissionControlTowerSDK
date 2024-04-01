@@ -13,6 +13,7 @@ std::string BridgeReader::readNextData() {
     const int bufferSize = 1024;
     DWORD bytesRead;
     char buffer[bufferSize];
+    std::vector<char> line;
 
     while (true) {
         if (!ReadFile(bridgeProcessRead, buffer, bufferSize - 1, &bytesRead, NULL) || bytesRead == 0) {
