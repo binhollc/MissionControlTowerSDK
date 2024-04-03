@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.5)
-project(ListDevices)
+project(I3cIbis)
 
 # ---
 # Source Files Declaration
 # ---
 
 set(SOURCES main.cpp)
-set(TARGET_NAME list_devices)
+set(TARGET_NAME i3c_ibis)
 
 # ---
 # Target Definition, Properties and Commands
