@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.5)
-project(ListDevices)
+project(I3cICM42605)
 
 # ---
 # Source Files Declaration
 # ---
 
 set(SOURCES main.cpp)
-set(TARGET_NAME list_devices)
+set(TARGET_NAME i3c_ICM42605)
 
 # ---
 # Target Definition, Properties and Commands

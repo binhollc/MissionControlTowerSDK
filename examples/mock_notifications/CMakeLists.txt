@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.5)
-project(ListDevices)
+project(MockNotifications)
 
 # ---
 # Source Files Declaration
 # ---
 
 set(SOURCES main.cpp)
-set(TARGET_NAME list_devices)
+set(TARGET_NAME mock_notifications)
 
 # ---
 # Target Definition, Properties and Commands
