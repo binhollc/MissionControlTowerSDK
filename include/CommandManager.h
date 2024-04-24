@@ -48,6 +48,7 @@ private:
     void handleReadBridgeThread();
     void handleCallbackOnResponseThread();
     std::function<void(CommandResponse)> callback_fn;
+    bool isBridgeCompatible(const std::vector<std::string>& compatibleVersions);
     bool isRunningWriteThread;
     bool isRunningReadThread;
     bool isRunningCallbackThread;
