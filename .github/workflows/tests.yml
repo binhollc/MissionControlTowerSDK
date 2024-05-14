@@ -1,11 +1,23 @@
-name: Run ctests
+# Run unit tests using CTest
+name: Tests
 
-on: 
-  workflow_dispatch
+on:
+  pull_request:
+    branches: 
+      - '*/develop*'
+  workflow_dispatch:
 
 jobs:
-  placeholder:
+  checkout-and-check-formatting:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Do Nothing
-        run: echo "This is a placeholder workflow."
+    - uses: actions/checkout@v2
+    - name: Run tests
+      uses: HorstBaerbel/action-ctest@1.1
+      # These are optional (defaults displayed)
+      with:
+        sourcedir: '.'
+        builddir: 'build'
+        cmakeoptions: '--config Release'
+        ctestoptions: ''
