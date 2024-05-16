@@ -236,7 +236,7 @@ For Windows users, we recommend downloading CMake's command line tool from the [
    cmake -DCMAKE_BUILD_TYPE=Release ..
    ```
 
-   On Windows it is recommended to select the generator (-G argument) and the platform (-A argument). The platform can be "win32" or "win64":
+   On Windows it is recommended to select the generator (-G argument) and the platform (-A argument). The platform can be "win32" or "x64":
 
    ```bash
    cmake -DCMAKE_BUILD_TYPE=Debug .. -G "Visual Studio 17 2022" -A win32
@@ -342,11 +342,24 @@ Preconditions:
    - The project is built and staged.
    - PATH (and DYLD_LIBRARY_PATH in Mac) environment variables are correctly set.
 
+On Windows 64 bits:
+```shell
+cd tests
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 17 2022" -A x64
+cmake --build build --config Release
+cd build
+ctest
+```
+
+On Windows 32 bits: Change `-A x64` to `-A win32` in the second line above.
+
+On Mac/Linux:
 ```shell
 cd tests
 cmake -S . -B build
 cmake --build build
-cd build && ctest
+cd build
+ctest
 ```
 
 ## Troubleshooting
