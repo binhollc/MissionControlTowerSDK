@@ -16,13 +16,13 @@
 
 
 void CommandManager::start() {
+    // If bridge version is incompatible, exit the application.
+    if (!isBridgeCompatible({"0.10.0", "0.11.0", "0.11.1", "0.12.0"})) {
+        std::cerr << "Bridge version check failed" << std::endl;
+        return;
+    }
     // Start the bridge process
     #ifdef _WIN32
-        // If bridge version is incompatible, exit the application.
-        if (!isBridgeCompatible({"0.10.0", "0.11.0", "0.11.1", "0.12.0"})) {
-            std::cerr << "Bridge version check failed" << std::endl;
-            return;
-        }
         // Create pipes for input and output
         HANDLE BridgeProcess_IN_Rd = NULL;
         HANDLE BridgeProcess_IN_Wr = NULL;
@@ -284,90 +284,116 @@ void CommandManager::on_command_response(std::function<void(CommandResponse)> fn
 }
 
 bool CommandManager::isBridgeCompatible(const std::vector<std::string>& compatibleVersions) {
-    std::string cmd = "bridge.exe --version";
-    std::string strResult;
-    HANDLE hPipeRead, hPipeWrite;
+    #ifdef _WIN32
+        std::string cmd = "bridge.exe --version";
+        std::string strResult;
+        HANDLE hPipeRead, hPipeWrite;
 
-    SECURITY_ATTRIBUTES saAttr = {sizeof(SECURITY_ATTRIBUTES)};
-    saAttr.bInheritHandle = TRUE; // Pipe handles are inherited by child process.
-    saAttr.lpSecurityDescriptor = NULL;
+        SECURITY_ATTRIBUTES saAttr = {sizeof(SECURITY_ATTRIBUTES)};
+        saAttr.bInheritHandle = TRUE; // Pipe handles are inherited by child process.
+        saAttr.lpSecurityDescriptor = NULL;
 
-    // Create a pipe to get results from child's stdout.
-    if (!CreatePipe(&hPipeRead, &hPipeWrite, &saAttr, 0))
-    {
-        DEBUG_MSG("Could not create pipe to read Bridge version");
-        std::cout << ("Could not create pipe to read Bridge version");
-        return false;
-    }
+        // Create a pipe to get results from child's stdout.
+        if (!CreatePipe(&hPipeRead, &hPipeWrite, &saAttr, 0))
+        {
+            DEBUG_MSG("Could not create pipe to read Bridge version");
+            std::cout << ("Could not create pipe to read Bridge version");
+            return false;
+        }
 
-    STARTUPINFO si = { 0 };
-    si.cb = sizeof(STARTUPINFO);
-    si.dwFlags     = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
-    si.hStdOutput  = hPipeWrite;
-    si.hStdError   = hPipeWrite;
-    si.wShowWindow = SW_HIDE; // Prevents cmd window from flashing.
-                              // Requires STARTF_USESHOWWINDOW in dwFlags.
+        STARTUPINFO si = { 0 };
+        si.cb = sizeof(STARTUPINFO);
+        si.dwFlags     = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+        si.hStdOutput  = hPipeWrite;
+        si.hStdError   = hPipeWrite;
+        si.wShowWindow = SW_HIDE; // Prevents cmd window from flashing.
+                                // Requires STARTF_USESHOWWINDOW in dwFlags.
 
-    PROCESS_INFORMATION pi = { 0 };
+        PROCESS_INFORMATION pi = { 0 };
 
-    BOOL fSuccess = CreateProcess(NULL, 
-            (LPSTR)cmd.c_str(), // command line 
-            NULL, // process security attributes 
-            NULL, // primary thread security attributes 
-            TRUE, // handles are inherited 
-            0, // creation flags 
-            NULL, // use parent's environment 
-            NULL, // use parent's current directory 
-            &si, // STARTUPINFO pointer 
-            &pi);;
-    if (! fSuccess)
-    {
-        DEBUG_MSG("Failed to create bridge process for version checking");
-        std::cout << ("Failed to create bridge process for version checking");
+        BOOL fSuccess = CreateProcess(NULL, 
+                (LPSTR)cmd.c_str(), // command line 
+                NULL, // process security attributes 
+                NULL, // primary thread security attributes 
+                TRUE, // handles are inherited 
+                0, // creation flags 
+                NULL, // use parent's environment 
+                NULL, // use parent's current directory 
+                &si, // STARTUPINFO pointer 
+                &pi);;
+        if (! fSuccess)
+        {
+            DEBUG_MSG("Failed to create bridge process for version checking");
+            std::cout << ("Failed to create bridge process for version checking");
+            CloseHandle(hPipeWrite);
+            CloseHandle(hPipeRead);
+            return false;
+        }
+
+        bool bProcessEnded = false;
+        for (; !bProcessEnded ;)
+        {
+            // Give some time (10 ms)
+            bProcessEnded = WaitForSingleObject( pi.hProcess, 10) == WAIT_OBJECT_0;
+
+            // Even if process exited - we continue reading, if
+            // there is some data available over pipe.
+            for (;;)
+            {
+                char buf[1024];
+                DWORD dwRead = 0;
+                DWORD dwAvail = 0;
+
+                if (!::PeekNamedPipe(hPipeRead, NULL, 0, NULL, &dwAvail, NULL))
+                    break;
+
+                if (!dwAvail) // No data available, return
+                    break;
+
+                if (!::ReadFile(hPipeRead, buf, min(sizeof(buf) - 1, dwAvail), &dwRead, NULL) || !dwRead)
+                    // Error, the child process might ended
+                    break;
+
+                buf[dwRead] = 0;
+                strResult += buf;
+            }
+        }
+
         CloseHandle(hPipeWrite);
         CloseHandle(hPipeRead);
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+
+        for (const auto& version : compatibleVersions) {
+            if (strResult.find(version) != std::string::npos) {
+                return true;
+            }
+        }
+        DEBUG_MSG("Version " << strResult << " is not compatible");
         return false;
-    }
-
-    bool bProcessEnded = false;
-    for (; !bProcessEnded ;)
-    {
-        // Give some time (10 ms)
-        bProcessEnded = WaitForSingleObject( pi.hProcess, 10) == WAIT_OBJECT_0;
-
-        // Even if process exited - we continue reading, if
-        // there is some data available over pipe.
-        for (;;)
-        {
-            char buf[1024];
-            DWORD dwRead = 0;
-            DWORD dwAvail = 0;
-
-            if (!::PeekNamedPipe(hPipeRead, NULL, 0, NULL, &dwAvail, NULL))
-                break;
-
-            if (!dwAvail) // No data available, return
-                break;
-
-            if (!::ReadFile(hPipeRead, buf, min(sizeof(buf) - 1, dwAvail), &dwRead, NULL) || !dwRead)
-                // Error, the child process might ended
-                break;
-
-            buf[dwRead] = 0;
-            strResult += buf;
+    #else
+        std::string cmd = "bridge --version";
+        FILE* pipe = popen(cmd.c_str(), "r");
+        if (!pipe) {
+            DEBUG_MSG("Failed to create bridge process for version checking");
+            std::cout << ("Failed to create bridge process for version checking");
+            return false;
         }
-    }
 
-    CloseHandle(hPipeWrite);
-    CloseHandle(hPipeRead);
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
-
-    for (const auto& version : compatibleVersions) {
-        if (strResult.find(version) != std::string::npos) {
-            return true;
+        char buffer[128];
+        std::string result = "";
+        while (!feof(pipe)) {
+            if (fgets(buffer, 128, pipe) != NULL)
+                result += buffer;
         }
-    }
-    DEBUG_MSG("Version " << strResult << " is not compatible");
-    return false;
+        pclose(pipe);
+
+        for (const auto& version : compatibleVersions) {
+            if (result.find(version) != std::string::npos) {
+                return true;
+            }
+        }
+        DEBUG_MSG("Version " << result << " is not compatible");
+        return false;
+    #endif
 }
