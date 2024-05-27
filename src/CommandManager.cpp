@@ -19,7 +19,7 @@ void CommandManager::start() {
     // Start the bridge process
     #ifdef _WIN32
         // If bridge version is incompatible, exit the application.
-        if (!isBridgeCompatible({"0.9.0", "0.10.0", "0.11.0"})) {
+        if (!isBridgeCompatible({"0.10.0", "0.11.0", "0.11.1", "0.12.0"})) {
             std::cerr << "Bridge version check failed" << std::endl;
             return;
         }
