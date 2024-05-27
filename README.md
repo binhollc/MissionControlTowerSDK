@@ -11,12 +11,6 @@ A C++ dynamic library for launching and interacting with MissionControlTower sys
 
 2. Navigate to the project folder.
 
-3. Initialize the submodules.
-
-   ```shell
-   git submodule update --init
-   ```
-
 ## Quick Start with Script
 
 For developers who prefer a quicker setup, we provide convenient scripts that automate the build and staging process. Depending on your operating system, use the appropriate script to skip manual steps:
@@ -37,109 +31,20 @@ These scripts are designed to handle all necessary steps, ensuring a seamless se
 
 ## Detailed Build and Stage Instructions
 
-### Building the Python Backend
+### Download the Bridge Executbale
 
-To build the Python backend, which is contained in the `python-backend` folder, we use cx_Freeze, a Python packaging tool. The following instructions guide you through the process.
+Create a directory named `build_bridge` and download the Bridge executable into it.
 
-#### Special note for Windows users
-
-> :warning: ** On Windows 64 **: Make sure that Python 64, and not 32, is installed in your system.
-
-##### How do I know if my Windows installation is 32 or 64 bits?
-
-1. Press the Windows key + R to open the Run dialog box.
-
-2. Type "msinfo32" and press Enter.
-
-3. The System Information window will open. Look for the "System Type" field, which will indicate whether your Windows is 32-bit or 64-bit.
-
-#### How can I know if I'm using Python 32 or 64 bits on windows?
-
-To determine whether you're using a 32-bit or 64-bit version of Python on Windows, you can follow these steps:
-
-1. Open the Command Prompt: Press the Windows key, type "Command Prompt," and select the Command Prompt application.
-
-2. In the Command Prompt, type the following command and press Enter:
-
-   ```shell
-   python --version
-   ```
-
-   This command will display the version of Python you have installed, along with additional information.
-
-   If you see something like `Python 3.x.x`, where `x.x` represents the version number, without any mention of "64-bit" or "32-bit," it means you have the 32-bit version of Python installed.
-
-   If you see something like `Python 3.x.x [MSC v.1916 64 bit (AMD64)]`, where `x.x` represents the version number, and it includes "64 bit" or "AMD64," it indicates that you have the 64-bit version of Python installed.
-
-#### Creating a virtual environment
-
-1. Create a virtual environment and save it in the `venv` folder:
-
-   On Linux / Mac:
-
-   ```shell
-   python3 -m venv venv
-   ```
-
-   On Windows:
-
-   ```shell
-   python -m venv venv
-   ```
-
-2. Activate the virtual environment:
-
-   On Linux / Mac:
-
-   ```shell
-   source ./venv/bin/activate
-   ```
-
-   On Windows:
-
-   ```shell
-   venv\\Scripts\\Activate
-   ```
-
-3. Verify that your command prompt has an indicator that the virtual environment is active.
-
-4. Install the cx_Freeze package:
-
-   ```shell
-   pip install cx_Freeze
-   ```
-   Note: inside the virtual environment you can safely use `python` to execute the interpreter.
-
-5. Set the GH_TOKEN evironment variable.
-
-   On Mac/Linux:
-   ```shell
-   export GH_TOKEN=[GitHub Personal Access Token]
-   ```
-
-   On Windows:
-   ```shell
-   set GH_TOKEN=[GitHub Personal Access Token]
-   ```
-
-6. Install the requirements.
-
-   ```shell
-   $(venv)> pip install -r python-backend/requirements.txt
-
-7. Run the following command to build the executable:
-
-   ```shell
-   $(venv)> python setup.py build
-   ```
-
-   This command invokes cx_Freeze using the `setup.py` script, which contains the necessary configuration to freeze the Python backend into an executable.
-
-8. After the build process completes, the executable and its dependencies will be located in the `build_bridge` directory.
+   - [Windows-32 Installer](https://cdn.binho.io/sw/MissionControlBridge/0.12.0/BinhoMissionControlBridge-0.12.0-32.exe)
+   - [Windows-64 Installer](https://cdn.binho.io/sw/MissionControlBridge/0.12.0/BinhoMissionControlBridge-0.12.0-64.exe)
+   - [Windows-32 Artifacts](https://cdn.binho.io/sw/MissionControlBridge/0.12.0/windows-latest-32-artifacts.zip)
+   - [Windows-64 Artifacts](https://cdn.binho.io/sw/MissionControlBridge/0.12.0/windows-latest-64-artifacts.zip)
+   - [MacOS-64 Artifacts](https://cdn.binho.io/sw/MissionControlBridge/0.12.0/macos-latest-64-artifacts.zip)
+   - [Ubuntu-64 Artifacts](https://cdn.binho.io/sw/MissionControlBridge/0.12.0/ubuntu-latest-64-artifacts.zip)
 
 #### Testing the bridge
 
-10. Navigate to the `build_bridge` directory and test that the bridge works properly.
+1. Navigate to the `build_bridge` directory and test that the bridge works properly.
 
    On Linux / Mac:
 
@@ -157,19 +62,19 @@ To determine whether you're using a 32-bit or 64-bit version of Python on Window
 
    Now the ListUsbDevices should be ready and waiting to receive JSON commands.
 
-11. Send the command to open the Nova simulator:
+2. Send the command to open the Nova simulator:
 
    ```json
    {"command":"open","params":{"address":"NovaSimulatedPort"},"transaction_id":"0"}
    ```
 
-12. Verify that the bridge returns the following command response:
+3. Verify that the bridge returns the following command response:
 
    ```json
    {"transaction_id": "0", "status": "success", "is_promise": false, "data": {"command": "open", "id": "BINHONOVASIM001", "port": "NovaSimulatedPort", "productName": "Binho Nova", "firmwareVersion": "0.2.8", "hardwareVersion": "1.0", "vendorId": "1240", "productId": "60724", "mode": "normal"}}
    ```
 
-13. Exit the bridge using the following command:
+4. Exit the bridge using the following command:
 
    ```json
    {"command":"exit","transaction_id":"0"}

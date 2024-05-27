@@ -1,6 +1,8 @@
 @echo off
 setlocal enabledelayedexpansion
 
+:: Set the bridge_build directory
+set "BRIDGE_BUILD_DIR=build_bridge"
 :: Set the staging directory
 set "STAGING_DIR=staging"
 :: Set the default platform
@@ -14,23 +16,43 @@ if exist "%STAGING_DIR%" rmdir /S /Q "%STAGING_DIR%"
 mkdir "%STAGING_DIR%"
 
 echo :: ---
-echo Building the Bridge...
+echo Installing the bridge...
 echo :: ---
 
-call build_bridge.bat
-if errorlevel 1 (
-    echo Failed to build the Bridge. Check the errors above.
+:: Remove the build_bridge directory
+if exist "%BRIDGE_BUILD_DIR%" rmdir /S /Q "%BRIDGE_BUILD_DIR%"
+
+:: Download the bridge depending on the platform
+echo Downloading the bridge...
+if "%PLATFORM%"=="win32" (
+    curl -L https://cdn.binho.io/sw/MissionControlBridge/0.12.0/windows-latest-32-artifacts.zip -o "bridge.zip"
+) else (
+    curl -L https://cdn.binho.io/sw/MissionControlBridge/0.12.0/windows-latest-64-artifacts.zip -o "bridge.zip"
+)
+
+:: Extract the bridge
+echo Extracting the bridge...
+tar -xf bridge.zip
+
+:: Remove the bridge zip
+del bridge.zip
+
+:: Rename the directory from bridge to build_bridge
+ren bridge "%BRIDGE_BUILD_DIR%"
+
+:: Check if the bridge was downloaded and extracted successfully
+if not exist "%BRIDGE_BUILD_DIR%" (
+    echo Bridge download and extraction failed
+    exit /b 1
+)
+if not exist "%BRIDGE_BUILD_DIR%\bridge.exe" (
+    echo Bridge download and extraction failed
     exit /b 1
 )
 
 echo :: ---
 echo Staging the Bridge...
 echo :: ---
-
-if not exist build_bridge (
-    echo "Couldn't find build_bridge directory. Did you build it?"
-    exit /b 1
-)
 
 echo Copying build_bridge to staging...
 echo "%STAGING_DIR%\bridge"

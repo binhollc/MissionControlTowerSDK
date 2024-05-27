@@ -23,47 +23,38 @@ PROJECT_DIR="$(pwd)"
 # Build bridge
 print_colored_message "${INFO}" "Building the Bridge"
 
-# Check if GH_TOKEN is present. If not, exit the script with an error.
-if [ -z "$GH_TOKEN" ]; then
-    print_colored_message "${ERROR}" "Error: GH_TOKEN is not set."
+# Clean the build_bridge directory
+if [ -d "build_bridge" ]; then
+    rm -rf build_bridge
+fi
+
+# Download the bridge for the current OS
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    print_colored_message "${INFO}" "Downloading the bridge for MacOS"
+    curl -L -o bridge.zip https://cdn.binho.io/sw/MissionControlBridge/0.12.0/macos-latest-64-artifacts.zip
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    print_colored_message "${INFO}" "Downloading the bridge for Ubuntu"
+    curl -L -o bridge.zip https://cdn.binho.io/sw/MissionControlBridge/0.12.0/ubuntu-latest-64-artifacts.zip
+else
+    print_colored_message "${ERROR}" "Error: Unsupported OS"
     exit 1
 fi
 
-# If argument 1 is provided, then set $PYTHON to argument 1.
-# Else $PYTHON=python
-PYTHON=${1:-python}
+# Unzip the bridge
+unzip bridge.zip
 
-print_colored_message "${WARNING}" "HEADS UP: $($PYTHON --version 2>&1). Is this what you want?\nIf not, provide the right interpreter as the first argument of this script."
+# Remove the zip file
+rm bridge.zip
 
-# Deactivate virtual environment (if active) and remove its folder
-if [ -n "$VIRTUAL_ENV" ]; then
-    deactivate
-fi
-
-if [ -d ".venv" ]; then
-    rm -rf .venv
-fi
-
-# Create Python virtual environment using $PYTHON
-$PYTHON -m venv .venv
-
-# Activate virtual env
-source .venv/bin/activate
-
-# Execute $PYTHON -m pip install cx_Freeze
-python -m pip install cx_Freeze
-
-# Execute $PYTHON -m pip install -r python-backend/requirements.txt
-python -m pip install -r python-backend/requirements.txt
-
-# Execute $PYTHON setup.py build
-python setup.py build
+# Rename the directory from bridge to build_bridge
+mv bridge build_bridge
 
 # Check if build_bridge was created with a file named bridge within. If not, exit with an error.
-if [ ! -f "build_bridge/bridge" ]; then
-    print_colored_message "${ERROR}" "Error: bridge was not created in build_bridge."
+if [ ! -d "build_bridge" ] || [ ! -f "build_bridge/bridge" ]; then
+    print_colored_message "${ERROR}" "Error: The bridge was not downloaded successfully"
     exit 1
 fi
+
 
 # Clean the staging directory
 
