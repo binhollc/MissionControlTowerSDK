@@ -42,6 +42,10 @@ jobs:
       with:
         python-version: '3.10'
         architecture: ${{ matrix.arch_python }}
+    
+    - name: Get version from Python script
+      run: echo "VERSION=$(python version.py)" >> $GITHUB_ENV
+      shell: bash
 
     - name: Get CMake
       uses: lukka/get-cmake@latest
