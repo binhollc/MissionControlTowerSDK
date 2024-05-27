@@ -13,6 +13,10 @@ endif()
 
 set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}")
 set(STAGING_DIR ${CMAKE_INSTALL_PREFIX}/staging)
+set(STAGING_BIN_DIR ${CMAKE_INSTALL_PREFIX}/staging/bin)
+set(STAGING_BRIDGE_DIR ${CMAKE_INSTALL_PREFIX}/staging/bridge)
+configure_file(${CMAKE_SOURCE_DIR}/staging_dirs.txt.in ${CMAKE_BINARY_DIR}/staging_dirs.txt @ONLY)
+
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
