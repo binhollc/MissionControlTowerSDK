@@ -57,6 +57,18 @@ jobs:
         dir
         .\build_and_stage.bat ${{ matrix.arch_cmake }}
 
+      - name: Windows Signing
+      if: runner.os == 'windows-latest'
+      uses: GabrielAcostaEngler/signtool-code-sign@main
+      with:
+        certificate: '${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}'
+        cert-password: '${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}'
+        cert-sha1: '${{ secrets.WINDOWS_CERTIFICATE_SHA1 }}'
+        cert-description: 'Binho LLC'
+        folder: staging/
+        recursive: false
+        timestamp-server: 'http://timestamp.digicert.com'
+
     - name: Create Windows installer
       if: matrix.os == 'windows-latest'
       uses: joncloud/makensis-action@v4
