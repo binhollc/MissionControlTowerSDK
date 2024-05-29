@@ -19,11 +19,11 @@ void CommandManager::start() {
     // Start the bridge process
     #ifdef _WIN32
         // If bridge version is incompatible, exit the application.
-        const std::vector<std::string> compatibleVersions = {"0.10.0", "0.11.0", "0.11.1", "0.12.0"};
+        const std::vector<std::string> compatibleVersions = {"0.10.", "0.11.", "0.12."};
         if (!isBridgeCompatible(compatibleVersions)) {
             std::cerr << "Compatible Bridge versions are: ";
             for (const auto& version : compatibleVersions) {
-            std::cerr << version << " ";
+            std::cerr << version << "x ";
         }
         std::cerr << std::endl;;
             return;
@@ -369,9 +369,11 @@ bool CommandManager::isBridgeCompatible(const std::vector<std::string>& compatib
     CloseHandle(pi.hThread);
 
     for (const auto& version : compatibleVersions) {
-        if (strResult.find(version) != std::string::npos) {
+        // Checks whether the installed version starts with one of the compatible versions major version (for example, 0.12.x)
+        if (strResult.rfind(version, 0) == 0) {
             return true;
         }
+        
     }
     std::cerr << "Bridge Version " << strResult << " is not compatible" << std::endl;
     return false;
