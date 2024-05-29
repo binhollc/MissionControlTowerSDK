@@ -19,8 +19,13 @@ void CommandManager::start() {
     // Start the bridge process
     #ifdef _WIN32
         // If bridge version is incompatible, exit the application.
-        if (!isBridgeCompatible({"0.10.0", "0.11.0", "0.11.1", "0.12.0"})) {
-            std::cerr << "Bridge version check failed" << std::endl;
+        const std::vector<std::string> compatibleVersions = {"0.10.0", "0.11.0", "0.11.1", "0.12.0"};
+        if (!isBridgeCompatible(compatibleVersions)) {
+            std::cerr << "Compatible Bridge versions are: ";
+            for (const auto& version : compatibleVersions) {
+            std::cerr << version << " ";
+        }
+        std::cerr << std::endl;;
             return;
         }
         // Create pipes for input and output
@@ -330,7 +335,7 @@ bool CommandManager::isBridgeCompatible(const std::vector<std::string>& compatib
     }
 
     bool bProcessEnded = false;
-    for (; !bProcessEnded ;)
+    while (!bProcessEnded)
     {
         // Give some time (10 ms)
         bProcessEnded = WaitForSingleObject( pi.hProcess, 10) == WAIT_OBJECT_0;
@@ -368,6 +373,6 @@ bool CommandManager::isBridgeCompatible(const std::vector<std::string>& compatib
             return true;
         }
     }
-    DEBUG_MSG("Version " << strResult << " is not compatible");
+    std::cerr << "Bridge Version " << strResult << " is not compatible" << std::endl;
     return false;
 }
