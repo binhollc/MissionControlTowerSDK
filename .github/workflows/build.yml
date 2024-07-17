@@ -1,6 +1,7 @@
 name: Build and Package BMC SDK
 env:
   VERSION: 1.1.0
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
 on:
   workflow_dispatch:
@@ -34,9 +35,6 @@ jobs:
       matrix:
         os: [ubuntu-latest]
     if: ${{ inputs.build-linux }}
-
-    env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     steps:
 
@@ -80,9 +78,6 @@ jobs:
             arch_python: x64
             arch_cmake: x64
     if: ${{ inputs.build-windows }}
-
-    env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     steps:
 
@@ -131,9 +126,6 @@ jobs:
       matrix:
         os: [macos-latest]
     if: ${{ inputs.build-macos }}
-
-    env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     steps:
 
