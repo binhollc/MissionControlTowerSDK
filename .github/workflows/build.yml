@@ -1,6 +1,8 @@
 name: Build and Package BMC SDK
 env:
   VERSION: 1.1.0
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  PYTHON_VERSION: 3.11
 
 on:
   workflow_dispatch:
@@ -35,9 +37,6 @@ jobs:
         os: [ubuntu-latest]
     if: ${{ inputs.build-linux }}
 
-    env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
     steps:
 
     - name: Checkout repository and submodules
@@ -49,7 +48,7 @@ jobs:
     - name: Install Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: ${{ env.PYTHON_VERSION }}
         architecture: ${{ matrix.arch_python }}
 
     - name: Get CMake
@@ -81,9 +80,6 @@ jobs:
             arch_cmake: x64
     if: ${{ inputs.build-windows }}
 
-    env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
     steps:
 
     - name: Checkout repository and submodules
@@ -95,7 +91,7 @@ jobs:
     - name: Install Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: ${{ env.PYTHON_VERSION }}
         architecture: ${{ matrix.arch_python }}
 
     - name: Get CMake
@@ -132,9 +128,6 @@ jobs:
         os: [macos-latest]
     if: ${{ inputs.build-macos }}
 
-    env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
     steps:
 
     - name: Checkout repository and submodules
@@ -146,7 +139,7 @@ jobs:
     - name: Install Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: ${{ env.PYTHON_VERSION }}
         architecture: ${{ matrix.arch_python }}
 
     - name: Get CMake
