@@ -130,7 +130,11 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-latest
+          - os: macos-13
+            arch: intel
+            arch_python: x64
+          - os: macos-14
+            arch: arm
             arch_python: x64
 
     runs-on: ${{ matrix.os }}
@@ -159,7 +163,7 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ matrix.os }}-artifacts
+        name: ${{ matrix.os }}-${{ matrix.arch }}-artifacts
         path: staging/
 
   publish-to-digital-ocean:
