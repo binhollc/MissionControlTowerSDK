@@ -131,9 +131,11 @@ jobs:
       matrix:
         include:
           - os: macos-13
+            platform: mac
             arch: intel
             arch_python: x64
           - os: macos-14
+            platform: mac
             arch: arm
             arch_python: x64
 
@@ -163,7 +165,7 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ matrix.os }}-${{ matrix.arch }}-artifacts
+        name: ${{ matrix.platform }}-${{ matrix.arch }}-artifacts
         path: staging/
 
   publish-to-digital-ocean:
