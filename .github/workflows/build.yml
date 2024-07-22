@@ -110,7 +110,7 @@ jobs:
         dir
         .\build_and_stage.bat ${{ matrix.arch_cmake }}
 
-      - name: Windows Signing
+    - name: Windows Signing
       if: runner.os == 'windows-latest'
       uses: GabrielAcostaEngler/signtool-code-sign@main
       with:
