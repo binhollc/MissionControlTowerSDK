@@ -10,7 +10,6 @@ void printCommandResponse(const CommandResponse &cr, const std::string &action)
     std::cout << "Status: " << cr.status << "\n";
     std::cout << "Is Promise: " << (cr.is_promise ? "True" : "False") << "\n";
     std::cout << "Data: " << cr.data.dump() << "\n";
-    std::cout << "Data Result: " << cr.data["result"].dump() << "\n";
     std::cout << "----------------------------------\n";
 }
 
@@ -83,11 +82,9 @@ int main()
   // We check if it effectively changed
   invokeI3CSendCCC(dispatcher, idGenerator.nextID(), "GETMWL");
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+  dispatcher.waitForAllCommands();
 
   dispatcher.invokeCommandSync(idGenerator.nextID(), "exit", {});
-
-  dispatcher.waitForAllCommands();
 
   dispatcher.stop();
 
