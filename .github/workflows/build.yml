@@ -1,33 +1,44 @@
 name: Build and Package BMC SDK
 env:
   VERSION: 1.1.0
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  PYTHON_VERSION: 3.11
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
+    inputs:
+      build-macos:
+        type: boolean
+        default: true
+        required: true
+        description: Build on Mac
+      build-windows:
+        type: boolean
+        default: true
+        required: true
+        description: Build on Windows
+      build-linux:
+        type: boolean
+        default: true
+        required: true
+        description: Build on Linux
+      publish-to-digital-ocean:
+        type: boolean
+        default: false
+        required: false
+        description: Publish to Digital Ocean Space
 
 jobs:
-  build:
+  build-ubuntu:
+    if: ${{ inputs.build-linux }}
+
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
-        arch: [32, 64]
         include:
-          - arch: 32
-            arch_python: x86
-            arch_cmake: win32
-          - arch: 64
-            arch_python: x64
-            arch_cmake: x64
-        exclude:
           - os: ubuntu-latest
-            arch: 32
-          - os: macos-latest
-            arch: 32
+            arch_python: x64
 
     runs-on: ${{ matrix.os }}
-
-    env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     steps:
 
@@ -40,19 +51,61 @@ jobs:
     - name: Install Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
-        architecture: ${{ matrix.arch_python }}
+        python-version: ${{ env.PYTHON_VERSION }}
 
     - name: Get CMake
       uses: lukka/get-cmake@latest
 
-    - name: Build and stage the Bridge, library and examples (Mac and Linux)
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+    - name: Build and stage the Bridge, library and examples
       run: |
         ./build_and_stage.sh
 
-    - name: Build the Bridge, library and examples (Windows)
-      if: matrix.os == 'windows-latest'
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.os }}-artifacts
+        path: staging/
+
+  build-windows:
+    if: ${{ inputs.build-windows }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            arch: 32
+            arch_python: x86
+            arch_cmake: win32
+          - os: windows-latest
+            arch: 64
+            arch_python: x64
+            arch_cmake: x64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v3
+      with:
+        token: ${{ env.GH_TOKEN }}
+        submodules: recursive
+
+    - name: Install Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        architecture: ${{ matrix.arch_python }}
+    
+    - name: Get version from Python script
+      run: echo "VERSION=$(python version.py)" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Get CMake
+      uses: lukka/get-cmake@latest
+
+    - name: Build the Bridge, library and examples
       run: |
         dir
         .\build_and_stage.bat ${{ matrix.arch_cmake }}
@@ -70,7 +123,6 @@ jobs:
         timestamp-server: 'http://timestamp.digicert.com'
 
     - name: Create Windows installer
-      if: matrix.os == 'windows-latest'
       uses: joncloud/makensis-action@v4
       with:
         script-file: bmc_sdk_installer.nsi
@@ -79,12 +131,99 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ matrix.os }}-artifacts
+        name: ${{ matrix.os }}-${{ matrix.arch }}-artifacts
         path: staging/
 
     - name: Upload Windows installer
-      if: matrix.os == 'windows-latest'
       uses: actions/upload-artifact@v3
       with:
         name: BinhoMissionControlSDK-${{ env.VERSION }}-${{ matrix.arch }}.exe
         path: BinhoMissionControlSDK-${{ env.VERSION }}-${{ matrix.arch }}.exe
+
+  build-macos:
+    if: ${{ inputs.build-macos }}
+
+    strategy:
+      matrix:
+        include:
+          - os: macos-13
+            platform: mac
+            arch: intel
+            arch_python: x64
+          - os: macos-14
+            platform: mac
+            arch: arm
+            arch_python: x64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v3
+      with:
+        token: ${{ env.GH_TOKEN }}
+        submodules: recursive
+
+    - name: Install Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        architecture: ${{ matrix.arch_python }}
+
+    - name: Get CMake
+      uses: lukka/get-cmake@latest
+
+    - name: Build and stage the Bridge, library and examples
+      run: |
+        ./build_and_stage.sh
+
+    - name: Run sign and notarize script
+      env:
+        APPLE_ID: ${{ secrets.APPLE_ID }}
+        TEAM_ID: ${{ secrets.TEAM_ID }}
+        NOTARIZATION_PASSWORD: ${{ secrets.NOTARIZATION_PASSWORD }}
+        BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+        P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        BUNDLE_ID: "com.binho.bmc_cpp_sdk"
+      run: |
+        ./sign_and_notarize.sh staging ${{ runner.temp }} ${{ runner.temp}}/bmc_cpp_sdk_${{ env.VERSION }}-${{ matrix.platform }}-${{ matrix.arch }}.tar
+      shell: bash
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: bmc_cpp_sdk_${{ env.VERSION }}-${{ matrix.platform }}-${{ matrix.arch }}
+        path: ${{ runner.temp}}/bmc_cpp_sdk_${{ env.VERSION }}-${{ matrix.platform }}-${{ matrix.arch }}.tar
+
+  publish-to-digital-ocean:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+    needs: [build-ubuntu, build-windows, build-macos]
+    if: ${{ inputs.publish-to-digital-ocean && always() }}
+
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: staging/
+
+    - name: Install s3cmd
+      run: pip3 install s3cmd
+
+    - name: Upload build artifacts to Digital Ocean Space
+      run: |
+        s3cmd \
+          --access_key="${{ secrets.BINHO_DIGITAL_OCEAN_CDN_ACCESS}}" \
+          --secret_key="${{ secrets.BINHO_DIGITAL_OCEAN_CDN_SECRET }}" \
+          --host="${{ secrets.BINHO_DIGITAL_OCEAN_CDN_REGION }}.digitaloceanspaces.com" \
+          --host-bucket="%(bucket)s.${{ secrets.BINHO_DIGITAL_OCEAN_CDN_REGION }}.digitaloceanspaces.com" \
+          --recursive \
+          --acl-public \
+          put \
+          staging/* \
+          s3://${{ secrets.BINHO_DIGITAL_OCEAN_CDN_SPACE_NAME }}/sw/MissionControlTowerSDK/${{ env.VERSION }}/
