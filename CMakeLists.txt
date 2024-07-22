@@ -48,10 +48,15 @@ FetchContent_MakeAvailable(json)
 
 add_library(bmc_sdk SHARED ${SOURCE_FILES})
 
+file(READ "VERSION" ver)
+
 set_target_properties(bmc_sdk PROPERTIES
-    VERSION 1.1.0
+    VERSION ${ver}
     SOVERSION 1
 )
+
+get_target_property(target_version bmc_sdk VERSION)
+message(STATUS "BMC SDK Version: ${target_version}")
 
 target_compile_definitions(bmc_sdk PRIVATE BUILD_BMC_SDK)
 
