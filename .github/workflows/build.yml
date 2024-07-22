@@ -30,12 +30,15 @@ on:
 
 jobs:
   build-ubuntu:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
     if: ${{ inputs.build-linux }}
+
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch_python: x64
+
+    runs-on: ${{ matrix.os }}
 
     steps:
 
@@ -49,7 +52,6 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-        architecture: ${{ matrix.arch_python }}
 
     - name: Get CMake
       uses: lukka/get-cmake@latest
@@ -65,20 +67,22 @@ jobs:
         path: staging/
     
   build-windows:
-    runs-on: ${{ matrix.os }}
+    if: ${{ inputs.build-windows }}
+
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest]
-        arch: [32, 64]
         include:
-          - arch: 32
+          - os: windows-latest
+            arch: 32
             arch_python: x86
             arch_cmake: win32
-          - arch: 64
+          - os: windows-latest
+            arch: 64
             arch_python: x64
             arch_cmake: x64
-    if: ${{ inputs.build-windows }}
+
+    runs-on: ${{ matrix.os }}
 
     steps:
 
@@ -111,7 +115,7 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ matrix.os }}-artifacts
+        name: ${{ matrix.os }}-${{ matrix.arch }}-artifacts
         path: staging/
 
     - name: Upload Windows installer
@@ -121,12 +125,21 @@ jobs:
         path: BinhoMissionControlSDK-${{ env.VERSION }}-${{ matrix.arch }}.exe
 
   build-macos:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-latest]
     if: ${{ inputs.build-macos }}
+
+    strategy:
+      matrix:
+        include:
+          - os: macos-13
+            platform: mac
+            arch: intel
+            arch_python: x64
+          - os: macos-14
+            platform: mac
+            arch: arm
+            arch_python: x64
+
+    runs-on: ${{ matrix.os }}
 
     steps:
 
@@ -152,7 +165,7 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ matrix.os }}-artifacts
+        name: ${{ matrix.platform }}-${{ matrix.arch }}-artifacts
         path: staging/
 
   publish-to-digital-ocean:
