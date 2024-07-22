@@ -65,7 +65,7 @@ jobs:
       with:
         name: ${{ matrix.os }}-artifacts
         path: staging/
-    
+
   build-windows:
     if: ${{ inputs.build-windows }}
 
@@ -166,11 +166,24 @@ jobs:
       run: |
         ./build_and_stage.sh
 
+    - name: Run sign and notarize script
+      env:
+        APPLE_ID: ${{ secrets.APPLE_ID }}
+        TEAM_ID: ${{ secrets.TEAM_ID }}
+        NOTARIZATION_PASSWORD: ${{ secrets.NOTARIZATION_PASSWORD }}
+        BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+        P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        BUNDLE_ID: "com.binho.bmc_cpp_sdk"
+      run: |
+        ./sign_and_notarize.sh staging ${{ runner.temp }} ${{ runner.temp}}/bmc_cpp_sdk_${{ env.VERSION }}-${{ matrix.platform }}-${{ matrix.arch }}.tar
+      shell: bash
+
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ matrix.platform }}-${{ matrix.arch }}-artifacts
-        path: staging/
+        name: bmc_cpp_sdk_${{ env.VERSION }}-${{ matrix.platform }}-${{ matrix.arch }}
+        path: ${{ runner.temp}}/bmc_cpp_sdk_${{ env.VERSION }}-${{ matrix.platform }}-${{ matrix.arch }}.tar
 
   publish-to-digital-ocean:
     runs-on: ${{ matrix.os }}
@@ -180,7 +193,7 @@ jobs:
         os: [ubuntu-latest]
     needs: [build-ubuntu, build-windows, build-macos]
     if: ${{ inputs.publish-to-digital-ocean && always() }}
-    
+
     steps:
     - name: Download build artifacts
       uses: actions/download-artifact@v3
