@@ -1,6 +1,7 @@
 import sys
 import os
 from cx_Freeze import setup, Executable
+from version import get_version
 
 base = None
 if sys.platform == "win32":
@@ -35,7 +36,7 @@ options = {
 # Perform the freezing process
 setup(
     name="MissionControlTowerSDK",
-    version="1.1.0",
+    version=get_version(),
     description="MissionControlTower SDK Standalone Distribution",
     executables=executables,
     options=options

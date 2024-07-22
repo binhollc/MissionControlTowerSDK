@@ -34,3 +34,14 @@ install(TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${STAGING_DIR}/examples/${TAR
 
 # Install the source files
 install(FILES ${SOURCES} DESTINATION ${STAGING_DIR}/examples/${TARGET_NAME})
+
+# ---
+# Post-installation steps to set RPATH only on macOS
+# ---
+
+if(APPLE)
+    install(CODE "
+      execute_process(COMMAND install_name_tool -add_rpath @loader_path/../../lib ${STAGING_DIR}/examples/${TARGET_NAME}/sample_app)
+      execute_process(COMMAND install_name_tool -add_rpath @loader_path/../sample_library ${STAGING_DIR}/examples/${TARGET_NAME}/sample_app)
+    ")
+endif()
