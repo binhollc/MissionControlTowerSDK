@@ -14,10 +14,35 @@
     #include "bridge_reader.h"
 #endif
 
+using json = nlohmann::json;
 
-void CommandManager::start() {
-    // Start the bridge process
-    #ifdef _WIN32
+#define ALLOWED_VERSIONS {"0.10", "0.11", "0.12", "0.13"}
+
+bool checkVersionCompatibility(std::string versionStr) {
+    // Verify only MAJOR and MINOR
+    size_t firstDot = versionStr.find('.');
+    size_t secondDot = versionStr.find('.', firstDot + 1);
+    if (firstDot != std::string::npos && secondDot != std::string::npos) {
+        versionStr = versionStr.substr(0, secondDot);
+    } else {
+        versionStr = "";
+    }
+
+    // Check if bridgeVersionNumber is in the list of allowed versions
+    std::vector<std::string> allowedVersions = ALLOWED_VERSIONS;
+
+    return (std::find(allowedVersions.begin(), allowedVersions.end(), versionStr) != allowedVersions.end());
+}
+
+std::string trim(const std::string& str) {
+    size_t first = str.find_first_not_of("\r\n");
+    if (first == std::string::npos) return "";
+    size_t last = str.find_last_not_of("\r\n");
+    return str.substr(first, (last - first + 1));
+}
+
+#ifdef _WIN32
+    void launchProcess(std::string command, HANDLE &hPipeStdInWrite, HANDLE &hPipeStdOutRead) {
         // Create pipes for input and output
         HANDLE BridgeProcess_IN_Rd = NULL;
         HANDLE BridgeProcess_IN_Wr = NULL;
@@ -40,7 +65,7 @@ void CommandManager::start() {
             return;
         }
 
-        // Create a pipe for the child process's STDIN. 
+        // Create a pipe for the child process's STDIN.
         if (!CreatePipe(&BridgeProcess_IN_Rd, &BridgeProcess_IN_Wr, &saAttr, 0)) {
             std::cerr << "STDIN CreatePipe failed" << std::endl;
             return;
@@ -65,17 +90,16 @@ void CommandManager::start() {
         startInfo.dwFlags |= STARTF_USESTDHANDLES;
 
         // Create the child process.
-        std::string command = "bridge.exe " + targetCommandAdaptor;
-        BOOL bSuccess = CreateProcess(NULL, 
-            (LPSTR)command.c_str(), // command line 
-            NULL, // process security attributes 
-            NULL, // primary thread security attributes 
-            TRUE, // handles are inherited 
-            0, // creation flags 
-            NULL, // use parent's environment 
-            NULL, // use parent's current directory 
-            &startInfo, // STARTUPINFO pointer 
-            &procInfo); // receives PROCESS_INFORMATION 
+        BOOL bSuccess = CreateProcess(NULL,
+            (LPSTR)command.c_str(), // command line
+            NULL, // process security attributes
+            NULL, // primary thread security attributes
+            TRUE, // handles are inherited
+            0, // creation flags
+            NULL, // use parent's environment
+            NULL, // use parent's current directory
+            &startInfo, // STARTUPINFO pointer
+            &procInfo); // receives PROCESS_INFORMATION
 
         // If an error occurs, exit the application.
         if (!bSuccess) {
@@ -85,17 +109,48 @@ void CommandManager::start() {
         else {
             CloseHandle(procInfo.hProcess);
             CloseHandle(procInfo.hThread);
-            bridgeProcessWrite = BridgeProcess_IN_Wr;
-            bridgeProcessRead = BridgeProcess_OUT_Rd;
+            hPipeStdInWrite = BridgeProcess_IN_Wr;
+            hPipeStdOutRead = BridgeProcess_OUT_Rd;
         }
-    #else
-        std::string command = "bridge " + targetCommandAdaptor;
+    }
+#else
+    void launchProcess(std::string command, FILE* &bridgeProcess) {
         bridgeProcess = popen(command.c_str(), "r+");
+    }
+#endif
+
+void CommandManager::start() {
+    // Verify version compatibility
+    #ifdef _WIN32
+        HANDLE hPipeRead, hPipeWrite;
+        launchProcess("bridge.exe --version", hPipeWrite, hPipeRead);
+        bridgeReader = std::make_unique<BridgeReader>(hPipeRead);
+    #else
+        launchProcess("bridge --version", bridgeProcess);
+        bridgeReader = std::make_unique<BridgeReader>(bridgeProcess);
+    #endif
+
+    std::string versionStr = trim(bridgeReader->readNextData());
+
+    DEBUG_MSG("Read version: " + versionStr);
+
+    if (!checkVersionCompatibility(versionStr)) {
+        std::cerr << "Unsupported bridge version: " << versionStr << std::endl;
+        CloseHandle(hPipeWrite);
+        CloseHandle(hPipeRead);
+        std::exit(EXIT_FAILURE);
+    }
+
+    // Start the bridge process
+    #ifdef _WIN32
+        launchProcess("bridge.exe " + targetCommandAdaptor, hPipeInputWrite, hPipeOutputRead);
+    #else
+        launchProcess("bridge " + targetCommandAdaptor, bridgeProcess);
     #endif
 
     // Initialize the bridge reader class
     #ifdef _WIN32
-        bridgeReader = std::make_unique<BridgeReader>(bridgeProcessRead);
+        bridgeReader = std::make_unique<BridgeReader>(hPipeOutputRead);
     #else
         bridgeReader = std::make_unique<BridgeReader>(bridgeProcess);
     #endif
@@ -140,11 +195,11 @@ void CommandManager::stop() {
     DEBUG_MSG("About to close read and write handles");
 
     #ifdef _WIN32
-        if (bridgeProcessRead != NULL) {
-            CloseHandle(bridgeProcessRead);
+        if (hPipeOutputRead != NULL) {
+            CloseHandle(hPipeOutputRead);
         }
-        if (bridgeProcessWrite != NULL) {
-            CloseHandle(bridgeProcessWrite);
+        if (hPipeInputWrite != NULL) {
+            CloseHandle(hPipeInputWrite);
         }
     #else
         if (bridgeProcess != nullptr) {
@@ -176,13 +231,13 @@ void CommandManager::handleWriteBridgeThread() {
 
         // write jsonString to bridge's stdin
         #ifdef _WIN32
-            if (bridgeProcessWrite != NULL) {
+            if (hPipeInputWrite != NULL) {
                 DWORD bytesWritten;
-                if (!WriteFile(bridgeProcessWrite, jsonString.c_str(), jsonString.length(), &bytesWritten, NULL)) {
+                if (!WriteFile(hPipeInputWrite, jsonString.c_str(), jsonString.length(), &bytesWritten, NULL)) {
                     // handle error here
                     std::cerr << "Error writing to bridge process stdin" << std::endl;
                 }
-                FlushFileBuffers(bridgeProcessWrite);
+                FlushFileBuffers(hPipeInputWrite);
             }
         #else
             if (bridgeProcess != nullptr) {
@@ -202,23 +257,23 @@ void CommandManager::handleWriteBridgeThread() {
 void CommandManager::handleReadBridgeThread() {
     while (isRunningReadThread) {
         // read from bridge's stdout
-        std::string jsonString = bridgeReader->readNextData();
+        std::string line = trim(bridgeReader->readNextData());
 
         // Break the loop upon receiving EOF
-        if (jsonString == "__EOF__") {
+        if (line == "__EOF__") {
             DEBUG_MSG("CommandManager::handleReadBridgeThread() EOF");
             isRunningReadThread = false;
             break;
         }
 
-        if (!jsonString.empty()) {
-            DEBUG_MSG("Command response read from bridge: " << jsonString);
+        if (!line.empty()) {
+            DEBUG_MSG("Command response read from bridge: " << line);
 
             try {
-                nlohmann::json j = nlohmann::json::parse(jsonString);
+                nlohmann::json j = nlohmann::json::parse(line);
                 CommandResponse response;
                 from_json(j, response);
-                
+
                 std::lock_guard<std::mutex> lock(responseMutex);
                 responseQueue.push(response);
                 responseCV.notify_one();
@@ -230,7 +285,7 @@ void CommandManager::handleReadBridgeThread() {
             }
             catch (const nlohmann::json::exception& e) {
                 std::cerr << "Exception during parsing: " << e.what() << "\n";
-                std::cerr << "Failed to parse: " << jsonString << "\n";
+                std::cerr << "Failed to parse: " << line << "\n";
                 // handle error or rethrow
             }
         }

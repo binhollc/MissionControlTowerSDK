@@ -3,10 +3,10 @@
 #include <vector>
 #include <algorithm>
 
-BridgeReader::BridgeReader(HANDLE bridgeProcessRead) : bridgeProcessRead(bridgeProcessRead) {}
+BridgeReader::BridgeReader(HANDLE hPipeOutputRead) : hPipeOutputRead(hPipeOutputRead) {}
 
 std::string BridgeReader::readNextData() {
-    if (bridgeProcessRead == NULL) {
+    if (hPipeOutputRead == NULL) {
         return "__EOF__";
     }
 
@@ -16,7 +16,7 @@ std::string BridgeReader::readNextData() {
     std::vector<char> line;
 
     while (true) {
-        if (!ReadFile(bridgeProcessRead, buffer, bufferSize - 1, &bytesRead, NULL) || bytesRead == 0) {
+        if (!ReadFile(hPipeOutputRead, buffer, bufferSize - 1, &bytesRead, NULL) || bytesRead == 0) {
             // EOF or error
             return "__EOF__";
         }
