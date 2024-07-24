@@ -2,6 +2,8 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
+#include <chrono>
+#include <thread>
 #ifdef _WIN32
     #include <io.h>
     #include <windows.h>
@@ -114,8 +116,8 @@ std::string trim(const std::string& str) {
         }
     }
 #else
-    void launchProcess(std::string command, FILE* &bridgeProcess) {
-        bridgeProcess = popen(command.c_str(), "r+");
+    void launchProcess(std::string command, FILE* &procStream) {
+        procStream = popen(command.c_str(), "r+");
     }
 #endif
 
@@ -126,18 +128,29 @@ void CommandManager::start() {
         launchProcess("bridge.exe --version", hPipeWrite, hPipeRead);
         bridgeReader = std::make_unique<BridgeReader>(hPipeRead);
     #else
-        launchProcess("bridge --version", bridgeProcess);
-        bridgeReader = std::make_unique<BridgeReader>(bridgeProcess);
+        FILE* checkVersionStream;
+        launchProcess("bridge --version", checkVersionStream);
+        bridgeReader = std::make_unique<BridgeReader>(checkVersionStream);
     #endif
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500)); // Give some time to prevent broken pipe error
 
     std::string versionStr = trim(bridgeReader->readNextData());
 
     DEBUG_MSG("Read version: " + versionStr);
 
-    if (!checkVersionCompatibility(versionStr)) {
-        std::cerr << "Unsupported bridge version: " << versionStr << std::endl;
+    // Close the pipe after attempting to read
+    #ifdef _WIN32
         CloseHandle(hPipeWrite);
         CloseHandle(hPipeRead);
+    #else
+        if (checkVersionStream != nullptr) {
+            pclose(checkVersionStream);
+        }
+    #endif
+
+    if (!checkVersionCompatibility(versionStr)) {
+        std::cerr << "Unsupported bridge version: " << versionStr << std::endl;
         std::exit(EXIT_FAILURE);
     }
 
