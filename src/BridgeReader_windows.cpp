@@ -5,7 +5,7 @@
 
 BridgeReader::BridgeReader(HANDLE hPipeOutputRead) : hPipeOutputRead(hPipeOutputRead) {}
 
-std::string BridgeReader::readNextData() {
+std::string BridgeReader::readNextData(bool nonBlocking) {
     if (hPipeOutputRead == NULL) {
         return "__EOF__";
     }
@@ -14,6 +14,13 @@ std::string BridgeReader::readNextData() {
     DWORD bytesRead;
     char buffer[bufferSize];
     std::vector<char> line;
+
+    if (nonBlocking) {
+        DWORD bytesAvailable;
+        if (!PeekNamedPipe(hPipeOutputRead, NULL, 0, NULL, &bytesAvailable, NULL) || bytesAvailable == 0) {
+            return "";
+        }
+    }
 
     while (true) {
         if (!ReadFile(hPipeOutputRead, buffer, bufferSize - 1, &bytesRead, NULL) || bytesRead == 0) {
