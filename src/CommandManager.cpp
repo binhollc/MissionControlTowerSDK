@@ -133,9 +133,7 @@ void CommandManager::start() {
         bridgeReader = std::make_unique<BridgeReader>(checkVersionStream);
     #endif
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(500)); // Give some time to prevent broken pipe error
-
-    std::string versionStr = trim(bridgeReader->readNextData());
+    std::string versionStr = trim(bridgeReader->readNextData(false)); // Non-blocking is set to false to prevent broken pipe error
 
     DEBUG_MSG("Read version: " + versionStr);
 
