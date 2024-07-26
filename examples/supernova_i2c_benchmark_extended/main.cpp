@@ -9,6 +9,7 @@
 #include <numeric>
 #include <map>
 #include <string>
+#include <random>
 
 void process_response(const CommandResponse& cr) {
     if (cr.status != "success") {
@@ -58,6 +59,16 @@ int main() {
     std::vector<int> frequencies = {100000, 400000, 1000000};
     std::vector<int> data_lengths = {10, 1024};
     int nro_of_experiments = 1000;
+    bool randomize_order = true; // Set this to true to randomize the trial order
+    int recovery_delay_ms = 100; // Set this to 0 for no delay between command invocations
+
+    // Randomize the order of frequencies and data lengths if required
+    if (randomize_order) {
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(frequencies.begin(), frequencies.end(), g);
+        std::shuffle(data_lengths.begin(), data_lengths.end(), g);
+    }
 
     for (const auto& data_length : data_lengths) {
         std::vector<uint8_t> data(data_length, 20);
@@ -82,8 +93,10 @@ int main() {
 
                 auto end = std::chrono::high_resolution_clock::now();
 
-                // Give the I2C device some milliseconds to recover:
-                // std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                // Give the I2C device some milliseconds to recover if needed
+                if (recovery_delay_ms > 0) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(recovery_delay_ms));
+                }
 
                 std::chrono::duration<double, std::milli> round_trip_time = end - start;
                 round_trip_times.push_back(round_trip_time.count());
