@@ -8,6 +8,8 @@
 #include <fstream>
 #include <numeric>
 #include <map>
+#include <iomanip>  // For std::setw and std::setfill
+#include <sstream>  // For std::ostringstream
 #include <string>
 #include <random>
 
@@ -42,8 +44,9 @@ void save_statistics(const std::string& filename, const std::vector<double>& dat
 // Helper function to convert data vector to hex string
 std::string vector_to_hex_string(const std::vector<uint8_t>& data) {
     std::ostringstream oss;
+    oss << std::hex << std::setw(2) << std::setfill('0');
     for (const auto& byte : data) {
-        oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(byte);
+        oss << static_cast<int>(byte);
     }
     return oss.str();
 }
