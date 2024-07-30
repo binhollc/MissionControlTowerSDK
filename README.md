@@ -1,5 +1,43 @@
-# MissionControlTowerSDK
-A C++ dynamic library for launching and interacting with MissionControlTower system
+# Binho Mission Control C++ SDK (BMC C++ SDK)
+A C++ dynamic library for interacting with Binho host adapters
+
+## Prerequisites
+
+BMC C++ SDK relies on the bridge service to be installed on your machine. Follow these steps to get everything set up:
+
+1. **Download and Install the Bridge Service:**
+   - Visit [support.binho.io](https://support.binho.io) to download the bridge executable.
+   - Follow the installation instructions specific to your operating system.
+
+2. **Add the Bridge to Your PATH Environment Variable:**
+   - **Windows:**
+     - The bridge is typically installed in `C:\Program Files (x86)\BinhoMissionControlBridge`.
+     - Add this path to your system's PATH environment variable.
+       - Press `Win + R`, type `sysdm.cpl`, and press Enter.
+       - Go to the Advanced tab, and click on Environment Variables.
+       - In the System variables section, find the PATH variable, select it, and click Edit.
+       - Click New and add `C:\Program Files (x86)\BinhoMissionControlBridge`.
+     - To verify the installation, open Command Prompt and execute:
+       ```cmd
+       bridge --version
+       ```
+       - You should see an output similar to `0.13.0`.
+
+   - **Mac/Linux:**
+     - Download and install the bridge executable from [support.binho.io](https://support.binho.io).
+     - Add the bridge executable path to your PATH environment variable by editing your shell profile file (e.g., `~/.bashrc`, `~/.zshrc`).
+       ```sh
+       export PATH=$PATH:/path/to/BinhoMissionControlBridge
+       ```
+     - Apply the changes:
+       ```sh
+       source ~/.bashrc  # or source ~/.zshrc
+       ```
+     - Verify the installation:
+       ```sh
+       bridge --version
+       ```
+       - You should see an output similar to `0.13.0`.
 
 ## Installing the development environment
 
@@ -31,66 +69,7 @@ These scripts are designed to handle all necessary steps, ensuring a seamless se
 
 ## Detailed Build and Stage Instructions
 
-### Download the Bridge Executbale
-
-Create a directory named `build_bridge` and download the Bridge executable into it.
-
-   - [Windows-32 Installer](https://cdn.binho.io/sw/MissionControlBridge/0.12.0/BinhoMissionControlBridge-0.12.0-32.exe)
-   - [Windows-64 Installer](https://cdn.binho.io/sw/MissionControlBridge/0.12.0/BinhoMissionControlBridge-0.12.0-64.exe)
-   - [Windows-32 Artifacts](https://cdn.binho.io/sw/MissionControlBridge/0.12.0/windows-latest-32-artifacts.zip)
-   - [Windows-64 Artifacts](https://cdn.binho.io/sw/MissionControlBridge/0.12.0/windows-latest-64-artifacts.zip)
-   - [MacOS-64 Artifacts](https://cdn.binho.io/sw/MissionControlBridge/0.12.0/macos-latest-64-artifacts.zip)
-   - [Ubuntu-64 Artifacts](https://cdn.binho.io/sw/MissionControlBridge/0.12.0/ubuntu-latest-64-artifacts.zip)
-
-#### Testing the bridge
-
-1. Navigate to the `build_bridge` directory and test that the bridge works properly.
-
-   On Linux / Mac:
-
-   ```shell
-   cd build_bridge
-   ./bridge BinhoNova
-   ```
-
-   On Windows:
-
-   ```shell
-   cd build_bridge
-   bridge.exe BinhoNova
-   ```
-
-   Now the ListUsbDevices should be ready and waiting to receive JSON commands.
-
-2. Send the command to open the Nova simulator:
-
-   ```json
-   {"command":"open","params":{"address":"NovaSimulatedPort"},"transaction_id":"0"}
-   ```
-
-3. Verify that the bridge returns the following command response:
-
-   ```json
-   {"transaction_id": "0", "status": "success", "is_promise": false, "data": {"command": "open", "id": "BINHONOVASIM001", "port": "NovaSimulatedPort", "productName": "Binho Nova", "firmwareVersion": "0.2.8", "hardwareVersion": "1.0", "vendorId": "1240", "productId": "60724", "mode": "normal"}}
-   ```
-
-4. Exit the bridge using the following command:
-
-   ```json
-   {"command":"exit","transaction_id":"0"}
-   ```
-
-#### Killing the bridge
-
-On Mac/Linux you can kill the bridge executable by pressing Command+C on Mac, or Control+C on Linux.
-
-On Windows, if you are using PowerShell you can open a different PowerShell window and execute the following command:
-
-```shell
-Stop-Process -Name "bridge"
-```
-
-### Dynamic library
+### Dynamic Library
 
 #### Special note for Windows developers
 
@@ -155,14 +134,6 @@ For Windows users, we recommend downloading CMake's command line tool from the [
 
 After the build process completes, all the generated files, including the shared library, examples and docs will be installed in the staging/ directory.
 
-#### Staging the Bridge
-
-1. If you want to stage the Bridge, execute:
-
-   ```shell
-   cp -R build_bridge staging\bridge
-   ```
-
 ## Staging Directory
 
 After executing the build scripts or manually building and installing the library and examples, the resulting folder structure will be organized for ease of distribution and usage. Below is an approximate overview of the directory structure on Mac/Linux systems:
@@ -170,9 +141,6 @@ After executing the build scripts or manually building and installing the librar
 ```
 ├── staging
 │   ├── README.md
-│   ├── bridge
-│   │   ├── bridge [Bridge executable]
-│   │   ├── ...
 │   ├── examples
 │   │   ├── list_devices
 │   │   ├── nova_breathing_leds
@@ -212,7 +180,7 @@ Alternatively, you can prepend the PATH variable to the command execution:
    On Mac:
 
    ```shell
-   DYLD_LIBRARY_PATH=/path/to/staging/lib PATH=$PATH:/path/to/staging/bridge ./sample_app
+   DYLD_LIBRARY_PATH=/path/to/staging/lib PATH=$PATH:/path/to/bridge ./sample_app
    ```
 
    On Linux:
@@ -222,14 +190,14 @@ Alternatively, you can prepend the PATH variable to the command execution:
    On Windows (using Command Prompt):
 
    ```shell
-   set PATH=%PATH%;\path\to\staging\bridge;\path\to\staging\bin
+   set PATH=%PATH%;\path\to\bridge;\path\to\staging\bin
    sample_app.exe
    ```
 
    Or on Windows (using PowerShell):
 
    ```shell
-   $env:PATH += ";\path\to\staging\bridge\;\path\to\staging\bin"
+   $env:PATH += ";\path\to\bridge\;\path\to\staging\bin"
    .\sample_app.exe
    ```
 
@@ -275,4 +243,4 @@ Add `/path/to/staging/` to the PATH environment variable.
 
 Solution:
 
-Add `/path/to/staging/bridge` to the PATH environment variable.
+Add `/path/to/bridge` to the PATH environment variable.
