@@ -7,9 +7,9 @@
 
 class BridgeReader {
 public:
-    BridgeReader(HANDLE bridgeProcessRead);
-    std::string readNextData();
+    BridgeReader(HANDLE hPipeOutputRead);
+    std::string readNextData(bool nonBlocking = true);
 private:
-    HANDLE bridgeProcessRead;
+    HANDLE hPipeOutputRead;
     std::vector<char> line;
 };
