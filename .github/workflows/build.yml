@@ -38,6 +38,10 @@ jobs:
     - name: Get CMake
       uses: lukka/get-cmake@latest
 
+    - name: Get version from VERSION file
+      run: echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
+      shell: bash
+
     - name: Build and stage the Bridge, library and examples (Mac and Linux)
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
       run: |
