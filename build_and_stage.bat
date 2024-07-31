@@ -1,8 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
 
-:: Set the bridge_build directory
-set "BRIDGE_BUILD_DIR=build_bridge"
 :: Set the staging directory
 set "STAGING_DIR=staging"
 :: Set the default platform
