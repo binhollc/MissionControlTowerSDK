@@ -30,13 +30,10 @@ jobs:
   build-ubuntu:
     if: ${{ inputs.build-linux }}
 
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            arch_python: x64
+    runs-on: ubuntu-latest
 
-    runs-on: ${{ matrix.os }}
+    env:
+      PLATFORM: linux
 
     steps:
 
@@ -56,11 +53,26 @@ jobs:
       run: |
         ./build_and_stage.sh
 
+    - name: Set artifact file name
+      run: |
+        echo "ARTIFACT_NAME=bmc_cpp_sdk-${{ env.VERSION }}-${{ env.PLATFORM }}-binaries" >> $GITHUB_ENV
+
+    - name: Zip staging contents
+      run: |
+        cd staging
+        zip -r ../${{ env.ARTIFACT_NAME }}.zip .
+
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: ${{ matrix.os }}-artifacts
-        path: staging/
+        name: ${{ env.ARTIFACT_NAME }}
+        path: ${{ env.ARTIFACT_NAME }}.zip
+
+    - name: Upload VERSION file
+      uses: actions/upload-artifact@v4
+      with:
+        name: VERSION
+        path: ./VERSION
 
   build-windows:
     if: ${{ inputs.build-windows }}
@@ -71,10 +83,12 @@ jobs:
         include:
           - os: windows-latest
             arch: 32
+            platform: win32
             arch_python: x86
             arch_cmake: win32
           - os: windows-latest
             arch: 64
+            platform: x64
             arch_python: x64
             arch_cmake: x64
 
@@ -87,9 +101,14 @@ jobs:
       with:
         token: ${{ env.GH_TOKEN }}
         submodules: recursive
-    
+
     - name: Extract version number
       run: echo VERSION=$(Get-Content VERSION) >> $env:GITHUB_ENV
+      shell: powershell
+
+    - name: Set artifact file name
+      run: |
+        echo "ARTIFACT_NAME=bmc_cpp_sdk-${{ env.VERSION }}-${{ matrix.platform }}" >> $env:GITHUB_ENV
       shell: powershell
 
     - name: Get CMake
@@ -100,8 +119,7 @@ jobs:
         dir
         .\build_and_stage.bat ${{ matrix.arch_cmake }}
 
-    - name: Windows Signing
-      if: runner.os == 'windows-latest'
+    - name: Windows Signing (staging)
       uses: GabrielAcostaEngler/signtool-code-sign@main
       with:
         certificate: '${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}'
@@ -112,23 +130,44 @@ jobs:
         recursive: false
         timestamp-server: 'http://timestamp.digicert.com'
 
+    - name: Create folder for Windows installer
+      run: |
+        mkdir windows_installer
+
     - name: Create Windows installer
       uses: joncloud/makensis-action@v4
       with:
         script-file: bmc_sdk_installer.nsi
-        arguments: /DOUTFILE=BinhoMissionControlSDK-${{ env.VERSION }}-${{ matrix.arch }}.exe
+        arguments: /DOUTFILE=windows_installer\${{ env.ARTIFACT_NAME }}.exe
+
+    - name: Windows Signing (installer)
+      uses: GabrielAcostaEngler/signtool-code-sign@main
+      with:
+        certificate: '${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}'
+        cert-password: '${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}'
+        cert-sha1: '${{ secrets.WINDOWS_CERTIFICATE_SHA1 }}'
+        cert-description: 'Binho LLC'
+        folder: windows_installer/
+        recursive: false
+        timestamp-server: 'http://timestamp.digicert.com'
+
+    - name: Zip staging contents
+      run: |
+        CD staging
+        Compress-Archive -Path . -DestinationPath ..\${{ env.ARTIFACT_NAME }}-binaries.zip
+      shell: powershell
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: ${{ matrix.os }}-${{ matrix.arch }}-artifacts
-        path: staging/
+        name: ${{ env.ARTIFACT_NAME }}
+        path: ${{ env.ARTIFACT_NAME }}-binaries.zip
 
     - name: Upload Windows installer
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: BinhoMissionControlSDK-${{ env.VERSION }}-${{ matrix.arch }}.exe
-        path: BinhoMissionControlSDK-${{ env.VERSION }}-${{ matrix.arch }}.exe
+        name: ${{ env.ARTIFACT_NAME }}.exe
+        path: windows_installer/${{ env.ARTIFACT_NAME }}.exe
 
   build-macos:
     if: ${{ inputs.build-macos }}
@@ -165,6 +204,10 @@ jobs:
       run: |
         ./build_and_stage.sh
 
+    - name: Set artifact file name
+      run: |
+        echo "ARTIFACT_NAME=bmc_cpp_sdk-${{ env.VERSION }}-${{ matrix.platform }}-${{ matrix.arch }}-binaries" >> $GITHUB_ENV
+
     - name: Run sign and notarize script
       env:
         APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -175,14 +218,19 @@ jobs:
         KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         BUNDLE_ID: "com.binho.bmc_cpp_sdk"
       run: |
-        ./sign_and_notarize.sh staging ${{ runner.temp }} ${{ runner.temp}}/bmc_cpp_sdk_${{ env.VERSION }}-${{ matrix.platform }}-${{ matrix.arch }}.tar
+        ./sign_and_notarize.sh staging ${{ runner.temp }}
       shell: bash
 
+    - name: Zip staging folder
+      run: |
+        cd staging
+        zip -r ../${{ env.ARTIFACT_NAME }}.zip .
+
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: bmc_cpp_sdk_${{ env.VERSION }}-${{ matrix.platform }}-${{ matrix.arch }}
-        path: ${{ runner.temp}}/bmc_cpp_sdk_${{ env.VERSION }}-${{ matrix.platform }}-${{ matrix.arch }}.tar
+        name: ${{ env.ARTIFACT_NAME }}
+        path: ${{ env.ARTIFACT_NAME }}.zip
 
   publish-to-digital-ocean:
     runs-on: ${{ matrix.os }}
@@ -194,10 +242,18 @@ jobs:
     if: ${{ inputs.publish-to-digital-ocean && always() }}
 
     steps:
+
     - name: Download build artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
-        path: staging/
+        path: dist/
+        merge-multiple: true
+
+    - name: Display structure of downloaded files
+      run: ls -R
+
+    - name: Extract version number
+      run: echo "VERSION=$(cat dist/VERSION)" >> $GITHUB_ENV
 
     - name: Install s3cmd
       run: pip3 install s3cmd
@@ -212,5 +268,5 @@ jobs:
           --recursive \
           --acl-public \
           put \
-          staging/* \
+          dist/* \
           s3://${{ secrets.BINHO_DIGITAL_OCEAN_CDN_SPACE_NAME }}/sw/MissionControlTowerSDK/${{ env.VERSION }}/

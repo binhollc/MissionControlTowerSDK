@@ -13,7 +13,7 @@ if not "%~1"=="" set "PLATFORM=%~1"
 if exist "%STAGING_DIR%" rmdir /S /Q "%STAGING_DIR%"
 mkdir "%STAGING_DIR%"
 
-:: TODO: Check for existence of bridge.exe in the PATH, if not warn 'Bridge executable could not be found. Please check README.md'
+:: Check for existence of bridge.exe in the PATH
 where bridge.exe >nul 2>nul
 if errorlevel 1 (
     echo WARNING: Bridge executable could not be found. Please check README.md
