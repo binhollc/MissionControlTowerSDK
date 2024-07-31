@@ -31,7 +31,7 @@ public:
 private:
     std::string targetCommandAdaptor;
     #ifdef _WIN32
-        HANDLE bridgeProcessWrite, bridgeProcessRead;
+        HANDLE hPipeInputWrite, hPipeOutputRead;
     #else
         FILE* bridgeProcess;
     #endif
