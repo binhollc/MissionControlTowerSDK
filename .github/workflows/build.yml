@@ -42,12 +42,12 @@ jobs:
       run: echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
       shell: bash
 
-    - name: Build and stage the Bridge, library and examples (Mac and Linux)
+    - name: Build and stage the library and examples (Mac and Linux)
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
       run: |
         ./build_and_stage.sh
 
-    - name: Build the Bridge, library and examples (Windows)
+    - name: Build the library and examples (Windows)
       if: matrix.os == 'windows-latest'
       run: |
         dir
