@@ -24,7 +24,6 @@ BMC C++ SDK relies on the bridge service to be installed on your machine. Follow
        - You should see an output similar to `0.13.0`.
 
    - **Mac/Linux:**
-     - Download and install the bridge executable from [support.binho.io](https://support.binho.io).
      - Add the bridge executable path to your PATH environment variable by editing your shell profile file (e.g., `~/.bashrc`, `~/.zshrc`).
        ```sh
        export PATH=$PATH:/path/to/BinhoMissionControlBridge
