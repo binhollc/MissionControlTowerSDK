@@ -6,7 +6,7 @@ project(I3cIbis)
 # ---
 
 set(SOURCES main.cpp)
-set(TARGET_NAME i3c_ibis)
+set(TARGET_NAME supernova_spi)
 
 # ---
 # Target Definition, Properties and Commands
