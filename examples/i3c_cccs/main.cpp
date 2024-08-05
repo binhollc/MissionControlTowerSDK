@@ -41,11 +41,11 @@ void invokeI3CSendCCC(CommandDispatcher& dispatcher,
                                    const std::string& openDrainClockFrequencyInKHz = "1250", 
                                    const std::string& address = "08") {
     json params;
-    params["cccParams"]["address"] = address;
-    params["cccParams"]["writeBuffer"] = writeBuffer;
-    params["cccParams"]["ccc"] = ccc;
-    params["cccParams"]["pushPullClockFrequencyInMHz"] = pushPullClockFrequencyInMHz;
-    params["cccParams"]["openDrainClockFrequencyInKHz"] = openDrainClockFrequencyInKHz;
+    params["address"] = address;
+    params["openDrainClockFrequencyInKHz"] = openDrainClockFrequencyInKHz;
+    params["pushPullClockFrequencyInMHz"] = pushPullClockFrequencyInMHz;
+    params["cccName"] = ccc;
+    params["cccParams"]["cccDataBuffer"] = writeBuffer;
     dispatcher.invokeCommandSync(transactionId, "i3c_ccc_send", params,
     [](CommandResponse cr) {
             printCommandResponse(cr, std::string("CCC"));
