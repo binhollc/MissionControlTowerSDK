@@ -1,3 +1,0 @@
-[submodule "python-backend"]
-	path = python-backend
-	url = git@github.com:binhollc/MissionControlBridge.git

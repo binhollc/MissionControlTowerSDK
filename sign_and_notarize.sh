@@ -10,14 +10,13 @@ KEYCHAIN_PASSWORD="$KEYCHAIN_PASSWORD"
 BUNDLE_ID="com.binhollc.bmc_cpp_sdk"
 
 # Validate input arguments
-if [ $# -ne 3 ]; then
-    echo "Usage: $0 <path-to-target> <temp-dir> <path-to-output-tar>"
+if [ $# -ne 2 ]; then
+    echo "Usage: $0 <path-to-target> <temp-dir>"
     exit 1
 fi
 
 TARGET_PATH="$1"
 TEMP_DIR="$2"
-OUTPUT_TAR_PATH="$3"
 
 CERTIFICATE_PATH="$TEMP_DIR/build_certificate.p12"
 KEYCHAIN_PATH="$TEMP_DIR/app-signing.keychain-db"
@@ -77,18 +76,12 @@ staple_binaries() {
     done
 }
 
-tar_target() {
-  echo "Tar target $1 into $2"
-  (cd "$1" && tar -cvf "$2" .)
-}
-
 # Main script execution
 create_keychain
 sign_binaries "$TARGET_PATH"
 zip_folder "$TARGET_PATH" "$ZIP_OUTPUT_PATH"
 notarize_app "$ZIP_OUTPUT_PATH"
 staple_binaries "$TARGET_PATH"
-tar_target "$TARGET_PATH" "$OUTPUT_TAR_PATH"
 
 # Clean up
 echo "Cleaning up keychain"
