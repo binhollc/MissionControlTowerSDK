@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(Tests)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
 set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR})
 set(STAGING_DIR ${PROJECT_SOURCE_DIR}/../staging)
 
