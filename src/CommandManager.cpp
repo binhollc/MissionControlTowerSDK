@@ -89,7 +89,9 @@ std::string trim(const std::string& str) {
         startInfo.hStdError = BridgeProcess_OUT_Wr;
         startInfo.hStdOutput = BridgeProcess_OUT_Wr;
         startInfo.hStdInput = BridgeProcess_IN_Rd;
-        startInfo.dwFlags |= STARTF_USESTDHANDLES;
+        startInfo.dwFlags |= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+        startInfo.wShowWindow = SW_HIDE;   // Prevents cmd window from flashing.
+                                    // Requires STARTF_USESHOWWINDOW in dwFlags.
 
         // Create the child process.
         BOOL bSuccess = CreateProcess(NULL,
