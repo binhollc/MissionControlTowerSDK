@@ -13,7 +13,14 @@ set(TARGET_NAME sample_app_using_sample_library)
 # ---
 
 add_executable(${TARGET_NAME} ${SOURCES})
+
+# Set output name
 set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME sample_app)
+
+# Only set WIN32_EXECUTABLE property on Windows
+if(WIN32)
+    set_target_properties(${TARGET_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
 
 # Include needed headers
 target_include_directories(${TARGET_NAME} PRIVATE 
