@@ -3,7 +3,22 @@
 #include <fstream>
 #include <string>
 
-int main() {
+// This example application just generates a file, no interaction.
+// On Windows, to avoid the console window from opening, we define WinMain to set
+// the subsystem to WINDOWS while still using the main function.
+
+#ifdef _WIN32
+#include <windows.h>
+
+int main(int argc, char* argv[]);
+
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+    // Your main code here
+    return main(__argc, __argv);
+}
+#endif
+
+int main(int argc, char* argv[]) {
     SampleLibrary device_api;
     std::ofstream outfile("output.txt");
 
