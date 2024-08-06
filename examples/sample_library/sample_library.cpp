@@ -23,7 +23,7 @@ std::string SampleLibrary::get_address() {
 
     dispatcher.waitForAllCommands();
 
-    dispatcher.invokeCommand("0", "exit", {});
+    dispatcher.invokeCommandSync("0", "exit", {});
 
     dispatcher.stop();
 
