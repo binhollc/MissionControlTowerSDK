@@ -154,6 +154,44 @@ target_link_libraries(${TARGET_NAME}
 )
 ```
 
+For Mac or Linux users, you need to change the installation directory to the location where the BMC SDK is installed:
+
+```
+set(
+  BMC_SDK_INSTALL_DIR
+  "/usr/local/BinhoMissionControlSDK"
+)
+```
+
+Also, update the section that links to the static library:
+
+```
+# ---
+# Static linking (macOS or Linux)
+# ---
+
+target_link_libraries(${TARGET_NAME}
+  "${BMC_SDK_INSTALL_DIR}/lib/libbmc_sdk_static.a"
+  nlohmann_json::nlohmann_json
+)
+```
+
+To link with the dynamic library:
+
+```
+# ---
+# Dynamic linking (macOS or Linux)
+# ---
+
+target_compile_definitions(${TARGET_NAME} PRIVATE BUILD_BMC_SDK)
+
+# Link against needed libraries from the parent project
+target_link_libraries(${TARGET_NAME}
+  "${BMC_SDK_INSTALL_DIR}/lib/libbmc_sdk.dylib"
+  nlohmann_json::nlohmann_json
+)
+```
+
 ## Using the Library - General Structure
 
 Using our library typically involves a series of steps to communicate with the target host adapter, execute commands, and handle the responses. Here's a high-level overview based on the provided sample applications:
