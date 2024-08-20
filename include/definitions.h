@@ -1,6 +1,8 @@
 #if defined(_WIN32) || defined(_WIN64)
     #ifdef BUILD_BMC_SDK
         #define BMC_SDK __declspec(dllexport)
+    #elif defined(USE_STATIC_LIBS)
+        #define BMC_SDK
     #else
         #define BMC_SDK __declspec(dllimport)
     #endif
