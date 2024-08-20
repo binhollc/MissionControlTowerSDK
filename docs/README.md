@@ -80,6 +80,80 @@ We provide a set of example applications to demonstrate how to use the library. 
 4. **Run the Sample Application**:
    After building, execute the sample application to test and explore its functionality. Ensure any required runtime dependencies or environment variables are set up correctly.
 
+### Template CMakeLists.txt File for Building the Sample Apps
+
+To link the static library on Windows (and avoid depending on a DLL), you can use this CMakeLists.txt as an example and place it in the directory where the source code of the sample app is located:
+
+```
+cmake_minimum_required(VERSION 3.5)
+project(BinhoCPPSDKSampleApp)
+
+# ---
+# Source Files Declaration
+# ---
+
+set(SOURCES main.cpp)
+set(TARGET_NAME bmc_sdk_sample_app)
+
+# ---
+# Installation Directory Variable
+# ---
+
+set(
+  BMC_SDK_INSTALL_DIR
+  "C:/Program Files (x86)/BinhoMissionControlSDK"
+)
+
+# ---
+# Target Definition, Properties and Commands
+# ---
+
+add_executable(${TARGET_NAME} ${SOURCES})
+set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME sample_app)
+
+# Include needed headers
+target_include_directories(${TARGET_NAME} PRIVATE
+  "${BMC_SDK_INSTALL_DIR}/include"
+  .
+)
+
+# ---
+# External Dependencies and Libraries
+# ---
+
+include(FetchContent)
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
+FetchContent_MakeAvailable(json)
+
+# ---
+# Static linking
+# ---
+
+target_compile_definitions(${TARGET_NAME} PRIVATE USE_STATIC_LIBS)
+
+# Link against needed libraries from the parent project
+target_link_libraries(${TARGET_NAME}
+  "${BMC_SDK_INSTALL_DIR}/bmc_sdk_static.lib"
+  nlohmann_json::nlohmann_json
+)
+```
+
+If you want to link to the dynamic library, you just need to change the last section:
+
+```
+# ---
+# Dynamic linking
+# ---
+
+target_compile_definitions(${TARGET_NAME} PRIVATE BUILD_BMC_SDK)
+
+# Link against needed libraries from the parent project
+target_link_libraries(${TARGET_NAME}
+  "${BMC_SDK_INSTALL_DIR}/bmc_sdk.lib"
+  nlohmann_json::nlohmann_json
+)
+```
+
 ## Using the Library - General Structure
 
 Using our library typically involves a series of steps to communicate with the target host adapter, execute commands, and handle the responses. Here's a high-level overview based on the provided sample applications:
