@@ -16,6 +16,7 @@ Section "Main Files"
     SetOutPath $INSTDIR
     File "staging\bin\bmc_sdk.dll"
     File "staging\lib\bmc_sdk.lib"
+    File "staging\lib\bmc_sdk_static.lib"
     File "staging\docs\README.md"
 
     ; Includes
