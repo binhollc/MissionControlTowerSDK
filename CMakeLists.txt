@@ -69,7 +69,10 @@ target_include_directories(bmc_sdk PUBLIC
     ${PROJECT_SOURCE_DIR}/include
 )
 
-target_link_libraries(bmc_sdk PRIVATE nlohmann_json::nlohmann_json pthread)
+target_link_libraries(bmc_sdk PRIVATE nlohmann_json::nlohmann_json)
+if(UNIX)
+    target_link_libraries(bmc_sdk PRIVATE pthread)
+endif()
 
 target_compile_features(bmc_sdk PUBLIC cxx_std_17)
 
@@ -89,6 +92,9 @@ target_include_directories(bmc_sdk_static PUBLIC
 )
 
 target_link_libraries(bmc_sdk_static PRIVATE nlohmann_json::nlohmann_json)
+if(UNIX)
+    target_link_libraries(bmc_sdk_static PRIVATE pthread)
+endif()
 
 target_compile_features(bmc_sdk_static PUBLIC cxx_std_17)
 
