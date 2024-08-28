@@ -184,7 +184,9 @@ Alternatively, you can prepend the PATH variable to the command execution:
 
    On Linux:
 
-   [TO DO]
+   ```shell
+   LD_LIBRARY_PATH=/path/to/staging/lib PATH=$PATH:/path/to/bridge ./sample_app
+   ```
 
    On Windows (using Command Prompt):
 
@@ -233,6 +235,24 @@ cmake --build build
 cd build
 ctest
 ```
+
+## Building MissionControlTowerSDK Installer (Windows)
+
+To build the installer for MissionControlTowerSDK, follow the steps below:
+
+### Prerequisites
+- NSIS (Nullsoft Scriptable Install System): You need to have NSIS installed on your system to compile the bmc_sdk_installer.nsi script.
+
+### Compilingt the installer
+
+#### 1. Locate the .nsi Script
+Navigate to the root directory of this repository, where the MissionControlTowerSDK.nsi script is located.
+
+#### 2. Compile the script
+Right click on the nsi script and select `Compile NSIS Script`. NOTE: In Windows 11, this option is available after selecting `Show More Options` when right-clicking.
+
+#### 3. Generated Installer
+After compiling, the installer MissionControlTowerSDKInstaller.exe will be generated in the same directory as the .nsi script.
 
 ## Troubleshooting
 
