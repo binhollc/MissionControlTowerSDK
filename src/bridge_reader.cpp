@@ -4,14 +4,14 @@
 #include <sys/select.h>
 #include <unistd.h>
 
-BridgeReader::BridgeReader(FILE* bridgeProcess) : bridgeProcess(bridgeProcess) {}
+BridgeReader::BridgeReader(int pipeFd) : pipeFd(pipeFd) {}
 
 bool BridgeReader::hasMoreData() const {
     fd_set set;
     struct timeval timeout;
 
     FD_ZERO(&set); /* clear the set */
-    FD_SET(fileno(bridgeProcess), &set); /* add our file descriptor to the set */
+    FD_SET(pipeFd, &set); /* add our file descriptor to the set */
 
     timeout.tv_sec = 0;
     timeout.tv_usec = 0;
@@ -21,13 +21,12 @@ bool BridgeReader::hasMoreData() const {
 
 std::string BridgeReader::readNextData(bool nonBlocking) {
     char tmpBuffer[128];
-    int fd = fileno(bridgeProcess);
 
     if (nonBlocking) {
-        fcntl(fd, F_SETFL, O_NONBLOCK);  // Make reading non-blocking
+        fcntl(pipeFd, F_SETFL, O_NONBLOCK);  // Make reading non-blocking
     }
 
-    ssize_t result = read(fd, tmpBuffer, sizeof(tmpBuffer) - 1);
+    ssize_t result = read(pipeFd, tmpBuffer, sizeof(tmpBuffer) - 1);
 
     if (result < 0) {
         // If errno == EAGAIN, that means we have read all data.

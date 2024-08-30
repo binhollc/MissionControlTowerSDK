@@ -4,10 +4,10 @@
 
 class BridgeReader {
 public:
-    BridgeReader(FILE* bridgeProcess);
+    explicit BridgeReader(int pipeFd);
     bool hasMoreData() const;
     std::string readNextData(bool nonBlocking = true);
 private:
-    FILE* bridgeProcess;
+    int pipeFd;
     std::string buffer;
 };
