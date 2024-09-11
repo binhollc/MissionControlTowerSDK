@@ -249,7 +249,7 @@ jobs:
     - name: Download build artifacts
       uses: actions/download-artifact@v4
       with:
-        path: dist/
+        path: downloaded_artifacts/
         merge-multiple: true
 
     - name: Display structure of downloaded files
@@ -268,5 +268,5 @@ jobs:
           --recursive \
           --acl-public \
           put \
-          dist/* \
+          downloaded_artifacts/* \
           s3://${{ secrets.BINHO_DIGITAL_OCEAN_CDN_SPACE_NAME }}/sw/MissionControlTowerSDK/${{ env.VERSION }}/
