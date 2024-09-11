@@ -6,7 +6,7 @@ A C++ dynamic library for interacting with Binho host adapters
 BMC C++ SDK relies on the bridge service to be installed on your machine. Follow these steps to get everything set up:
 
 1. **Download and Install the Bridge Service:**
-   - Visit [support.binho.io](https://support.binho.io) to download the bridge executable.
+   - Visit [binho customer support portal](https://support.binho.io/getting-started/c++-sdk/installation-and-setup) to download the bridge executable.
    - Follow the installation instructions specific to your operating system.
 
 2. **Add the Bridge to Your PATH Environment Variable:**

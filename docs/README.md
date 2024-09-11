@@ -10,37 +10,13 @@ Welcome to the Binho Mission Control SDK (BMC_SDK), a set of software tools spec
 
 The Binho Mission Control SDK installer will install the necessary components for the SDK on your system. This includes:
 
-- The core SDK library (`bmc_sdk.dll` and `bmc_sdk.lib`).
+- The core SDK library (`bmc_sdk.dll` and `bmc_sdk_static.lib`).
 - Example applications to test the SDK.
-- The "bridge" service used by the library.
 - Header files for integration (`include` directory).
 
 ### Instructions
 
-1. **Download the Installer**
-   Get the Binho Mission Control SDK installer named `BinhoMissionControlSDK.exe`.
-
-2. **Run the Installer**
-   Double-click on `BinhoMissionControlSDK.exe` and follow the on-screen prompts.
-
-3. **Installation Directories**
-   By default, the SDK will be installed into the `c:\Program Files (x86)\BinhoMissionControlSDK` directory. Inside this directory, you will find:
-   - `bmc_sdk.dll`: The SDK dynamic link library.
-   - `bmc_sdk.lib`: The SDK static library.
-   - `examples`: A directory containing example applications.
-   - `bridge`: A directory containing components for the bridge service used by the library.
-   - `include`: A directory containing various header files necessary for SDK integration.
-
-4. **Add to PATH Environment Variable**
-   For the sample application to function correctly, the `bridge` directory must be added to your system's PATH environment variable. See the steps bellow.
-
-5. **Integration**
-   To integrate the Binho Mission Control SDK into your project:
-   - Reference the SDK library using the `bmc_sdk.lib` file.
-   - Include necessary headers from the `include` directory.
-
-6. **Test the Example Applications**
-   After setting up the PATH, you can run `sample_app.exe` to check the installation and get an understanding of how the SDK functions.
+You can find the installation instructions in the [binho customer support portal](https://support.binho.io/getting-started/c++-sdk/installation-and-setup).
 
 ## Usage Examples
 
@@ -49,9 +25,14 @@ We provide a set of example applications to demonstrate how to use the library. 
 ### Prerequisites
 
 - A development environment compatible with C++17.
+- The Binho Bridge installed on your system.
 - The Binho Mission Control SDK installed on your system.
 
 ### Example Use Cases
+
+**General**
+
+- **list_devices**: Lists connected USB devices, displaying details such as the product name, type, port, and manufacturer. This example highlights the capability to query and process information about connected devices using the CommandDispatcher framework.
 
 **Nova Host Adapter**
 
@@ -59,7 +40,6 @@ We provide a set of example applications to demonstrate how to use the library. 
 
 **Supernova Host Adapter**
 
-- **list_devices**: Lists connected USB devices, displaying details such as the product name, type, port, and manufacturer. This example highlights the capability to query and process information about connected devices using the CommandDispatcher framework.
 - **supernova_101**: Demonstrates fetching USB strings like `MANUFACTURER`, `PRODUCT_NAME`, etc., from a BinhoSupernova host adapter.
 - **supernova_i2C**: Showcases I2C operations using the BinhoSupernova host adapter.
 - **supernova_i2c_benchmark**: Performs benchmarking of I2C communication with the BinhoSupernova host adapter. It measures and displays the average round-trip time for a series of I2C write operations, offering insight into the performance and efficiency of I2C communications.
@@ -278,3 +258,16 @@ dispatcher.stop();
 - Reduces roundtrip time.
 - Adds more examples.
 - Enhances supernova_i2c example.
+
+### v1.0.0
+- Adds I3C Examples
+- Ensures Unique Active Command per Transaction ID
+- Updated to use Bridge v0.9.0
+
+### v1.1.0
+- Adds support for SPI
+- Adds version compatibility check with Bridge
+- Updated I3C examples
+- Updated to use Bridge v1.0.0
+- Adds static linking option
+- Bugfixes
