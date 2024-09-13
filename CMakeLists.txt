@@ -46,12 +46,18 @@ FetchContent_MakeAvailable(json)
 # Target Definition, Properties and Commands
 # ---
 
+# Define the shared library
 add_library(bmc_sdk SHARED ${SOURCE_FILES})
 
+file(READ "VERSION" ver)
+
 set_target_properties(bmc_sdk PROPERTIES
-    VERSION 1.0.0
+    VERSION ${ver}
     SOVERSION 1
 )
+
+get_target_property(target_version bmc_sdk VERSION)
+message(STATUS "BMC SDK Version: ${target_version}")
 
 target_compile_definitions(bmc_sdk PRIVATE BUILD_BMC_SDK)
 
@@ -67,6 +73,25 @@ target_link_libraries(bmc_sdk PRIVATE nlohmann_json::nlohmann_json)
 
 target_compile_features(bmc_sdk PUBLIC cxx_std_17)
 
+# Define the static library
+add_library(bmc_sdk_static STATIC ${SOURCE_FILES})
+
+# Ensure the static library doesn't define `BUILD_BMC_SDK`
+target_compile_definitions(bmc_sdk_static PRIVATE USE_STATIC_LIBS)
+
+set_target_properties(bmc_sdk_static PROPERTIES
+    OUTPUT_NAME bmc_sdk_static
+    VERSION ${ver}
+)
+
+target_include_directories(bmc_sdk_static PUBLIC
+    ${PROJECT_SOURCE_DIR}/include
+)
+
+target_link_libraries(bmc_sdk_static PRIVATE nlohmann_json::nlohmann_json)
+
+target_compile_features(bmc_sdk_static PUBLIC cxx_std_17)
+
 # ---
 # Installation instructions
 # ---
@@ -74,11 +99,16 @@ target_compile_features(bmc_sdk PUBLIC cxx_std_17)
 # Installation path for headers
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION ${STAGING_DIR}/include)
 
-# Install the library (e.g. .dll, .lib, .so files)
+# Install the shared library (e.g. .dll, .so files)
 install(TARGETS bmc_sdk
         RUNTIME DESTINATION ${STAGING_DIR}/bin
         ARCHIVE DESTINATION ${STAGING_DIR}/lib
         LIBRARY DESTINATION ${STAGING_DIR}/lib
+)
+
+# Install the static library (.lib or .a files)
+install(TARGETS bmc_sdk_static
+        ARCHIVE DESTINATION ${STAGING_DIR}/lib
 )
 
 # Install documentation

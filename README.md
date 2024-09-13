@@ -1,5 +1,42 @@
-# MissionControlTowerSDK
-A C++ dynamic library for launching and interacting with MissionControlTower system
+# Binho Mission Control C++ SDK (BMC C++ SDK)
+A C++ dynamic library for interacting with Binho host adapters
+
+## Prerequisites
+
+BMC C++ SDK relies on the bridge service to be installed on your machine. Follow these steps to get everything set up:
+
+1. **Download and Install the Bridge Service:**
+   - Visit [binho customer support portal](https://support.binho.io/getting-started/c++-sdk/installation-and-setup) to download the bridge executable.
+   - Follow the installation instructions specific to your operating system.
+
+2. **Add the Bridge to Your PATH Environment Variable:**
+   - **Windows:**
+     - The bridge is typically installed in `C:\Program Files (x86)\BinhoMissionControlBridge`.
+     - Add this path to your system's PATH environment variable.
+       - Press `Win + R`, type `sysdm.cpl`, and press Enter.
+       - Go to the Advanced tab, and click on Environment Variables.
+       - In the System variables section, find the PATH variable, select it, and click Edit.
+       - Click New and add `C:\Program Files (x86)\BinhoMissionControlBridge`.
+     - To verify the installation, open Command Prompt and execute:
+       ```cmd
+       bridge --version
+       ```
+       - You should see an output similar to `0.13.0`.
+
+   - **Mac/Linux:**
+     - Add the bridge executable path to your PATH environment variable by editing your shell profile file (e.g., `~/.bashrc`, `~/.zshrc`).
+       ```sh
+       export PATH=$PATH:/path/to/BinhoMissionControlBridge
+       ```
+     - Apply the changes:
+       ```sh
+       source ~/.bashrc  # or source ~/.zshrc
+       ```
+     - Verify the installation:
+       ```sh
+       bridge --version
+       ```
+       - You should see an output similar to `0.13.0`.
 
 ## Installing the development environment
 
@@ -10,12 +47,6 @@ A C++ dynamic library for launching and interacting with MissionControlTower sys
    ```
 
 2. Navigate to the project folder.
-
-3. Initialize the submodules.
-
-   ```shell
-   git submodule update --init
-   ```
 
 ## Quick Start with Script
 
@@ -37,155 +68,7 @@ These scripts are designed to handle all necessary steps, ensuring a seamless se
 
 ## Detailed Build and Stage Instructions
 
-### Building the Python Backend
-
-To build the Python backend, which is contained in the `python-backend` folder, we use cx_Freeze, a Python packaging tool. The following instructions guide you through the process.
-
-#### Special note for Windows users
-
-> :warning: ** On Windows 64 **: Make sure that Python 64, and not 32, is installed in your system.
-
-##### How do I know if my Windows installation is 32 or 64 bits?
-
-1. Press the Windows key + R to open the Run dialog box.
-
-2. Type "msinfo32" and press Enter.
-
-3. The System Information window will open. Look for the "System Type" field, which will indicate whether your Windows is 32-bit or 64-bit.
-
-#### How can I know if I'm using Python 32 or 64 bits on windows?
-
-To determine whether you're using a 32-bit or 64-bit version of Python on Windows, you can follow these steps:
-
-1. Open the Command Prompt: Press the Windows key, type "Command Prompt," and select the Command Prompt application.
-
-2. In the Command Prompt, type the following command and press Enter:
-
-   ```shell
-   python --version
-   ```
-
-   This command will display the version of Python you have installed, along with additional information.
-
-   If you see something like `Python 3.x.x`, where `x.x` represents the version number, without any mention of "64-bit" or "32-bit," it means you have the 32-bit version of Python installed.
-
-   If you see something like `Python 3.x.x [MSC v.1916 64 bit (AMD64)]`, where `x.x` represents the version number, and it includes "64 bit" or "AMD64," it indicates that you have the 64-bit version of Python installed.
-
-#### Creating a virtual environment
-
-1. Create a virtual environment and save it in the `venv` folder:
-
-   On Linux / Mac:
-
-   ```shell
-   python3 -m venv venv
-   ```
-
-   On Windows:
-
-   ```shell
-   python -m venv venv
-   ```
-
-2. Activate the virtual environment:
-
-   On Linux / Mac:
-
-   ```shell
-   source ./venv/bin/activate
-   ```
-
-   On Windows:
-
-   ```shell
-   venv\\Scripts\\Activate
-   ```
-
-3. Verify that your command prompt has an indicator that the virtual environment is active.
-
-4. Install the cx_Freeze package:
-
-   ```shell
-   pip install cx_Freeze
-   ```
-   Note: inside the virtual environment you can safely use `python` to execute the interpreter.
-
-5. Set the GH_TOKEN evironment variable.
-
-   On Mac/Linux:
-   ```shell
-   export GH_TOKEN=[GitHub Personal Access Token]
-   ```
-
-   On Windows:
-   ```shell
-   set GH_TOKEN=[GitHub Personal Access Token]
-   ```
-
-6. Install the requirements.
-
-   ```shell
-   $(venv)> pip install -r python-backend/requirements.txt
-
-7. Run the following command to build the executable:
-
-   ```shell
-   $(venv)> python setup.py build
-   ```
-
-   This command invokes cx_Freeze using the `setup.py` script, which contains the necessary configuration to freeze the Python backend into an executable.
-
-8. After the build process completes, the executable and its dependencies will be located in the `build_bridge` directory.
-
-#### Testing the bridge
-
-10. Navigate to the `build_bridge` directory and test that the bridge works properly.
-
-   On Linux / Mac:
-
-   ```shell
-   cd build_bridge
-   ./bridge BinhoNova
-   ```
-
-   On Windows:
-
-   ```shell
-   cd build_bridge
-   bridge.exe BinhoNova
-   ```
-
-   Now the ListUsbDevices should be ready and waiting to receive JSON commands.
-
-11. Send the command to open the Nova simulator:
-
-   ```json
-   {"command":"open","params":{"address":"NovaSimulatedPort"},"transaction_id":"0"}
-   ```
-
-12. Verify that the bridge returns the following command response:
-
-   ```json
-   {"transaction_id": "0", "status": "success", "is_promise": false, "data": {"command": "open", "id": "BINHONOVASIM001", "port": "NovaSimulatedPort", "productName": "Binho Nova", "firmwareVersion": "0.2.8", "hardwareVersion": "1.0", "vendorId": "1240", "productId": "60724", "mode": "normal"}}
-   ```
-
-13. Exit the bridge using the following command:
-
-   ```json
-   {"command":"exit","transaction_id":"0"}
-   ```
-
-#### Killing the bridge
-
-On Mac/Linux you can kill the bridge executable by pressing Command+C on Mac, or Control+C on Linux.
-
-On Windows, if you are using PowerShell you can open a different PowerShell window and execute the following command:
-
-```shell
-Stop-Process -Name "bridge"
-```
-
-### Dynamic library
+### Dynamic Library
 
 #### Special note for Windows developers
 
@@ -236,7 +119,7 @@ For Windows users, we recommend downloading CMake's command line tool from the [
    cmake -DCMAKE_BUILD_TYPE=Release ..
    ```
 
-   On Windows it is recommended to select the generator (-G argument) and the platform (-A argument). The platform can be "win32" or "win64":
+   On Windows it is recommended to select the generator (-G argument) and the platform (-A argument). The platform can be "win32" or "x64":
 
    ```bash
    cmake -DCMAKE_BUILD_TYPE=Debug .. -G "Visual Studio 17 2022" -A win32
@@ -250,14 +133,6 @@ For Windows users, we recommend downloading CMake's command line tool from the [
 
 After the build process completes, all the generated files, including the shared library, examples and docs will be installed in the staging/ directory.
 
-#### Staging the Bridge
-
-1. If you want to stage the Bridge, execute:
-
-   ```shell
-   cp -R build_bridge staging\bridge
-   ```
-
 ## Staging Directory
 
 After executing the build scripts or manually building and installing the library and examples, the resulting folder structure will be organized for ease of distribution and usage. Below is an approximate overview of the directory structure on Mac/Linux systems:
@@ -265,9 +140,6 @@ After executing the build scripts or manually building and installing the librar
 ```
 ├── staging
 │   ├── README.md
-│   ├── bridge
-│   │   ├── bridge [Bridge executable]
-│   │   ├── ...
 │   ├── examples
 │   │   ├── list_devices
 │   │   ├── nova_breathing_leds
@@ -307,24 +179,26 @@ Alternatively, you can prepend the PATH variable to the command execution:
    On Mac:
 
    ```shell
-   DYLD_LIBRARY_PATH=/path/to/staging/lib PATH=$PATH:/path/to/staging/bridge ./sample_app
+   DYLD_LIBRARY_PATH=/path/to/staging/lib PATH=$PATH:/path/to/bridge ./sample_app
    ```
 
    On Linux:
 
-   [TO DO]
+   ```shell
+   LD_LIBRARY_PATH=/path/to/staging/lib PATH=$PATH:/path/to/bridge ./sample_app
+   ```
 
    On Windows (using Command Prompt):
 
    ```shell
-   set PATH=%PATH%;\path\to\staging\bridge;\path\to\staging\bin
+   set PATH=%PATH%;\path\to\bridge;\path\to\staging\bin
    sample_app.exe
    ```
 
    Or on Windows (using PowerShell):
 
    ```shell
-   $env:PATH += ";\path\to\staging\bridge\;\path\to\staging\bin"
+   $env:PATH += ";\path\to\bridge\;\path\to\staging\bin"
    .\sample_app.exe
    ```
 
@@ -342,12 +216,43 @@ Preconditions:
    - The project is built and staged.
    - PATH (and DYLD_LIBRARY_PATH in Mac) environment variables are correctly set.
 
+On Windows 64 bits:
+```shell
+cd tests
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 17 2022" -A x64
+cmake --build build --config Release
+cd build
+ctest
+```
+
+On Windows 32 bits: Change `-A x64` to `-A win32` in the second line above.
+
+On Mac/Linux:
 ```shell
 cd tests
 cmake -S . -B build
 cmake --build build
-cd build && ctest
+cd build
+ctest
 ```
+
+## Building MissionControlTowerSDK Installer (Windows)
+
+To build the installer for MissionControlTowerSDK, follow the steps below:
+
+### Prerequisites
+- NSIS (Nullsoft Scriptable Install System): You need to have NSIS installed on your system to compile the bmc_sdk_installer.nsi script.
+
+### Compilingt the installer
+
+#### 1. Locate the .nsi Script
+Navigate to the root directory of this repository, where the MissionControlTowerSDK.nsi script is located.
+
+#### 2. Compile the script
+Right click on the nsi script and select `Compile NSIS Script`. NOTE: In Windows 11, this option is available after selecting `Show More Options` when right-clicking.
+
+#### 3. Generated Installer
+After compiling, the installer MissionControlTowerSDKInstaller.exe will be generated in the same directory as the .nsi script.
 
 ## Troubleshooting
 
@@ -370,4 +275,4 @@ Add `/path/to/staging/` to the PATH environment variable.
 
 Solution:
 
-Add `/path/to/staging/bridge` to the PATH environment variable.
+Add `/path/to/bridge` to the PATH environment variable.

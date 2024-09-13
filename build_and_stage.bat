@@ -13,29 +13,11 @@ if not "%~1"=="" set "PLATFORM=%~1"
 if exist "%STAGING_DIR%" rmdir /S /Q "%STAGING_DIR%"
 mkdir "%STAGING_DIR%"
 
-echo :: ---
-echo Building the Bridge...
-echo :: ---
-
-call build_bridge.bat
+:: Check for existence of bridge.exe in the PATH
+where bridge.exe >nul 2>nul
 if errorlevel 1 (
-    echo Failed to build the Bridge. Check the errors above.
-    exit /b 1
+    echo WARNING: Bridge executable could not be found. Please check README.md
 )
-
-echo :: ---
-echo Staging the Bridge...
-echo :: ---
-
-if not exist build_bridge (
-    echo "Couldn't find build_bridge directory. Did you build it?"
-    exit /b 1
-)
-
-echo Copying build_bridge to staging...
-echo "%STAGING_DIR%\bridge"
-rmdir /S /Q "%STAGING_DIR%\bridge"
-xcopy /E /I /Y build_bridge "%STAGING_DIR%\bridge"
 
 echo :: ---
 echo Building and staging bmc_sdk library, docs and examples...

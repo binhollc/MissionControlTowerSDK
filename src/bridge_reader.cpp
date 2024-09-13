@@ -19,10 +19,13 @@ bool BridgeReader::hasMoreData() const {
     return select(FD_SETSIZE, &set, NULL, NULL, &timeout) == 1;
 }
 
-std::string BridgeReader::readNextData() {
+std::string BridgeReader::readNextData(bool nonBlocking) {
     char tmpBuffer[128];
     int fd = fileno(bridgeProcess);
-    fcntl(fd, F_SETFL, O_NONBLOCK);  // Make reading non-blocking
+
+    if (nonBlocking) {
+        fcntl(fd, F_SETFL, O_NONBLOCK);  // Make reading non-blocking
+    }
 
     ssize_t result = read(fd, tmpBuffer, sizeof(tmpBuffer) - 1);
 
@@ -32,7 +35,6 @@ std::string BridgeReader::readNextData() {
         if (errno == EAGAIN) {
             return "";
         } else {
-            // Error occurred, report it and exit.
             perror("read");
             exit(EXIT_FAILURE);
         }

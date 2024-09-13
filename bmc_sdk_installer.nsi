@@ -16,11 +16,8 @@ Section "Main Files"
     SetOutPath $INSTDIR
     File "staging\bin\bmc_sdk.dll"
     File "staging\lib\bmc_sdk.lib"
+    File "staging\lib\bmc_sdk_static.lib"
     File "staging\docs\README.md"
-
-    ; Bridge
-    SetOutPath $INSTDIR\bridge
-    File /r "staging\bridge\*.*"
 
     ; Includes
     SetOutPath $INSTDIR\include

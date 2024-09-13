@@ -10,37 +10,13 @@ Welcome to the Binho Mission Control SDK (BMC_SDK), a set of software tools spec
 
 The Binho Mission Control SDK installer will install the necessary components for the SDK on your system. This includes:
 
-- The core SDK library (`bmc_sdk.dll` and `bmc_sdk.lib`).
+- The core SDK library (`bmc_sdk.dll` and `bmc_sdk_static.lib`).
 - Example applications to test the SDK.
-- The "bridge" service used by the library.
 - Header files for integration (`include` directory).
 
 ### Instructions
 
-1. **Download the Installer**
-   Get the Binho Mission Control SDK installer named `BinhoMissionControlSDK.exe`.
-
-2. **Run the Installer**
-   Double-click on `BinhoMissionControlSDK.exe` and follow the on-screen prompts.
-
-3. **Installation Directories**
-   By default, the SDK will be installed into the `c:\Program Files (x86)\BinhoMissionControlSDK` directory. Inside this directory, you will find:
-   - `bmc_sdk.dll`: The SDK dynamic link library.
-   - `bmc_sdk.lib`: The SDK static library.
-   - `examples`: A directory containing example applications.
-   - `bridge`: A directory containing components for the bridge service used by the library.
-   - `include`: A directory containing various header files necessary for SDK integration.
-
-4. **Add to PATH Environment Variable**
-   For the sample application to function correctly, the `bridge` directory must be added to your system's PATH environment variable. See the steps bellow.
-
-5. **Integration**
-   To integrate the Binho Mission Control SDK into your project:
-   - Reference the SDK library using the `bmc_sdk.lib` file.
-   - Include necessary headers from the `include` directory.
-
-6. **Test the Example Applications**
-   After setting up the PATH, you can run `sample_app.exe` to check the installation and get an understanding of how the SDK functions.
+You can find the installation instructions in the [binho customer support portal](https://support.binho.io/getting-started/c++-sdk/installation-and-setup).
 
 ## Usage Examples
 
@@ -49,9 +25,14 @@ We provide a set of example applications to demonstrate how to use the library. 
 ### Prerequisites
 
 - A development environment compatible with C++17.
+- The Binho Bridge installed on your system.
 - The Binho Mission Control SDK installed on your system.
 
 ### Example Use Cases
+
+**General**
+
+- **list_devices**: Lists connected USB devices, displaying details such as the product name, type, port, and manufacturer. This example highlights the capability to query and process information about connected devices using the CommandDispatcher framework.
 
 **Nova Host Adapter**
 
@@ -59,7 +40,6 @@ We provide a set of example applications to demonstrate how to use the library. 
 
 **Supernova Host Adapter**
 
-- **list_devices**: Lists connected USB devices, displaying details such as the product name, type, port, and manufacturer. This example highlights the capability to query and process information about connected devices using the CommandDispatcher framework.
 - **supernova_101**: Demonstrates fetching USB strings like `MANUFACTURER`, `PRODUCT_NAME`, etc., from a BinhoSupernova host adapter.
 - **supernova_i2C**: Showcases I2C operations using the BinhoSupernova host adapter.
 - **supernova_i2c_benchmark**: Performs benchmarking of I2C communication with the BinhoSupernova host adapter. It measures and displays the average round-trip time for a series of I2C write operations, offering insight into the performance and efficiency of I2C communications.
@@ -79,6 +59,118 @@ We provide a set of example applications to demonstrate how to use the library. 
 
 4. **Run the Sample Application**:
    After building, execute the sample application to test and explore its functionality. Ensure any required runtime dependencies or environment variables are set up correctly.
+
+### Template CMakeLists.txt File for Building the Sample Apps
+
+To link the static library on Windows (and avoid depending on a DLL), you can use this CMakeLists.txt as an example and place it in the directory where the source code of the sample app is located:
+
+```
+cmake_minimum_required(VERSION 3.5)
+project(BinhoCPPSDKSampleApp)
+
+# ---
+# Source Files Declaration
+# ---
+
+set(SOURCES main.cpp)
+set(TARGET_NAME bmc_sdk_sample_app)
+
+# ---
+# Installation Directory Variable
+# ---
+
+set(
+  BMC_SDK_INSTALL_DIR
+  "C:/Program Files (x86)/BinhoMissionControlSDK"
+)
+
+# ---
+# Target Definition, Properties and Commands
+# ---
+
+add_executable(${TARGET_NAME} ${SOURCES})
+set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME sample_app)
+
+# Include needed headers
+target_include_directories(${TARGET_NAME} PRIVATE
+  "${BMC_SDK_INSTALL_DIR}/include"
+  .
+)
+
+# ---
+# External Dependencies and Libraries
+# ---
+
+include(FetchContent)
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
+FetchContent_MakeAvailable(json)
+
+# ---
+# Static linking
+# ---
+
+target_compile_definitions(${TARGET_NAME} PRIVATE USE_STATIC_LIBS)
+
+# Link against needed libraries from the parent project
+target_link_libraries(${TARGET_NAME}
+  "${BMC_SDK_INSTALL_DIR}/bmc_sdk_static.lib"
+  nlohmann_json::nlohmann_json
+)
+```
+
+If you want to link to the dynamic library, you just need to change the last section:
+
+```
+# ---
+# Dynamic linking
+# ---
+
+target_compile_definitions(${TARGET_NAME} PRIVATE BUILD_BMC_SDK)
+
+# Link against needed libraries from the parent project
+target_link_libraries(${TARGET_NAME}
+  "${BMC_SDK_INSTALL_DIR}/bmc_sdk.lib"
+  nlohmann_json::nlohmann_json
+)
+```
+
+For Mac or Linux users, you need to change the installation directory to the location where the BMC SDK is installed:
+
+```
+set(
+  BMC_SDK_INSTALL_DIR
+  "/usr/local/BinhoMissionControlSDK"
+)
+```
+
+Also, update the section that links to the static library:
+
+```
+# ---
+# Static linking (macOS or Linux)
+# ---
+
+target_link_libraries(${TARGET_NAME}
+  "${BMC_SDK_INSTALL_DIR}/lib/libbmc_sdk_static.a"
+  nlohmann_json::nlohmann_json
+)
+```
+
+To link with the dynamic library:
+
+```
+# ---
+# Dynamic linking (macOS or Linux)
+# ---
+
+target_compile_definitions(${TARGET_NAME} PRIVATE BUILD_BMC_SDK)
+
+# Link against needed libraries from the parent project
+target_link_libraries(${TARGET_NAME}
+  "${BMC_SDK_INSTALL_DIR}/lib/libbmc_sdk.dylib"
+  nlohmann_json::nlohmann_json
+)
+```
 
 ## Using the Library - General Structure
 
@@ -166,3 +258,16 @@ dispatcher.stop();
 - Reduces roundtrip time.
 - Adds more examples.
 - Enhances supernova_i2c example.
+
+### v1.0.0
+- Adds I3C Examples
+- Ensures Unique Active Command per Transaction ID
+- Updated to use Bridge v0.9.0
+
+### v1.1.0
+- Adds support for SPI
+- Adds version compatibility check with Bridge
+- Updated I3C examples
+- Updated to use Bridge v1.0.0
+- Adds static linking option
+- Bugfixes

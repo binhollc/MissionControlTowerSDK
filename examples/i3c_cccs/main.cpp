@@ -10,7 +10,6 @@ void printCommandResponse(const CommandResponse &cr, const std::string &action)
     std::cout << "Status: " << cr.status << "\n";
     std::cout << "Is Promise: " << (cr.is_promise ? "True" : "False") << "\n";
     std::cout << "Data: " << cr.data.dump() << "\n";
-    std::cout << "Data Result: " << cr.data["result"].dump() << "\n";
     std::cout << "----------------------------------\n";
 }
 
@@ -42,11 +41,11 @@ void invokeI3CSendCCC(CommandDispatcher& dispatcher,
                                    const std::string& openDrainClockFrequencyInKHz = "1250", 
                                    const std::string& address = "08") {
     json params;
-    params["cccParams"]["address"] = address;
-    params["cccParams"]["writeBuffer"] = writeBuffer;
-    params["cccParams"]["ccc"] = ccc;
-    params["cccParams"]["pushPullClockFrequencyInMHz"] = pushPullClockFrequencyInMHz;
-    params["cccParams"]["openDrainClockFrequencyInKHz"] = openDrainClockFrequencyInKHz;
+    params["address"] = address;
+    params["openDrainClockFrequencyInKHz"] = openDrainClockFrequencyInKHz;
+    params["pushPullClockFrequencyInMHz"] = pushPullClockFrequencyInMHz;
+    params["cccName"] = ccc;
+    params["cccParams"]["cccDataBuffer"] = writeBuffer;
     dispatcher.invokeCommandSync(transactionId, "i3c_ccc_send", params,
     [](CommandResponse cr) {
             printCommandResponse(cr, std::string("CCC"));
@@ -83,11 +82,9 @@ int main()
   // We check if it effectively changed
   invokeI3CSendCCC(dispatcher, idGenerator.nextID(), "GETMWL");
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+  dispatcher.waitForAllCommands();
 
   dispatcher.invokeCommandSync(idGenerator.nextID(), "exit", {});
-
-  dispatcher.waitForAllCommands();
 
   dispatcher.stop();
 

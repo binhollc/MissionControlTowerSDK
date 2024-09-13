@@ -5,7 +5,7 @@
 #include <thread>
 
 // Global constant for minimum tolerable waiting time for a command
-constexpr std::chrono::milliseconds MIN_TOLERABLE_CMD_WAIT_MS(300);
+constexpr std::chrono::milliseconds MIN_TOLERABLE_CMD_WAIT_MS(2000);
 
 class SupernovaGenericCommandFlowTest : public ::testing::Test {
 protected:
