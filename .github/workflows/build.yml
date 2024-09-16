@@ -50,7 +50,7 @@ jobs:
     needs: [check-prerequisites]
     if: ${{ inputs.build-linux }}
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     env:
       PLATFORM: linux
