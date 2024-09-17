@@ -170,10 +170,10 @@ void CommandManager::start() {
     // Verify version compatibility
     #ifdef _WIN32
         HANDLE hPipeRead, hPipeWrite;
-        launchProcess("bridge.exe --version", hPipeWrite, hPipeRead);
+        launchProcess("bmcbridge.exe --version", hPipeWrite, hPipeRead);
         bridgeReader = std::make_unique<BridgeReader>(hPipeRead);
     #else
-        launchProcess("bridge --version", pipeWrite, pipeRead);
+        launchProcess("bmcbridge --version", pipeWrite, pipeRead);
         bridgeReader = std::make_unique<BridgeReader>(pipeRead);
     #endif
 
@@ -191,15 +191,15 @@ void CommandManager::start() {
     #endif
 
     if (!checkVersionCompatibility(versionStr)) {
-        std::cerr << "Unsupported bridge version: " << versionStr << std::endl;
+        std::cerr << "Unsupported bmcbridge version: " << versionStr << std::endl;
         std::exit(EXIT_FAILURE);
     }
 
     // Start the bridge process
     #ifdef _WIN32
-        launchProcess("bridge.exe " + targetCommandAdaptor, hPipeInputWrite, hPipeOutputRead);
+        launchProcess("bmcbridge.exe " + targetCommandAdaptor, hPipeInputWrite, hPipeOutputRead);
     #else
-        launchProcess("bridge " + targetCommandAdaptor, pipeWrite, pipeRead);
+        launchProcess("bmcbridge " + targetCommandAdaptor, pipeWrite, pipeRead);
     #endif
 
     // Initialize the bridge reader class
@@ -292,7 +292,7 @@ void CommandManager::handleWriteBridgeThread() {
                 DWORD bytesWritten;
                 if (!WriteFile(hPipeInputWrite, jsonString.c_str(), jsonString.length(), &bytesWritten, NULL)) {
                     // handle error here
-                    std::cerr << "Error writing to bridge process stdin" << std::endl;
+                    std::cerr << "Error writing to bmcbridge process stdin" << std::endl;
                 }
                 FlushFileBuffers(hPipeInputWrite);
             }
@@ -331,7 +331,7 @@ void CommandManager::handleReadBridgeThread() {
         }
 
         if (!line.empty()) {
-            DEBUG_MSG("Command response read from bridge: " << line);
+            DEBUG_MSG("Command response read from bmcbridge: " << line);
 
             try {
                 nlohmann::json j = nlohmann::json::parse(line);
