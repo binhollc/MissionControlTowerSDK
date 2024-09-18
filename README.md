@@ -3,15 +3,15 @@ A C++ dynamic library for interacting with Binho host adapters
 
 ## Prerequisites
 
-BMC C++ SDK relies on the bridge service to be installed on your machine. Follow these steps to get everything set up:
+BMC C++ SDK relies on the bmcbridge service to be installed on your machine. Follow these steps to get everything set up:
 
 1. **Download and Install the Bridge Service:**
-   - Visit [binho customer support portal](https://support.binho.io/getting-started/c++-sdk/installation-and-setup) to download the bridge executable.
+   - Visit [binho customer support portal](https://support.binho.io/getting-started/c++-sdk/installation-and-setup) to download the bmcbridge executable.
    - Follow the installation instructions specific to your operating system.
 
 2. **Add the Bridge to Your PATH Environment Variable:**
    - **Windows:**
-     - The bridge is typically installed in `C:\Program Files (x86)\BinhoMissionControlBridge`.
+     - The bmcbridge is typically installed in `C:\Program Files (x86)\BinhoMissionControlBridge`.
      - Add this path to your system's PATH environment variable.
        - Press `Win + R`, type `sysdm.cpl`, and press Enter.
        - Go to the Advanced tab, and click on Environment Variables.
@@ -19,12 +19,12 @@ BMC C++ SDK relies on the bridge service to be installed on your machine. Follow
        - Click New and add `C:\Program Files (x86)\BinhoMissionControlBridge`.
      - To verify the installation, open Command Prompt and execute:
        ```cmd
-       bridge --version
+       bmcbridge --version
        ```
        - You should see an output similar to `0.13.0`.
 
    - **Mac/Linux:**
-     - Add the bridge executable path to your PATH environment variable by editing your shell profile file (e.g., `~/.bashrc`, `~/.zshrc`).
+     - Add the bmcbridge executable path to your PATH environment variable by editing your shell profile file (e.g., `~/.bashrc`, `~/.zshrc`).
        ```sh
        export PATH=$PATH:/path/to/BinhoMissionControlBridge
        ```
@@ -34,7 +34,7 @@ BMC C++ SDK relies on the bridge service to be installed on your machine. Follow
        ```
      - Verify the installation:
        ```sh
-       bridge --version
+       bmcbridge --version
        ```
        - You should see an output similar to `0.13.0`.
 
@@ -168,7 +168,7 @@ When distributing this tool, package the entire `staging` directory. Users can t
 
 ## Executing the Sample Apps
 
-The sample app uses the dynamic library, which executes the bridge. This means that BOTH the bridge executable AND the library must be reachable in the path. Before executing the app, you should add the directory that contains the bridge executable AND the directory that contains the library to the PATH environment variable.
+The sample app uses the dynamic library, which executes the bmcbridge. This means that BOTH the bmcbridge executable AND the library must be reachable in the path. Before executing the app, you should add the directory that contains the bmcbridge executable AND the directory that contains the library to the PATH environment variable.
 
 Alternatively, you can prepend the PATH variable to the command execution:
 
@@ -179,26 +179,26 @@ Alternatively, you can prepend the PATH variable to the command execution:
    On Mac:
 
    ```shell
-   DYLD_LIBRARY_PATH=/path/to/staging/lib PATH=$PATH:/path/to/bridge ./sample_app
+   DYLD_LIBRARY_PATH=/path/to/staging/lib PATH=$PATH:/path/to/bmcbridge ./sample_app
    ```
 
    On Linux:
 
    ```shell
-   LD_LIBRARY_PATH=/path/to/staging/lib PATH=$PATH:/path/to/bridge ./sample_app
+   LD_LIBRARY_PATH=/path/to/staging/lib PATH=$PATH:/path/to/bmcbridge ./sample_app
    ```
 
    On Windows (using Command Prompt):
 
    ```shell
-   set PATH=%PATH%;\path\to\bridge;\path\to\staging\bin
+   set PATH=%PATH%;\path\to\bmcbridge;\path\to\staging\bin
    sample_app.exe
    ```
 
    Or on Windows (using PowerShell):
 
    ```shell
-   $env:PATH += ";\path\to\bridge\;\path\to\staging\bin"
+   $env:PATH += ";\path\to\bmcbridge\;\path\to\staging\bin"
    .\sample_app.exe
    ```
 
@@ -275,4 +275,4 @@ Add `/path/to/staging/` to the PATH environment variable.
 
 Solution:
 
-Add `/path/to/bridge` to the PATH environment variable.
+Add `/path/to/bmcbridge` to the PATH environment variable.

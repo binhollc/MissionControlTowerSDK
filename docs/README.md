@@ -25,7 +25,7 @@ We provide a set of example applications to demonstrate how to use the library. 
 ### Prerequisites
 
 - A development environment compatible with C++17.
-- The Binho Bridge installed on your system.
+- The Binho Bridge (bmcbridge) installed on your system.
 - The Binho Mission Control SDK installed on your system.
 
 ### Example Use Cases
