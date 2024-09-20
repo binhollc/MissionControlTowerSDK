@@ -118,8 +118,51 @@ std::string trim(const std::string& str) {
         }
     }
 #else
-    void launchProcess(std::string command, FILE* &procStream) {
-        procStream = popen(command.c_str(), "r+");
+    void launchProcess(std::string command, int &pipeStdInWrite, int &pipeStdOutRead) {
+        int pipeIn[2];  // Pipe for stdin
+        int pipeOut[2]; // Pipe for stdout
+
+        if (pipe(pipeIn) == -1) {
+            std::cerr << "Pipe creation failed for stdin" << std::endl;
+            return;
+        }
+
+        if (pipe(pipeOut) == -1) {
+            std::cerr << "Pipe creation failed for stdout" << std::endl;
+            close(pipeIn[0]);
+            close(pipeIn[1]);
+            return;
+        }
+
+        pid_t pid = fork();
+        if (pid < 0) {
+            std::cerr << "Fork failed" << std::endl;
+            close(pipeIn[0]);
+            close(pipeIn[1]);
+            close(pipeOut[0]);
+            close(pipeOut[1]);
+            return;
+        }
+
+        if (pid == 0) { // Child process
+            // Redirect stdin
+            dup2(pipeIn[0], STDIN_FILENO);
+            close(pipeIn[1]); // Close unused write end
+
+            // Redirect stdout
+            dup2(pipeOut[1], STDOUT_FILENO);
+            close(pipeOut[0]); // Close unused read end
+
+            // Execute the command
+            execl("/bin/sh", "sh", "-c", command.c_str(), (char *)nullptr);
+            exit(1); // If exec fails, exit child process
+        } else { // Parent process
+            close(pipeIn[0]);  // Close unused read end of stdin
+            close(pipeOut[1]); // Close unused write end of stdout
+
+            pipeStdInWrite = pipeIn[1];  // Parent writes to stdin of the child
+            pipeStdOutRead = pipeOut[0]; // Parent reads from stdout of the child
+        }
     }
 #endif
 
@@ -130,9 +173,8 @@ void CommandManager::start() {
         launchProcess("bridge.exe --version", hPipeWrite, hPipeRead);
         bridgeReader = std::make_unique<BridgeReader>(hPipeRead);
     #else
-        FILE* checkVersionStream;
-        launchProcess("bridge --version", checkVersionStream);
-        bridgeReader = std::make_unique<BridgeReader>(checkVersionStream);
+        launchProcess("bridge --version", pipeWrite, pipeRead);
+        bridgeReader = std::make_unique<BridgeReader>(pipeRead);
     #endif
 
     std::string versionStr = trim(bridgeReader->readNextData(false)); // Non-blocking is set to false to prevent broken pipe error
@@ -144,9 +186,8 @@ void CommandManager::start() {
         CloseHandle(hPipeWrite);
         CloseHandle(hPipeRead);
     #else
-        if (checkVersionStream != nullptr) {
-            pclose(checkVersionStream);
-        }
+        close(pipeWrite);
+        close(pipeRead);
     #endif
 
     if (!checkVersionCompatibility(versionStr)) {
@@ -158,14 +199,14 @@ void CommandManager::start() {
     #ifdef _WIN32
         launchProcess("bridge.exe " + targetCommandAdaptor, hPipeInputWrite, hPipeOutputRead);
     #else
-        launchProcess("bridge " + targetCommandAdaptor, bridgeProcess);
+        launchProcess("bridge " + targetCommandAdaptor, pipeWrite, pipeRead);
     #endif
 
     // Initialize the bridge reader class
     #ifdef _WIN32
         bridgeReader = std::make_unique<BridgeReader>(hPipeOutputRead);
     #else
-        bridgeReader = std::make_unique<BridgeReader>(bridgeProcess);
+        bridgeReader = std::make_unique<BridgeReader>(pipeRead);
     #endif
 
     // Start the write bridge thread
@@ -215,8 +256,11 @@ void CommandManager::stop() {
             CloseHandle(hPipeInputWrite);
         }
     #else
-        if (bridgeProcess != nullptr) {
-            pclose(bridgeProcess);
+        if (pipeRead != -1) {
+            close(pipeRead);
+        }
+        if (pipeWrite != -1) {
+            close(pipeWrite);
         }
     #endif
 
@@ -253,9 +297,16 @@ void CommandManager::handleWriteBridgeThread() {
                 FlushFileBuffers(hPipeInputWrite);
             }
         #else
-            if (bridgeProcess != nullptr) {
-                fputs(jsonString.c_str(), bridgeProcess);
-                fflush(bridgeProcess); // make sure jsonString is written immediately
+            if (pipeWrite != -1) {
+                ssize_t bytesWritten = write(pipeWrite, jsonString.c_str(), jsonString.length());
+                if (bytesWritten == -1) {
+                    perror("write");
+                    // Handle error
+                } else if (bytesWritten != static_cast<ssize_t>(jsonString.length())) {
+                    std::cerr << "Warning: Not all data was written to pipe" << std::endl;
+                    // Handle partial write if necessary
+                }
+                fsync(pipeWrite); // Ensure data is written immediately
             }
         #endif
 
