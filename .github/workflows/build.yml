@@ -69,7 +69,7 @@ jobs:
     - name: Extract version number
       run: echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
 
-    - name: Build and stage the Bridge, library and examples
+    - name: Build and stage the bmcbridge, library and examples
       run: |
         ./build_and_stage.sh
 
@@ -129,7 +129,7 @@ jobs:
     - name: Get CMake
       uses: lukka/get-cmake@latest
 
-    - name: Build the Bridge, library and examples
+    - name: Build the bmcbridge, library and examples
       run: |
         dir
         .\build_and_stage.bat ${{ matrix.arch_cmake }}
@@ -216,7 +216,7 @@ jobs:
     - name: Get CMake
       uses: lukka/get-cmake@latest
 
-    - name: Build and stage the Bridge, library and examples
+    - name: Build and stage the bmcbridge, library and examples
       run: |
         ./build_and_stage.sh
 

@@ -21,9 +21,9 @@ print_colored_message() {
 PROJECT_DIR="$(pwd)"
 
 # Ensure that the bridge executable is accessible
-if ! command -v bridge &> /dev/null
+if ! command -v bmcbridge &> /dev/null
 then
-    print_colored_message "${WARNING}" "Bridge executable could not be found. Please check README.md"
+    print_colored_message "${WARNING}" "bmcbridge executable could not be found. Please check README.md"
 fi
 
 # Clean the staging directory
