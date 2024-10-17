@@ -14,9 +14,9 @@ if exist "%STAGING_DIR%" rmdir /S /Q "%STAGING_DIR%"
 mkdir "%STAGING_DIR%"
 
 :: Check for existence of bridge.exe in the PATH
-where bridge.exe >nul 2>nul
+where bmcbridge.exe >nul 2>nul
 if errorlevel 1 (
-    echo WARNING: Bridge executable could not be found. Please check README.md
+    echo WARNING: bmcbridge executable could not be found. Please check README.md
 )
 
 echo :: ---

@@ -33,7 +33,8 @@ private:
     #ifdef _WIN32
         HANDLE hPipeInputWrite, hPipeOutputRead;
     #else
-        FILE* bridgeProcess;
+        int pipeRead = -1;
+        int pipeWrite = -1;
     #endif
     std::queue<CommandRequest> requestQueue;
     std::queue<CommandResponse> responseQueue;
