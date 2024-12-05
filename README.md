@@ -72,9 +72,7 @@ These scripts are designed to handle all necessary steps, ensuring a seamless se
 
 #### Special note for Windows developers
 
-```
-Ensure that your application and all its dependent libraries are compiled for the same architecture, either all for 32-bit or all for 64-bit. Mixing 32-bit and 64-bit applications and libraries often leads to errors like the one you're seeing.
-```
+*Ensure that your application and all its dependent libraries are compiled for the same architecture, either all for 32-bit or all for 64-bit. Mixing 32-bit and 64-bit applications and libraries often leads to errors like the one you're seeing.*
 
 If you get an error code `0xc000007b` when executing your app, it is most likely because the DLL was compiled for a different architecture.
 
