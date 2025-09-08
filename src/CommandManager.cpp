@@ -18,7 +18,7 @@
 
 using json = nlohmann::json;
 
-#define ALLOWED_VERSIONS {"0.12", "0.13", "1.0", "1.1"}
+#define ALLOWED_VERSIONS {"1.3"}
 
 bool checkVersionCompatibility(std::string versionStr) {
     // Verify only MAJOR and MINOR
