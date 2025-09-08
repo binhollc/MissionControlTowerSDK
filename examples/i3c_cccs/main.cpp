@@ -32,27 +32,6 @@ private:
     unsigned long long currentID;
 };
 
-// Utility function to simplify command invocation
-void invokeI3CSendCCC(CommandDispatcher& dispatcher, 
-                                   const std::string& transactionId,
-                                   const std::string& ccc, 
-                                   const std::string& writeBuffer = "",
-                                   const std::string& pushPullClockFrequencyInMHz = "5",
-                                   const std::string& openDrainClockFrequencyInKHz = "1250", 
-                                   const std::string& address = "08") {
-    json params;
-    params["address"] = address;
-    params["openDrainClockFrequencyInKHz"] = openDrainClockFrequencyInKHz;
-    params["pushPullClockFrequencyInMHz"] = pushPullClockFrequencyInMHz;
-    params["cccName"] = ccc;
-    params["cccParams"]["cccDataBuffer"] = writeBuffer;
-    dispatcher.invokeCommandSync(transactionId, "i3c_ccc_send", params,
-    [](CommandResponse cr) {
-            printCommandResponse(cr, std::string("CCC"));
-        });
-}
-
-
 int main()
 {
   CommandDispatcher dispatcher("BinhoSupernova");
@@ -63,25 +42,36 @@ int main()
   // Open device
   dispatcher.invokeCommandSync(idGenerator.nextID(), "open", {}, handleCommandResponse("Supernova Opened"));
 
+  // Init controller
+  dispatcher.invokeCommandSync(idGenerator.nextID(), "i3c_controller_init", {{"pushPullClockFrequencyInMHz", 5}, {"pushPullDutyCycle", 50}, {"openDrainClockFrequencyInKHz", 400}, {"i2cOpenDrainClockFrequencyInkHz", 400}}, handleCommandResponse("I3C Controller Initialized"));
+
   // Set bus voltage
-  dispatcher.invokeCommandSync(idGenerator.nextID(), "i3c_init_bus", {{"busVoltageInV", "3.3"}}, handleCommandResponse("Bus Voltage Set"));
+  dispatcher.invokeCommandSync(idGenerator.nextID(), "i3c_set_bus_voltage", {{"busVoltageInV", 3.3}}, handleCommandResponse("Bus Voltage Set"));
+
+  // Init bus
+  dispatcher.invokeCommandSync(idGenerator.nextID(), "i3c_controller_init_bus", {}, handleCommandResponse("I3C Bus Initialized"));
 
   // Gets target Provisioned ID
-  invokeI3CSendCCC(dispatcher, idGenerator.nextID(), "GETPID");
+  dispatcher.invokeCommandSync(idGenerator.nextID(), "i3c_ccc_getpid", {{"address", 0x08}}, handleCommandResponse("GETPID"));
+  
   // Gets target Max read length
-  invokeI3CSendCCC(dispatcher, idGenerator.nextID(), "GETMRL");
+  dispatcher.invokeCommandSync(idGenerator.nextID(), "i3c_ccc_getmrl", {{"address", 0x08}}, handleCommandResponse("GETMRL"));
+  
   // Gets target Max write length
-  invokeI3CSendCCC(dispatcher, idGenerator.nextID(), "GETMWL");
-
+  dispatcher.invokeCommandSync(idGenerator.nextID(), "i3c_ccc_getmwl", {{"address", 0x08}}, handleCommandResponse("GETMWL"));
+  
   // Sets target Max read length to 3
-  invokeI3CSendCCC(dispatcher, idGenerator.nextID(), "DIRECTSETMRL", "03");
+  dispatcher.invokeCommandSync(idGenerator.nextID(), "i3c_ccc_direct_setmrl", {{"address", 0x08}, {"cccDataBuffer", 3}}, handleCommandResponse("DIRECT SETMRL => 3"));
+  
   // We check if it effectively changed
-  invokeI3CSendCCC(dispatcher, idGenerator.nextID(), "GETMRL");
+  dispatcher.invokeCommandSync(idGenerator.nextID(), "i3c_ccc_getmrl", {{"address", 0x08}}, handleCommandResponse("GETMRL"));
+  
   // Sets target Max write length to 2
-  invokeI3CSendCCC(dispatcher, idGenerator.nextID(), "BROADCASTSETMWL", "02");
-  // We check if it effectively changed
-  invokeI3CSendCCC(dispatcher, idGenerator.nextID(), "GETMWL");
+dispatcher.invokeCommandSync(idGenerator.nextID(), "i3c_ccc_broadcast_setmwl", {{"cccDataBuffer", 2}}, handleCommandResponse("BROADCAST SETMWL => 2"));
 
+  // We check if it effectively changed
+  dispatcher.invokeCommandSync(idGenerator.nextID(), "i3c_ccc_getmwl", {{"address", 0x08}}, handleCommandResponse("GETMWL"));
+  
   dispatcher.waitForAllCommands();
 
   dispatcher.invokeCommandSync(idGenerator.nextID(), "exit", {});
