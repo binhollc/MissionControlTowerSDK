@@ -14,14 +14,17 @@ int main() {
     dispatcher.start();
 
     // Open device
-    dispatcher.invokeCommandSync("0", "open", {}, process_response);
-    // dispatcher.invokeCommandSync("0", "open", {{"address", "SupernovaSimulatedPort"}}, process_response);
+    dispatcher.invokeCommandSync("1", "open", {}, process_response);
+    // dispatcher.invokeCommandSync("1", "open", {{"address", "SupernovaSimulatedPort"}}, process_response);
+
+    // Initialize I2C controller
+    dispatcher.invokeCommandSync("1", "i2c_controller_init", {
+        {"clockFrequencyInKHz", 400},
+        {"pullUpResistanceInOhm", "DISABLE"}
+    }, process_response);
 
     // Set bus voltage
-    dispatcher.invokeCommandSync("0", "i2c_spi_uart_set_bus_voltage", {{"busVoltageInV", "3.3"}}, process_response);
-
-    // Set I2C parameters
-    dispatcher.invokeCommandSync("0", "i2c_set_parameters", {{"clockFrequencyInKHz", "400"}}, process_response);
+    dispatcher.invokeCommandSync("1", "i2c_spi_uart_set_bus_voltage", {{"busVoltageInV", "3.3"}}, process_response);
 
     double total_round_trip_time = 0.0;
     for (int i = 0; i < 100; ++i) {
@@ -29,7 +32,7 @@ int main() {
 
         // Write to I2C address using subaddress
         dispatcher.invokeCommandSync("0", "i2c_write_using_subaddress", {
-            {"address", "50"},
+            {"address", 0x50},
             {"subaddress", "0000"},
             {"writeBuffer", "010203040506"}  // Example write buffer, replace as needed
         }, process_response);
@@ -42,6 +45,9 @@ int main() {
 
     double average_round_trip_time = total_round_trip_time / 100;
     std::cout << "Average round-trip time: " << average_round_trip_time << " ms\n";
+
+    // Close device
+    dispatcher.invokeCommandSync("1", "close", {});
 
     // Exit
     dispatcher.invokeCommandSync("0", "exit", {});
