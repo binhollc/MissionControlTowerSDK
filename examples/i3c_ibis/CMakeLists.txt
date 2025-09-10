@@ -16,6 +16,7 @@ set(TARGET_NAME i3c_ibis)
 # ---
 
 add_executable(${TARGET_NAME} ${SOURCES})
+set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME sample_app)
 
 # Include needed headers
 target_include_directories(${TARGET_NAME} PRIVATE
