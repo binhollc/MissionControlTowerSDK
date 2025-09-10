@@ -168,30 +168,49 @@ std::string trim(const std::string& str) {
 
 void CommandManager::start() {
     // Verify version compatibility
-    #ifdef _WIN32
-        HANDLE hPipeRead, hPipeWrite;
-        launchProcess("bmcbridge.exe --version", hPipeWrite, hPipeRead);
-        bridgeReader = std::make_unique<BridgeReader>(hPipeRead);
-    #else
-        launchProcess("bmcbridge --version", pipeWrite, pipeRead);
-        bridgeReader = std::make_unique<BridgeReader>(pipeRead);
-    #endif
 
-    std::string versionStr = trim(bridgeReader->readNextData(false)); // Non-blocking is set to false to prevent broken pipe error
+    std::string versionStr;
+    std::vector<std::string> allowedVersions = ALLOWED_VERSIONS;
+    try {
+        #ifdef _WIN32
+            HANDLE hPipeRead, hPipeWrite;
+            launchProcess("bmcbridge.exe --version", hPipeWrite, hPipeRead);
+            bridgeReader = std::make_unique<BridgeReader>(hPipeRead);
+        #else
+            launchProcess("bmcbridge --version", pipeWrite, pipeRead);
+            bridgeReader = std::make_unique<BridgeReader>(pipeRead);
+        #endif
 
-    DEBUG_MSG("Read version: " + versionStr);
+        versionStr = trim(bridgeReader->readNextData(false)); // Non-blocking is set to false to prevent broken pipe error
 
-    // Close the pipe after attempting to read
-    #ifdef _WIN32
-        CloseHandle(hPipeWrite);
-        CloseHandle(hPipeRead);
-    #else
-        close(pipeWrite);
-        close(pipeRead);
-    #endif
+        DEBUG_MSG("Read version: " + versionStr);
 
-    if (!checkVersionCompatibility(versionStr)) {
-        std::cerr << "Unsupported bmcbridge version: " << versionStr << std::endl;
+        // Close the pipe after attempting to read
+        #ifdef _WIN32
+            CloseHandle(hPipeWrite);
+            CloseHandle(hPipeRead);
+        #else
+            close(pipeWrite);
+            close(pipeRead);
+        #endif
+
+        if (versionStr == "__EOF__") {
+            std::cerr << "Error: No bridge staged. Please ensure the bridge is installed and available." << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
+
+        if (!checkVersionCompatibility(versionStr)) {
+            std::cerr << "Unsupported bridge version: " << versionStr << "." << std::endl;
+            std::cerr << "Compatible versions are: ";
+            for (size_t i = 0; i < allowedVersions.size(); ++i) {
+                std::cerr << allowedVersions[i];
+                if (i != allowedVersions.size() - 1) std::cerr << ", ";
+            }
+            std::cerr << "." << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error: An unexpected error occurred while checking the bridge version. Please try again or contact support if the issue persists." << std::endl;
         std::exit(EXIT_FAILURE);
     }
 
