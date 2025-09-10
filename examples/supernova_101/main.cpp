@@ -1,3 +1,14 @@
+// Example: Supernova 101 - Basic Device Information with BinhoSupernova
+//
+// This example demonstrates how to use the MissionControlTowerSDK to connect to a BinhoSupernova host adapter
+// and retrieve basic device information. It shows how to:
+//   - Open a connection to the device
+//   - Retrieve device info via USB strings (manufacturer, product name, serial number, etc.)
+//   - Print responses for each command
+//   - Cleanly close and exit the session
+//
+// The example uses the CommandDispatcher and is a starting point for more advanced Supernova usage.
+
 #include "CommandDispatcher.h"
 #include <iostream>
 

@@ -1,3 +1,15 @@
+// Example: I3C CCCs (Common Command Codes) usage with BinhoSupernova
+//
+// This example demonstrates how to use the MissionControlTowerSDK to send I3C Common Command Codes (CCCs)
+// to a target device using a BinhoSupernova host adapter. It shows how to:
+//   - Initialize the controller and bus
+//   - Set bus voltage
+//   - Query and set target device properties (GETPID, GETMRL, GETMWL, SETMRL, SETMWL)
+//   - Use both direct and broadcast CCCs
+//   - Wait for all commands to complete and cleanly exit
+//
+// The example uses the CommandDispatcher and prints responses for each command.
+
 #include "CommandDispatcher.h"
 #include <iostream>
 #include <chrono>

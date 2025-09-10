@@ -1,3 +1,14 @@
+// Example: Supernova I2C - Basic I2C Communication with BinhoSupernova
+//
+// This example demonstrates how to use the MissionControlTowerSDK to perform I2C communication
+// with a target device using a BinhoSupernova host adapter. It shows how to:
+//   - Open a connection to the device
+//   - Configure and use I2C read/write commands
+//   - Print responses for each command
+//   - Cleanly close and exit the session
+//
+// The example uses the CommandDispatcher and is a starting point for more advanced I2C usage.
+
 #include "CommandDispatcher.h"
 #include <iostream>
 

@@ -1,3 +1,16 @@
+// Example: I3C IBIS (In-Band Interrupts) with BMI323 and BinhoSupernova
+//
+// This example demonstrates how to use the MissionControlTowerSDK to configure and interact with a BMI323 sensor
+// over I3C using a BinhoSupernova host adapter. It shows how to:
+//   - Initialize the I3C controller and bus
+//   - Set bus voltage
+//   - Discover the target device by PID
+//   - Enable and handle I3C In-Band Interrupts (IBI)
+//   - Configure the BMI323 sensor registers
+//   - Cleanly disable IBI and shut down the session
+//
+// The example uses the CommandDispatcher and prints responses for each command.
+
 #include "CommandDispatcher.h"
 #include <iostream>
 #include <chrono>

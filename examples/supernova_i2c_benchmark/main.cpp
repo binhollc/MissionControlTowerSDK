@@ -1,3 +1,14 @@
+// Example: Supernova I2C Benchmark - Performance Testing with BinhoSupernova
+//
+// This example demonstrates how to use the MissionControlTowerSDK to benchmark I2C communication
+// performance with a BinhoSupernova host adapter. It shows how to:
+//   - Open a connection to the device
+//   - Perform repeated I2C write operations and measure round-trip time
+//   - Print timing and status information for each operation
+//   - Cleanly close and exit the session
+//
+// The example uses the CommandDispatcher pattern and is useful for evaluating I2C throughput and latency.
+
 #include "CommandDispatcher.h"
 #include <iostream>
 #include <chrono>

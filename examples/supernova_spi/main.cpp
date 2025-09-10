@@ -1,3 +1,14 @@
+// Example: Supernova SPI - Basic SPI Communication with BinhoSupernova
+//
+// This example demonstrates how to use the MissionControlTowerSDK to perform SPI communication
+// with a target device using a BinhoSupernova host adapter. It shows how to:
+//   - Open a connection to the device
+//   - Configure and use SPI read/write commands
+//   - Print responses for each command
+//   - Cleanly close and exit the session
+//
+// The example uses the CommandDispatcher and is a starting point for more advanced SPI usage.
+
 #include "CommandDispatcher.h"
 #include <iostream>
 #include <chrono>
