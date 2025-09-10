@@ -1,3 +1,4 @@
+#include <chrono>
 #include "sample_library.h"
 #include "CommandDispatcher.h"
 #include "CommandResponse.h"
@@ -7,7 +8,7 @@ std::string SampleLibrary::get_address() {
 
     dispatcher.start();
 
-    dispatcher.invokeCommandSync("0", "list", {
+    dispatcher.invokeCommandSync("1", "list", {
         {"serialFilter", {{1240, 60724}}},
         {"hidFilter", {{1240, 221}, {8137, 33532}}}
     }, [this](CommandResponse cr) {
@@ -23,7 +24,7 @@ std::string SampleLibrary::get_address() {
 
     dispatcher.waitForAllCommands();
 
-    dispatcher.invokeCommandSync("0", "exit", {});
+    dispatcher.invokeCommandSync("1", "exit", {});
 
     dispatcher.stop();
 
@@ -39,7 +40,7 @@ void SampleLibrary::load_values() {
 
     dispatcher.start();
 
-    dispatcher.invokeCommandSync("0", "open", {{"address", device_address}}, [this](CommandResponse cr) {
+    dispatcher.invokeCommandSync("1", "open", {{"address", device_address}}, [this](CommandResponse cr) {
       if (!cr.is_promise) {
         open_ok = true;
       }
@@ -49,26 +50,28 @@ void SampleLibrary::load_values() {
       throw std::runtime_error("Failed to open the target device");
     }
 
-    dispatcher.invokeCommandSync("0", "get_usb_string", {{"subCommand", "HW_VERSION"}}, [this](CommandResponse cr) {
+    dispatcher.invokeCommandSync("1", "get_usb_string", {{"subCommand", "HW_VERSION"}}, [this](CommandResponse cr) {
       if (!cr.is_promise) {
         hw_version = cr.data["data"];
       }
     });
 
-    dispatcher.invokeCommandSync("0", "get_usb_string", {{"subCommand", "FW_VERSION"}}, [this](CommandResponse cr) {
+    dispatcher.invokeCommandSync("1", "get_usb_string", {{"subCommand", "FW_VERSION"}}, [this](CommandResponse cr) {
       if (!cr.is_promise) {
         fw_version = cr.data["data"];
       }
     });
 
-    dispatcher.invokeCommandSync("0", "get_usb_string", {{"subCommand", "SERIAL_NUMBER"}}, [this](CommandResponse cr) {
+    dispatcher.invokeCommandSync("1", "get_usb_string", {{"subCommand", "SERIAL_NUMBER"}}, [this](CommandResponse cr) {
       if (!cr.is_promise) {
         serial_number = cr.data["data"];
       }
     });
 
+    dispatcher.invokeCommandSync("1", "close", {});
+
     dispatcher.waitForAllCommands();
-    dispatcher.invokeCommandSync("0", "exit", {});
+    dispatcher.invokeCommandSync("1", "exit", {});
     dispatcher.stop();
 }
 
