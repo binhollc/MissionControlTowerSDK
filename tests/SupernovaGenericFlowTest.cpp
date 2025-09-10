@@ -39,15 +39,13 @@ TEST_F(SupernovaGenericCommandFlowTest, OpenCloseExit_SimulatedPort_OperationsCo
 
     dispatcher.waitFor({"1"});
 
-    // TODO: Uncomment the code below when https://focusuy.atlassian.net/browse/BMC2-991 is solved:
+    dispatcher.invokeCommand("2", "close", {}, [&](CommandResponse cr) {
+      closeInvoked = true;
+    });
 
-    // dispatcher.invokeCommand("2", "close", {}, [&](CommandResponse cr) {
-    //   closeInvoked = true;
-    // });
+    std::this_thread::sleep_for(std::chrono::milliseconds(MIN_TOLERABLE_CMD_WAIT_MS));
 
-    // std::this_thread::sleep_for(std::chrono::milliseconds(MIN_TOLERABLE_CMD_WAIT_MS));
-
-    // EXPECT_TRUE(closeInvoked);
+    EXPECT_TRUE(closeInvoked);
 
     dispatcher.invokeCommand("1000", "exit", {}, [&](CommandResponse cr) {
       exitInvoked = true;
