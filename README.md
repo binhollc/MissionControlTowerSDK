@@ -91,43 +91,34 @@ For Windows users, we recommend downloading CMake's command line tool from the [
 
 1. Navigate to the root of your project (where the `CMakeLists.txt` file is).
 
-2. Create a new directory for the build files. You can call it `build` or anything you like.
 
-    ```bash
-    mkdir build
-    ```
+2. Create a new directory for the build files (e.g., `build`).
 
-3. Then navigate into this directory.
+  ```bash
+  mkdir build
+  ```
 
-    ```bash
-    cd build
-    ```
+3. Configure CMake from the project root using the `-S` (source) and `-B` (build) flags:
 
-4. Configure `cmake`.
+  For Debug builds:
+  ```bash
+  cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+  ```
+  For Release builds:
+  ```bash
+  cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+  ```
 
-   You can select the Release or Debug variant by setting the CMAKE_BUILD_TYPE parameter. For example, if you want to generate debug symbols and messages:
+  On Windows, specify the generator and platform as needed:
+  ```bash
+  cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -G "Visual Studio 17 2022" -A win32
+  ```
 
-   ```bash
-   cmake -DCMAKE_BUILD_TYPE=Debug ..
-   ```
+4. Build and install from the project root (no need to change directories):
 
-   Alternatively, if you want to optimize for speed and disable debug information:
-
-   ```bash
-   cmake -DCMAKE_BUILD_TYPE=Release ..
-   ```
-
-   On Windows it is recommended to select the generator (-G argument) and the platform (-A argument). The platform can be "win32" or "x64":
-
-   ```bash
-   cmake -DCMAKE_BUILD_TYPE=Debug .. -G "Visual Studio 17 2022" -A win32
-   ```
-
-5. Within the build folder, execute the following command:
-
-   ```shell
-   cmake --build . --config Release --target install
-   ```
+  ```bash
+  cmake --build build --config Release --target install
+  ```
 
 After the build process completes, all the generated files, including the shared library, examples and docs will be installed in the staging/ directory.
 
@@ -206,32 +197,29 @@ Alternatively, you can prepend the PATH variable to the command execution:
 
    The repository includes several examples under the `examples` folder. The instructions to build and execute the examples are analogous to the ones for the sample app.
 
+
 ## Automated Tests
 
-### Build
+### Build and Run Tests (All Platforms)
 
 Preconditions:
-   - The project is built and staged.
-   - PATH (and DYLD_LIBRARY_PATH in Mac) environment variables are correctly set.
+  - The project is built and staged.
+  - PATH (and DYLD_LIBRARY_PATH in Mac) environment variables are correctly set.
 
-On Windows 64 bits:
+**Windows 64-bit:**
 ```shell
-cd tests
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 17 2022" -A x64
-cmake --build build --config Release
-cd build
-ctest
+cmake -S tests -B tests/build -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 17 2022" -A x64
+cmake --build tests/build --config Release
+ctest --test-dir tests/build
 ```
 
-On Windows 32 bits: Change `-A x64` to `-A win32` in the second line above.
+**Windows 32-bit:** Change `-A x64` to `-A win32` in the first command above.
 
-On Mac/Linux:
+**Mac/Linux:**
 ```shell
-cd tests
-cmake -S . -B build
-cmake --build build
-cd build
-ctest
+cmake -S tests -B tests/build
+cmake --build tests/build
+ctest --test-dir tests/build
 ```
 
 ## Building MissionControlTowerSDK Installer (Windows)
