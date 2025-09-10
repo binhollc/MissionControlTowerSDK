@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(bmi323_i3c_example)
+project(i3c_ibis)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 # ---
 
 set(SOURCES main.cpp)
-set(TARGET_NAME bmi323_i3c_example)
+set(TARGET_NAME i3c_ibis)
 
 # ---
 # Target Definition and Properties
