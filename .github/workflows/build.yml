@@ -234,19 +234,14 @@ jobs:
         KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         BUNDLE_ID: "com.binho.bmc_cpp_sdk"
       run: |
-        ./sign_and_notarize.sh staging ${{ runner.temp }}
+        ./sign_and_notarize.sh staging ${{ runner.temp }} ${{ env.ARTIFACT_NAME }}.dmg
       shell: bash
-
-    - name: Zip staging folder
-      run: |
-        cd staging
-        zip -r ../${{ env.ARTIFACT_NAME }}.zip .
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.ARTIFACT_NAME }}
-        path: ${{ env.ARTIFACT_NAME }}.zip
+        path: ${{ runner.temp }}/${{ env.ARTIFACT_NAME }}.dmg
 
   publish-to-digital-ocean:
     runs-on: ${{ matrix.os }}
