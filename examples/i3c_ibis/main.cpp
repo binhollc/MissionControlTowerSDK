@@ -18,6 +18,7 @@
 #include <vector>
 #include <cstdint>
 #include <iomanip>
+#include <sstream>
 
 // BMI323 Register Definitions (translated from Python)
 const uint8_t BMI323_ACCEL_CONFIG_REG = 0x20;
