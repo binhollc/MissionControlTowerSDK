@@ -44,7 +44,13 @@ fi
 mkdir build
 
 cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
+
+# Added -DCMAKE_POLICY_VERSION_MINIMUM=3.5 to address CMake error:
+#   Compatibility with CMake < 3.5 has been removed from CMake.
+# This flag ensures compatibility with the minimum required policy version for dependencies (e.g., nlohmann_json),
+# as suggested by the error message when configuring the project.
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..
+
 cmake --build . --config Release --target install
 
 # Stage library, docs and examples
