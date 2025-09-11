@@ -176,15 +176,20 @@ jobs:
         arguments: /DOUTFILE=windows_installer\${{ env.ARTIFACT_NAME }}.exe
 
     - name: Windows Signing (installer)
-      uses: GabrielAcostaEngler/signtool-code-sign@main
+      uses: azure/trusted-signing-action@v0
       with:
-        certificate: '${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}'
-        cert-password: '${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}'
-        cert-sha1: '${{ secrets.WINDOWS_CERTIFICATE_SHA1 }}'
-        cert-description: 'Binho LLC'
-        folder: windows_installer/
-        recursive: false
-        timestamp-server: 'http://timestamp.digicert.com'
+        azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+        endpoint: https://eus.codesigning.azure.net/
+        trusted-signing-account-name: binho-sw
+        certificate-profile-name: binho-certificate
+        files-folder: windows_installer/
+        files-folder-filter: exe
+        files-folder-recurse: true
+        file-digest: SHA256
+        timestamp-rfc3161: http://timestamp.acs.microsoft.com
+        timestamp-digest: SHA256
 
     - name: Zip staging contents
       run: |
