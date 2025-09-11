@@ -160,6 +160,11 @@ jobs:
         exclude-azure-developer-cli-credential: true
         exclude-interactive-browser-credential: true
 
+    - name: Install NSIS
+      run: |
+        choco install nsis -y
+      shell: powershell
+
     - name: Create folder for Windows installer
       run: |
         mkdir windows_installer
