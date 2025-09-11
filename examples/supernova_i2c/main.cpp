@@ -13,6 +13,10 @@
 #include <iostream>
 
 void printCommandResponse(const CommandResponse& cr, const std::string& action) {
+    // Filter out bridge log messages (negative transaction_id)
+    if (!cr.transaction_id.empty() && cr.transaction_id[0] == '-') {
+        return;
+    }
     std::cout << "Action: " << action << "\n";
     std::cout << "Transaction ID: " << cr.transaction_id << "\n";
     std::cout << "Status: " << cr.status << "\n";

@@ -14,6 +14,11 @@
 #include <chrono>
 
 void process_response(const CommandResponse& cr) {
+    // Filter out bridge log messages (negative transaction_id)
+    if (!cr.transaction_id.empty() && cr.transaction_id[0] == '-') {
+        return;
+    }
+
     if (cr.status != "success") {
         std::cerr << "Error occurred.\n";
     }

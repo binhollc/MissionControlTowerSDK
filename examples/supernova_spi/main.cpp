@@ -16,14 +16,16 @@
 
 void printCommandResponse(const CommandResponse &cr, const std::string &action)
 {
-    if (!cr.is_promise){
-        std::cout << "Action: " << action << "\n";
-        std::cout << "Transaction ID: " << cr.transaction_id << "\n";
-        std::cout << "Status: " << cr.status << "\n";
-        std::cout << "Is Promise: " << (cr.is_promise ? "True" : "False") << "\n";
-        std::cout << "Data: " << cr.data.dump() << "\n";
-        std::cout << "----------------------------------\n";
-    }
+  // Filter out bridge log messages (negative transaction_id)
+  if (!cr.transaction_id.empty() && cr.transaction_id[0] == '-') {
+      return;
+  }
+  std::cout << "Action: " << action << "\n";
+  std::cout << "Transaction ID: " << cr.transaction_id << "\n";
+  std::cout << "Status: " << cr.status << "\n";
+  std::cout << "Is Promise: " << (cr.is_promise ? "True" : "False") << "\n";
+  std::cout << "Data: " << cr.data.dump() << "\n";
+  std::cout << "----------------------------------\n";
 }
 
 auto handleCommandResponse(const std::string &action)
