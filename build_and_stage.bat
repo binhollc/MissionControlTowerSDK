@@ -29,7 +29,11 @@ mkdir build
 
 cd build
 
-cmake -DCMAKE_BUILD_TYPE=Release .. -G "Visual Studio 17 2022" -A %PLATFORM% || (
+:: Added -DCMAKE_POLICY_VERSION_MINIMUM=3.5 to address CMake error:
+::   Compatibility with CMake < 3.5 has been removed from CMake.
+:: This flag ensures compatibility with the minimum required policy version for dependencies (e.g., nlohmann_json),
+:: as suggested by the error message when configuring the project.
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 .. -G "Visual Studio 17 2022" -A %PLATFORM% || (
     echo CMake configuration failed
     exit /b 1
 )

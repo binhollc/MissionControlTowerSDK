@@ -1,5 +1,7 @@
 #!/bin/bash
 
+PROJECT_NAME="binho_cpp_sdk"
+
 # Configuration
 APPLE_ID="$APPLE_ID"
 TEAM_ID="$TEAM_ID"
@@ -7,20 +9,23 @@ NOTARIZATION_PASSWORD="$NOTARIZATION_PASSWORD"
 BUILD_CERTIFICATE_BASE64="$BUILD_CERTIFICATE_BASE64"
 P12_PASSWORD="$P12_PASSWORD"
 KEYCHAIN_PASSWORD="$KEYCHAIN_PASSWORD"
-BUNDLE_ID="com.binhollc.bmc_cpp_sdk"
+BUNDLE_ID="com.binhollc.$PROJECT_NAME"
 
 # Validate input arguments
-if [ $# -ne 2 ]; then
-    echo "Usage: $0 <path-to-target> <temp-dir>"
+if [ $# -ne 3 ]; then
+    echo "Usage: $0 <path-to-target> <temp-dir> <output-dmg-name>"
     exit 1
 fi
 
 TARGET_PATH="$1"
 TEMP_DIR="$2"
+DMG_OUTPUT_NAME="$3"
 
 CERTIFICATE_PATH="$TEMP_DIR/build_certificate.p12"
 KEYCHAIN_PATH="$TEMP_DIR/app-signing.keychain-db"
-ZIP_OUTPUT_PATH="$TEMP_DIR/signed.zip"
+DIST_DIR="$TEMP_DIR/dist"
+WRAPPER_DIR="$DIST_DIR/$PROJECT_NAME"
+DMG_OUTPUT_PATH="$TEMP_DIR/$DMG_OUTPUT_NAME"
 
 # Create a temporary keychain
 create_keychain() {
@@ -55,36 +60,42 @@ sign_binaries() {
     done
 }
 
-# Function to zip the folder for notarization
-zip_folder() {
-    echo "Zipping folder $1 into $2"
-    (cd "$1" && zip -r "$2" .)
+# Wrap contents under distribution folder
+prepare_wrapper_folder() {
+    echo "Creating wrapper folder ${WRAPPER_DIR}"
+    mkdir -p "$WRAPPER_DIR"
+    cp -R "$TARGET_PATH"/* "$WRAPPER_DIR/"
 }
 
-# Function to notarize the app
+# Create DMG from the wrapper
+create_dmg() {
+    echo "Creating DMG from $DIST_DIR into $DMG_OUTPUT_PATH"
+    hdiutil create -volname "Binho SDK Tools" -srcfolder "$DIST_DIR" -ov -format UDZO "$DMG_OUTPUT_PATH"
+}
+
+# Notarize the DMG
 notarize_app() {
     echo "Notarizing $1"
     xcrun notarytool submit "$1" --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$NOTARIZATION_PASSWORD" --wait
 }
 
 # Staple the notarization ticket
-staple_binaries() {
+staple_dmg() {
     echo "Stapling $1"
-    find "$1" -type f \( -name "*.dylib" -o -name "*.so" -o -perm +111 \) -print0 | while IFS= read -r -d $'\0' file; do
-        echo "Stapling $file"
-        xcrun stapler staple "$file"
-    done
+    xcrun stapler staple "$1"
 }
 
 # Main script execution
 create_keychain
 sign_binaries "$TARGET_PATH"
-zip_folder "$TARGET_PATH" "$ZIP_OUTPUT_PATH"
-notarize_app "$ZIP_OUTPUT_PATH"
-staple_binaries "$TARGET_PATH"
+prepare_wrapper_folder
+create_dmg
+notarize_app "$DMG_OUTPUT_PATH"
+staple_dmg "$DMG_OUTPUT_PATH"
 
 # Clean up
 echo "Cleaning up keychain"
 security delete-keychain "$KEYCHAIN_PATH"
 
-echo "Signing and notarization process completed."
+echo "Signing and notarization process completed. DMG ready at:"
+echo "$DMG_OUTPUT_PATH"
