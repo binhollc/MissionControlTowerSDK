@@ -134,16 +134,31 @@ jobs:
         dir
         .\build_and_stage.bat ${{ matrix.arch_cmake }}
 
-    - name: Windows Signing (staging)
-      uses: GabrielAcostaEngler/signtool-code-sign@main
+    - name: Windows Signing - build
+      uses: azure/trusted-signing-action@v0
       with:
-        certificate: '${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}'
-        cert-password: '${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}'
-        cert-sha1: '${{ secrets.WINDOWS_CERTIFICATE_SHA1 }}'
-        cert-description: 'Binho LLC'
-        folder: staging/
-        recursive: false
-        timestamp-server: 'http://timestamp.digicert.com'
+        azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+        endpoint: https://eus.codesigning.azure.net/
+        trusted-signing-account-name: binho-sw
+        certificate-profile-name: binho-certificate
+        files-folder: staging/
+        files-folder-filter: exe,dll
+        files-folder-recurse: true
+        file-digest: SHA256
+        timestamp-rfc3161: http://timestamp.acs.microsoft.com
+        timestamp-digest: SHA256
+        exclude-environment-credential: false
+        exclude-azure-cli-credential: false
+        exclude-workload-identity-credential: true
+        exclude-managed-identity-credential: true
+        exclude-shared-token-cache-credential: true
+        exclude-visual-studio-credential: true
+        exclude-visual-studio-code-credential: true
+        exclude-azure-powershell-credential: true
+        exclude-azure-developer-cli-credential: true
+        exclude-interactive-browser-credential: true
 
     - name: Create folder for Windows installer
       run: |
