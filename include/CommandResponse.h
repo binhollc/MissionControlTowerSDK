@@ -24,17 +24,33 @@ BMC_SDK inline void to_json(json& j, const CommandResponse& p) {
 }
 
 BMC_SDK inline void from_json(const json& j, CommandResponse& p) {
-    if (j.at("transaction_id").is_string()) {
-        j.at("transaction_id").get_to(p.transaction_id);
-    } else if (j.at("transaction_id").is_number()) {
-        p.transaction_id = std::to_string(j.at("transaction_id").get<int64_t>());
-    } else {
-        throw std::runtime_error("transaction_id is neither a string nor a number");
-    }
+    try {
+        if (j.at("transaction_id").is_string()) {
+            j.at("transaction_id").get_to(p.transaction_id);
+        } else if (j.at("transaction_id").is_number()) {
+            p.transaction_id = std::to_string(j.at("transaction_id").get<int64_t>());
+        } else {
+            throw std::runtime_error("transaction_id is neither a string nor a number");
+        }
 
-    j.at("status").get_to(p.status);
-    j.at("is_promise").get_to(p.is_promise);
-    j.at("data").get_to(p.data);
+        j.at("status").get_to(p.status);
+        // Command responses from bmcbridge 1.3.0 with status=="log" doesn't have is_promise or data fields
+        if (j.contains("is_promise")) {
+            j.at("is_promise").get_to(p.is_promise);
+        } else {
+            p.is_promise = false; // Default to false
+        }
+        if (j.contains("data")) {
+            j.at("data").get_to(p.data);
+        } else {
+            p.data = json::object(); // Default to empty object
+        }
+    } catch (const json::parse_error& e) {
+        p.transaction_id = "0";
+        p.status = "error";
+        p.is_promise = false;
+        p.data = {{"message", std::string("JSON parse error: ") + e.what()}};
+    }
 }
 
 

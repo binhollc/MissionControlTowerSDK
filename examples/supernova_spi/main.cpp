@@ -1,3 +1,14 @@
+// Example: Supernova SPI - Basic SPI Communication with BinhoSupernova
+//
+// This example demonstrates how to use the MissionControlTowerSDK to perform SPI communication
+// with a target device using a BinhoSupernova host adapter. It shows how to:
+//   - Open a connection to the device
+//   - Configure and use SPI read/write commands
+//   - Print responses for each command
+//   - Cleanly close and exit the session
+//
+// The example uses the CommandDispatcher and is a starting point for more advanced SPI usage.
+
 #include "CommandDispatcher.h"
 #include <iostream>
 #include <chrono>
@@ -5,14 +16,16 @@
 
 void printCommandResponse(const CommandResponse &cr, const std::string &action)
 {
-    if (!cr.is_promise){
-        std::cout << "Action: " << action << "\n";
-        std::cout << "Transaction ID: " << cr.transaction_id << "\n";
-        std::cout << "Status: " << cr.status << "\n";
-        std::cout << "Is Promise: " << (cr.is_promise ? "True" : "False") << "\n";
-        std::cout << "Data: " << cr.data.dump() << "\n";
-        std::cout << "----------------------------------\n";
-    }
+  // Filter out bridge log messages (negative transaction_id)
+  if (!cr.transaction_id.empty() && cr.transaction_id[0] == '-') {
+      return;
+  }
+  std::cout << "Action: " << action << "\n";
+  std::cout << "Transaction ID: " << cr.transaction_id << "\n";
+  std::cout << "Status: " << cr.status << "\n";
+  std::cout << "Is Promise: " << (cr.is_promise ? "True" : "False") << "\n";
+  std::cout << "Data: " << cr.data.dump() << "\n";
+  std::cout << "----------------------------------\n";
 }
 
 auto handleCommandResponse(const std::string &action)

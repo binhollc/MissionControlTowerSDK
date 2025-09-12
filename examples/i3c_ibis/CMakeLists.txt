@@ -1,5 +1,8 @@
-cmake_minimum_required(VERSION 3.5)
-project(I3cIbis)
+cmake_minimum_required(VERSION 3.16)
+
+project(i3c_ibis)
+
+set(CMAKE_CXX_STANDARD 17)
 
 # ---
 # Source Files Declaration
@@ -9,37 +12,39 @@ set(SOURCES main.cpp)
 set(TARGET_NAME i3c_ibis)
 
 # ---
-# Target Definition, Properties and Commands
+# Target Definition and Properties
 # ---
 
 add_executable(${TARGET_NAME} ${SOURCES})
 set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME sample_app)
 
 # Include needed headers
-target_include_directories(${TARGET_NAME} PRIVATE 
-    ${CMAKE_SOURCE_DIR}/include
-    .
+target_include_directories(${TARGET_NAME} PRIVATE
+  ${CMAKE_SOURCE_DIR}/include
+  .
 )
 
+# ---
+# External Dependencies and Libraries
+# ---
+
 # Link against needed libraries from the parent project
-target_link_libraries(${TARGET_NAME} bmc_sdk nlohmann_json::nlohmann_json)
+target_link_libraries(${TARGET_NAME}
+  bmc_sdk
+  nlohmann_json::nlohmann_json
+)
 
 # ---
-# Installation instructions
+# Installation Configuration
 # ---
 
-# Install the executable
-install(TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${STAGING_DIR}/examples/${TARGET_NAME})
+install(TARGETS ${TARGET_NAME}
+  RUNTIME DESTINATION staging/examples/${PROJECT_NAME}
+)
 
-# Install the source files
-install(FILES ${SOURCES} DESTINATION ${STAGING_DIR}/examples/${TARGET_NAME})
-
-# ---
-# Post-installation steps to set RPATH only on macOS
-# ---
-
+# For macOS, set RPATH for the installed executable
 if(APPLE)
-    install(CODE "
-      execute_process(COMMAND install_name_tool -add_rpath @loader_path/../../lib ${STAGING_DIR}/examples/${TARGET_NAME}/sample_app)
-    ")
+  set_target_properties(${TARGET_NAME} PROPERTIES
+    INSTALL_RPATH "@loader_path/../../lib"
+  )
 endif()

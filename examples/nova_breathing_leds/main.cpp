@@ -1,7 +1,21 @@
+// Example: Nova Breathing LEDs with BinhoNova
+//
+// This example demonstrates how to use the MissionControlTowerSDK to control the PWM output of a BinhoNova host adapter
+// to create a "breathing" LED effect. It shows how to:
+//   - Open a connection to a simulated Nova port
+//   - Use the GPIO PWM command to vary the duty cycle in a forward and backward loop
+//   - Wait for all commands to complete and cleanly exit
+//
+// The example uses the CommandDispatcher and prints responses for each command.
+
 #include "CommandDispatcher.h"
 #include <iostream>
 
 void printCommandResponse(const CommandResponse& cr, const std::string& action) {
+    // Filter out bridge log messages (negative transaction_id)
+    if (!cr.transaction_id.empty() && cr.transaction_id[0] == '-') {
+        return;
+    }
     std::cout << "Action: " << action << "\n";
     std::cout << "Transaction ID: " << cr.transaction_id << "\n";
     std::cout << "Status: " << cr.status << "\n";

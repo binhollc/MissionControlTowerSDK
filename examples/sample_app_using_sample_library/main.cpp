@@ -1,3 +1,13 @@
+// Example: Using a Custom Device API Library with MissionControlTowerSDK
+//
+// This example demonstrates how to use a custom C++ library (SampleLibrary) that wraps MissionControlTowerSDK
+// device discovery and information retrieval for Binho host adapters. It shows how to:
+//   - Use a library to abstract device address discovery
+//   - Load device values (firmware version, hardware version, serial number)
+//   - Handle errors and write results to a file
+//
+// The example is cross-platform and demonstrates robust error handling for integration scenarios.
+
 #include "sample_library.h"
 #include <iostream>
 #include <fstream>
